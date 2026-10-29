@@ -56,35 +56,20 @@
   // === 1) Promise.then 콜백 후킹 ===
   // 플레이어 응답을 처리하는 콜백(.next( 또는 jspbResponseCtor)만 골라 값을 정리한다.
   // 모든 then 콜백을 건드리면 유튜브 전체가 느려지므로 대상만 선별한다.
-  const hookableCache = new WeakMap();
-  function isHookable(fn) {
-    if (hookableCache.has(fn)) return hookableCache.get(fn);
-    let ok = false;
-    try {
-      const src = Function.prototype.toString.call(fn);
-      ok = src.indexOf(".next(") !== -1 || src.indexOf("jspbResponseCtor") !== -1;
-    } catch (e) {
-      ok = false;
-    }
-    hookableCache.set(fn, ok);
-    return ok;
-  }
-
   const nativeThen = Promise.prototype.then;
-  Promise.prototype.then = new Proxy(nativeThen, {
-    apply(target, thisArg, args) {
-      if (enabled) {
-        for (let i = 0; i < args.length; i++) {
-          const fn = args[i];
-          if (typeof fn !== "function" || !isHookable(fn)) continue;
-          args[i] = function (value) {
-            return fn.call(this, clean(value));
-          };
-        }
+  Promise.prototype.then = function (onFulfilled, onRejected) {
+    // 빠른 패스: 함수가 아니면 바로 통과
+    if (typeof onFulfilled === "function" && enabled) {
+      const src = Function.prototype.toString.call(onFulfilled);
+      const isAdCallback = src.indexOf(".next(") !== -1 || src.indexOf("jsonpResponseCtor") !== -1;
+      if (isAdCallback) {
+        onFulfilled = function (value) {
+          return onFulfilled.call(this, clean(value));
+        };
       }
-      return Reflect.apply(target, thisArg, args);
     }
-  });
+    return nativeThen.call(this, onFulfilled, onRejected);
+  };
 
   // === 2) JSON.parse 후킹 ===
   const nativeParse = JSON.parse;

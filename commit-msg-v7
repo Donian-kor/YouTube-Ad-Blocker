@@ -1,0 +1,2 @@
+feat: youtube-main faster hook - remove WeakMap/cache overhead, direct string check
+fix: Promise.then overhead reduced, no 1-3s spinner delay
