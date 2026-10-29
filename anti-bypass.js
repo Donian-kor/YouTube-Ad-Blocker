@@ -144,7 +144,9 @@
   (function () {
     var selectorsToHide = [
       ".anti-adblock", "#anti-adblock", ".adblock-warning",
-      ".adblock-detected", "#adblock-detected", ".disable-adblock"
+      ".adblock-detected", "#adblock-detected", ".disable-adblock",
+      ".ddnad-wrapper", "ins.adsbygoogle", "[class*='adsbygoogle']",
+      "iframe[src*='googlesyndication']", "iframe[src*='doubleclick']"
     ];
     var observer = new MutationObserver(function () {
       selectorsToHide.forEach(function (sel) {
@@ -159,5 +161,31 @@
     try {
       observer.observe(document.documentElement || document.body, { childList: true, subtree: true });
     } catch (e) {}
+  })();
+
+  // ============================================================
+  // 8. dogdrip.net 전용 지속 차단 규칙 (CSS 강제 적용)
+  // ============================================================
+  (function () {
+    var css = 
+      '.ddnad-wrapper, .ddnad-wrapper * { display:none !important; visibility:hidden !important; height:0 !important; overflow:hidden !important; } ' +
+      'ins.adsbygoogle, ins.adsbygoogle * { display:none !important; visibility:hidden !important; height:0 !important; overflow:hidden !important; } ' +
+      'iframe[src*="googlesyndication"], iframe[src*="doubleclick"], iframe[src*="googleads"] { display:none !important; visibility:hidden !important; } ';
+    try {
+      var style = document.createElement('style');
+      style.type = 'text/css';
+      style.textContent = css;
+      (document.head || document.documentElement).appendChild(style);
+    } catch (e) {}
+
+    // 지속적으로 새로 추가되는 광고 요소를 300ms마다 다시 숨김
+    setInterval(function () {
+      try {
+        document.querySelectorAll('.ddnad-wrapper, ins.adsbygoogle, iframe[src*="googlesyndication"]').forEach(function (el) {
+          el.style.display = 'none';
+          el.style.visibility = 'hidden';
+        });
+      } catch (e) {}
+    }, 300);
   })();
 })();
