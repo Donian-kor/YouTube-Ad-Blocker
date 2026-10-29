@@ -178,14 +178,7 @@
       (document.head || document.documentElement).appendChild(style);
     } catch (e) {}
 
-    // 지속적으로 새로 추가되는 광고 요소를 300ms마다 다시 숨김
-    setInterval(function () {
-      try {
-        document.querySelectorAll('.ddnad-wrapper, ins.adsbygoogle, iframe[src*="googlesyndication"]').forEach(function (el) {
-          el.style.display = 'none';
-          el.style.visibility = 'hidden';
-        });
-      } catch (e) {}
-    }, 300);
+    // MutationObserver만 사용하여 새로 추가되는 요소 숨김 (CPU/네트워크 부담 최소)
+    // setInterval 제거 — 지속 감시는 observer가 담당
   })();
 })();
