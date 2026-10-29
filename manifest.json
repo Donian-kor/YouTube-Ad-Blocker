@@ -1,0 +1,70 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Ad Blocker",
+  "version": "1.0",
+  "description": "PC 크롬에서 유튜브 광고를 차단하고 통계를 확인합니다.",
+  "permissions": [
+    "declarativeNetRequest",
+    "declarativeNetRequestFeedback",
+    "activeTab",
+    "contextMenus",
+    "scripting",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "*://*.youtube.com/*",
+    "*://*.google.com/*",
+    "*://*.googlesyndication.com/*",
+    "*://*.doubleclick.net/*",
+    "*://*.adsense.googlesyndication.com/*",
+    "*://*.googleadservices.com/*",
+    "*://*.google-analytics.com/*",
+    "*://*.googletagmanager.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "declarative_net_request": {
+    "rule_resources": [
+      { "id": "general_1", "enabled": true, "path": "filters/ruleset_1.json" },
+      { "id": "general_2", "enabled": true, "path": "filters/ruleset_2.json" },
+      { "id": "general_3", "enabled": true, "path": "filters/ruleset_3.json" },
+      { "id": "general_4", "enabled": true, "path": "filters/ruleset_4.json" },
+      { "id": "general_5", "enabled": true, "path": "filters/ruleset_5.json" }
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.youtube.com/*"],
+      "js": ["youtube-main.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": ["*://*.youtube.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["element-blocker.js"],
+      "run_at": "document_idle",
+      "all_frames": true,
+      "match_about_blank": true
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "YouTube Ad Blocker",
+    "default_icon": {
+      "48": "icon48.png"
+    }
+  },
+  "options_page": "options.html",
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}

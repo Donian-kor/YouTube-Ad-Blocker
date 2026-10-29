@@ -1,0 +1,15 @@
+# Chrome이 압축 해제된 확장을 로드할 때 자동 생성하는 캐시
+_metadata/
+
+# 필터 원본 다운로드 임시 폴더 (tools/build-filters.js 로 다시 받을 수 있음)
+tools/tmp/
+
+# 패키징 결과물
+*.zip
+*.crx
+*.pem
+
+# OS / 편집기 부산물
+node_modules/
+Thumbs.db
+.DS_Store
