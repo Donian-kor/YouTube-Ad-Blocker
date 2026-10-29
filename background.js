@@ -221,9 +221,11 @@ function applyStaticRulesets(enabled) {
 
 function applyRules(enabled) {
   applyStaticRulesets(enabled);
+  // YouTube Studio 허용 규칙은 항상 적용 (광고 차단 대상이 아님)
+  const studioAllowRule = { id: 100, priority: 100, action: { type: "allow" }, condition: { domainType: "firstParty", domains: ["studio.youtube.com"] } };
   chrome.declarativeNetRequest.updateDynamicRules(
     {
-      addRules: enabled ? adBlockRules : [],
+      addRules: enabled ? [studioAllowRule, ...adBlockRules] : [studioAllowRule],
       removeRuleIds: ALL_RULE_IDS
     },
     () => {

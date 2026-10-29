@@ -2,6 +2,8 @@
 // 전체 사이트(http/https) document_start에서 가장 먼저 실행
 (function () {
   "use strict";
+  // 유튜브 스튜디오는 광고 차단 대상이 아니므로 건너뜀
+  if (typeof location !== "undefined" && location.hostname === "studio.youtube.com") return;
 
   // ============================================================
   // 1. AakScript 기반 fakeFuckAdBlock 인스턴스 생성

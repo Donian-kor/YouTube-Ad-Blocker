@@ -3,6 +3,8 @@
 // (content script는 격리된 세계라 페이지의 Promise/JSON.parse에 접근할 수 없음)
 (function () {
   "use strict";
+  // 유튜브 스튜디오는 광고 차단 대상이 아니므로 건너뜀
+  if (typeof location !== "undefined" && location.hostname === "studio.youtube.com") return;
   if (window.__yabInstalled) return;
   window.__yabInstalled = true;
 

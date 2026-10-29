@@ -2,6 +2,8 @@
 // 모든 사이트(iframe 포함)에 주입된다.
 (function () {
   "use strict";
+  // YouTube Studio는 광고 차단 대상이 아니므로 전부 건너뜀
+  if (typeof location !== "undefined" && location.hostname === "studio.youtube.com") return;
 
   const STORAGE_KEY = "blockedSelectors";
   const MAX_PER_SITE = 200;

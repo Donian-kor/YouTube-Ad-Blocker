@@ -3,6 +3,8 @@
 
 (function () {
   "use strict";
+  // 유튜브 스튜디오는 광고 차단 대상이 아니므로 건너뜀
+  if (typeof location !== "undefined" && location.hostname === "studio.youtube.com") return;
 
   // === 활성화 상태 관리 ===
   let enabled = true;
