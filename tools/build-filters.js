@@ -18,6 +18,7 @@ const LISTS = [
 const KOREAN_LISTS = [
   ["noridev", "https://raw.githubusercontent.com/noridev/NoriDev-AdBlock-Filter/master/filter/filter.txt"],
   ["turtlecute", "https://adblock.turtlecute.org/d3host.adblock"],
+  ["d3host", "https://raw.githubusercontent.com/d3ward/toolz/master/src/d3host.txt"],
 ];
 const KOREAN_ONLY = process.argv.includes("--korean");
 const ACTIVE_LISTS = KOREAN_ONLY ? KOREAN_LISTS : LISTS;
@@ -78,6 +79,17 @@ function sanitizeDomain(d) {
 
 function convertLine(rawLine) {
   let line = rawLine;
+  // hosts 형식 ("0.0.0.0 example.com" / "127.0.0.1 example.com") → ||example.com^
+  const hostsMatch = line.match(/^(?:0\.0\.0\.0|127\.0\.0\.1|::1)\s+([a-zA-Z0-9.-]+)\s*$/);
+  if (hostsMatch) {
+    const domain = hostsMatch[1].toLowerCase();
+    if (!domain || domain.indexOf(".") === -1) return null;
+    return {
+      priority: 1,
+      action: { type: "block" },
+      condition: { urlFilter: "||" + domain + "^" }
+    };
+  }
   // HTML 필터링($$)과 요소 숨김 잔여물은 DNR urlFilter로 표현할 수 없으므로 제외
   if (line.includes("$$")) return null;
   if (/^[\w-]+$/.test(line.trim())) return null;

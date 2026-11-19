@@ -57,7 +57,7 @@ _metadata/             Chrome DNR 인덱스 캐시 (배포 ZIP에는 미포함)
 
 ```
 node tools/build-filters.js          # EasyList + EasyPrivacy → ruleset_1~5.json
-node tools/build-filters.js --korean # NoriDev + Turtlecute → ruleset_korean.json
+node tools/build-filters.js --korean # NoriDev + Turtlecute + d3Host → ruleset_korean.json
 ```
 
 검사 및 테스트:
@@ -84,6 +84,7 @@ node tools/test-element-blocker.js
 - **v1.7**: dogdrip.net의 서버 측 광고 차단 감지("광고 허용" 리다이렉트)를 우회했습니다. dogdrip에서만 감지용 분석 스크립트(gtag, coupang, optad, veta.naver 등) 허용 규칙을 적용하고, 광고는 `display:none` 대신 화면 밖 이동 방식으로 숨겨 서버가 정상 이용자로 판단하도록 했습니다.
 - **v1.8**: d3ward.com 광고 차단 테스트의 미차단 6건을 보완했습니다. 누락 도메인, 광고 스크립트, 코스메틱 테스트 대상(`#cts_test`, `#ad_ctd`)을 차단합니다.
 - **v1.9**: d3ward 잔여 3건 수정 — 잘못된 `ads.js` 경로(`/js/widget/ads.js`)로 변경하고, 정적 allow 규칙에 밀리던 도메인 차단 규칙의 우선순위를 11로 올렸습니다.
+- **d3Host 통합**: d3ward 공식 호스트 리스트(131개 도메인)를 보조 규칙셋에 추가했습니다 (hosts 형식 `0.0.0.0` → DNR `||domain^` 변환 지원).
 
 ## 참고 자료
 
@@ -94,6 +95,7 @@ node tools/test-element-blocker.js
 - [List-KR](https://github.com/List-KR/List-KR), [filterslists-ko](https://github.com/FilteringDev/filterslists-ko) — 한국 사이트 필터 구조 참고
 - [AdAway](https://github.com/AdAway/AdAway) — 호스트 기반 차단 도메인 참고
 - [Turtlecute Host List](https://adblock.turtlecute.org/d3host.adblock) — 간단 호스트 차단 목록 (보조 규칙셋에 포함)
+- [d3ward d3Host List](https://raw.githubusercontent.com/d3ward/toolz/master/src/d3host.txt) — d3ward 테스트 전체 도메인 목록 (보조 규칙셋에 포함)
 - [hagezi/dns-blocklists](https://github.com/hagezi/dns-blocklists) — DNS 차단 목록 구조 참고 (규모가 커서 현재 미포함)
 - [tryblock.org](https://tryblock.org/ko) — 인라인 DOM 광고 차단 테스트 (기본/중급/고급 3단계 검증)
 
