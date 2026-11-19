@@ -34,7 +34,9 @@
     ".ad-wrapper", ".ad-unit", ".ad-overlay", ".ad-modal", ".ad-popup",
     ".sponsor", ".promoted", "[data-ad]", "[data-ad-slot]",
     "[aria-label='advertisement']", "ins.adsbygoogle",
-    "iframe[src*='googlesyndication']", "iframe[src*='doubleclick']"
+    "iframe[src*='googlesyndication']", "iframe[src*='doubleclick']",
+    // dogdrip.net 전용 광고 슬롯 (고유 마커 enjgioijew + 좌측 배너 클래스)
+    "iframe[enjgioijew]", ".clayerbox-left-ad", ".clayerbox-right-ad"
   ].join(",");
 
   const STYLE_ID = "yab-general-hide-style";

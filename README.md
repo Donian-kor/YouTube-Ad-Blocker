@@ -3,7 +3,7 @@
 크롬(Chrome)에서 유튜브 영상 광고와 일반 사이트 광고를 차단하는 확장 프로그램입니다.
 Manifest V3 기반이며, 개발자 모드에서 폴더 또는 ZIP을 불러와 사용합니다.
 
-**현재 버전: 1.5**
+**현재 버전: 1.6**
 
 ## 주요 기능
 
@@ -20,7 +20,7 @@ Manifest V3 기반이며, 개발자 모드에서 폴더 또는 ZIP을 불러와 
 
 ### ZIP 배포판으로 설치 (권장)
 
-1. GitHub Release 페이지에서 `youtube-ad-blocker-v1.5.zip` 을 내려받습니다.
+1. GitHub Release 페이지에서 `youtube-ad-blocker-v1.6.zip` 을 내려받습니다.
 2. ZIP의 압축을 풀어 폴더를 만듭니다. (`manifest.json`이 들어있는 폴더)
 3. 크롬 주소창에 `chrome://extensions/` 를 입력합니다.
 4. 오른쪽 위 **개발자 모드**를 켭니다.
@@ -80,6 +80,7 @@ node tools/test-element-blocker.js
 - **v1.3**: 네트워크 차단으로 잡히지 않는 페이지 내부 광고(배너·사이드바·스폰서·인라인·동적·오버레이·가짜 다운로드·안티애드블록 경고)를 `general-blocker.js`로 숨기고 제거하도록 했습니다. tryblock.org 3단계 테스트에서 확인했습니다.
 - **v1.4**: 고급 테스트의 악성 리디렉션 체인(`.redirect-test`, `.redirect-preview`, `.redirect-icon`) 선택자를 추가해 3단계 전체 광고를 차단합니다.
 - **v1.5**: tryblock.org 광고 차단 우회 챌린지의 감지 결과 메시지(`.test-area .text-center`)를 숨겨, 차단기 활성 상태에서도 감지 화면이 뜨지 않도록 했습니다.
+- **v1.6**: dogdrip.net의 광고 iframe(고유 마커 `enjgioijew`)과 좌/우 배너(`.clayerbox-*-ad`)를 차단했습니다.
 
 ## 참고 자료
 
