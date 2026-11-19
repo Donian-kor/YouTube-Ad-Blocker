@@ -36,7 +36,9 @@
     "[aria-label='advertisement']", "ins.adsbygoogle",
     "iframe[src*='googlesyndication']", "iframe[src*='doubleclick']",
     // dogdrip.net 전용 광고 슬롯 (고유 마커 enjgioijew + 좌측 배너 클래스)
-    "iframe[enjgioijew]", ".clayerbox-left-ad", ".clayerbox-right-ad"
+    "iframe[enjgioijew]", ".clayerbox-left-ad", ".clayerbox-right-ad",
+    // d3ward.com 코스메틱 필터 테스트 대상
+    "#cts_test", "#ad_ctd"
   ].join(",");
 
   const STYLE_ID = "yab-general-hide-style";
