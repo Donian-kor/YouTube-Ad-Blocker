@@ -38,7 +38,9 @@
     // dogdrip.net 전용 광고 슬롯 (고유 마커 enjgioijew + 좌측 배너 클래스)
     "iframe[enjgioijew]", ".clayerbox-left-ad", ".clayerbox-right-ad",
     // d3ward.com 코스메틱 필터 테스트 대상
-    "#cts_test", "#ad_ctd"
+    "#cts_test", "#ad_ctd",
+    // raymondhill.net/ublock 코스메틱 필터 테스트 대상 (광고 슬롯만, 대조군 iframe은 유지)
+    "#ADSLOT_1"
   ].join(",");
 
   const STYLE_ID = "yab-general-hide-style";

@@ -44,6 +44,8 @@ const adBlockRules = [
   { id: 31, priority: 11, action: { type: "block" }, condition: { urlFilter: "||tracking.india.miui.com^" } },
   { id: 32, priority: 11, action: { type: "block" }, condition: { urlFilter: "||securemetrics.apple.com^" } },
   { id: 33, priority: 11, action: { type: "block" }, condition: { urlFilter: "||supportmetrics.apple.com^" } },
+  // raymondhill.net/ublock 네트워크 필터 테스트용 광고 iframe
+  { id: 34, priority: 11, action: { type: "block" }, condition: { urlFilter: "||raymondhill.net/ublock/ad.html" } },
 ];
 
 // === 통계 관리 ===
@@ -249,7 +251,7 @@ const dogdripAllowRules = DOGDRIP_DETECTION_DOMAINS.map((domain, i) => ({
 // 재적용 시 중복 ID 오류를 막기 위해 모두 함께 제거한다.
 const ALL_RULE_IDS = [
   1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-  20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33,
+  20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34,
   100, 101, 102, 103, 104, 105, 106, 107, 108, 109
 ];
 
