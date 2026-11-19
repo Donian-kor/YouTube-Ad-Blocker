@@ -6,7 +6,7 @@
 ## 주요 기능
 
 - **유튜브 영상 광고 차단** — 플레이어 응답의 `adSlots` / `playerAds` / `adPlacements` / `adBreakHeartbeatParams` 를 제거하고 Shorts 광고 플래그(`isAd`)를 무력화
-- **일반 사이트 광고 차단** — EasyList + EasyPrivacy(약 10만 규칙)에 NoriDev 한국 광고 도메인 규칙을 더해 DNR로 차단
+- **일반 사이트 광고 차단** — EasyList + EasyPrivacy(약 10만 규칙)에 NoriDev 한국 광고 도메인 + Turtlecute 호스트 목록 규칙을 더해 DNR로 차단
 - **사이트별 누적 차단 수** — 툴바 뱃지와 팝업에 표시. 페이지를 옮기거나 탭을 바꿔도 유지
 - **차단 URL 목록** — 팝업의 「총 차단」을 누르면 확인 가능
 - **광고 차단 ON/OFF 토글** — 팝업에서 즉시 전환
@@ -60,7 +60,7 @@ node tools/test-element-blocker.js
 - uBlock Origin의 현재 유튜브 대응(`set-constant` / `json-prune` / `trusted-replace-*-response`)을 참고해 광고 키와 Shorts `isAd` 플래그 처리 범위를 넓혔습니다.
 - DOM 광고 제거가 선택자당 한 요소만 지우던 문제를 고쳐 **모든 일치 요소**를 제거하도록 했습니다.
 - 안티애드블록 감시 Observer가 `document_start` 시점에 등록되지 않던 문제를 `document` 감시로 수정했습니다.
-- 한국 광고 도메인 규칙(209개)을 별도 규칙셋으로 추가했습니다.
+- 한국 광고 도메인 + Turtlecute 규칙(330개)을 별도 규칙셋으로 추가했습니다.
 
 ## 참고 자료
 
@@ -70,6 +70,8 @@ node tools/test-element-blocker.js
 - [NoriDev-AdBlock-Filter](https://github.com/noridev/NoriDev-AdBlock-Filter) — 한국 광고 도메인·안티애드블록 목록
 - [List-KR](https://github.com/List-KR/List-KR), [filterslists-ko](https://github.com/FilteringDev/filterslists-ko) — 한국 사이트 필터 구조 참고
 - [AdAway](https://github.com/AdAway/AdAway) — 호스트 기반 차단 도메인 참고
+- [Turtlecute Host List](https://adblock.turtlecute.org/d3host.adblock) — 간단 호스트 차단 목록 (보조 규칙셋에 포함)
+- [hagezi/dns-blocklists](https://github.com/hagezi/dns-blocklists) — DNS 차단 목록 구조 참고 (규모가 커서 현재 미포함)
 
 ## 참고
 

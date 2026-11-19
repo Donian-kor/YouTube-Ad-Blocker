@@ -12,10 +12,12 @@ const LISTS = [
   ["easyprivacy", "https://easylist.to/easylist/easyprivacy.txt"],
 ];
 
-// 한국 사이트 광고 도메인 보강 (AdAway / NoriDev / List-KR 참고)
+// 보조 도메인 차단 규칙셋 소스 (한국 광고 + 간단 호스트 리스트)
 // node tools/build-filters.js --korean  로 별도 규칙셋만 생성한다.
+// 중복 도메인은 변환기의 seen Set이 자동으로 제거한다.
 const KOREAN_LISTS = [
   ["noridev", "https://raw.githubusercontent.com/noridev/NoriDev-AdBlock-Filter/master/filter/filter.txt"],
+  ["turtlecute", "https://adblock.turtlecute.org/d3host.adblock"],
 ];
 const KOREAN_ONLY = process.argv.includes("--korean");
 const ACTIVE_LISTS = KOREAN_ONLY ? KOREAN_LISTS : LISTS;
