@@ -25,6 +25,8 @@
     ".popup-preview", ".anti-adblock-test", ".anti-adblock-message",
     ".fake-download-button", ".fake-alert", ".fake-redirect",
     ".trigger-popup", ".fake-close-button",
+    // 악성 리디렉션 체인 (고급 테스트)
+    ".redirect-test", ".redirect-preview", ".redirect-icon",
     // 일반 사이트에서 흔한 광고 클래스
     ".adsbygoogle", ".advertisement", ".advert", ".ad-banner", ".ad-slot",
     ".ad-wrapper", ".ad-unit", ".ad-overlay", ".ad-modal", ".ad-popup",
