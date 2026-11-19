@@ -3,7 +3,7 @@
 크롬(Chrome)에서 유튜브 영상 광고와 일반 사이트 광고를 차단하는 Manifest V3 확장 프로그램입니다.
 개발자 모드에서 폴더 또는 ZIP을 불러와 사용합니다.
 
-**현재 버전: 2.6**
+**현재 버전: 2.7**
 
 ## 주요 기능
 
@@ -20,7 +20,7 @@
 
 ### ZIP 배포판 (권장)
 
-1. GitHub Release에서 `youtube-ad-blocker-v2.6.zip` 다운로드
+1. GitHub Release에서 `youtube-ad-blocker-v2.7.zip` 다운로드
 2. 압축 해제 (`manifest.json`이 들어있는 폴더 확인)
 3. `chrome://extensions/` 접속 → **개발자 모드** ON
 4. **압축해제된 확장 프로그램을 로드합니다** → 2번 폴더 선택
@@ -97,6 +97,7 @@ node tools/test-element-blocker.js   # 우클릭 요소 차단 테스트
 - **v2.4**: skidrowreloaded의 화면 클릭 시 광고 사이트로 이동하는 popunder(`aclib.runPop`)를 MAIN world에서 무력화
 - **v2.5**: obfusgated(55)+ipcheck(26) 테스트 미차단 도메인 72개를 `extra-hosts` 규칙셋에 추가 (정적 allow를 덮도록 priority 11 적용)
 - **v2.6**: superadblocktest 미차단 105개 중 신규 48개 도메인 추가 (보조 규칙셋 총 454개)
+- **v2.7**: 잔여 4개 도메인(`redirector.googlevideo.com`, `analytics.x.com`, `ads.x.com`, `mon.tiktokv.com`) 추가 (총 458개)
 
 ## 참고 자료
 
