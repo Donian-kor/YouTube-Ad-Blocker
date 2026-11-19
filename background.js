@@ -273,8 +273,19 @@ function applyStaticRulesets(enabled) {
   );
 }
 
+// ON/OFF 상태에 따라 툴바 아이콘을 교체한다 (OFF 시 회색 아이콘)
+function updateActionIcon(enabled) {
+  if (!chrome.action || !chrome.action.setIcon) return;
+  const iconPath = enabled
+    ? { 16: "icon16.png", 48: "icon48.png", 128: "icon128.png" }
+    : { 16: "icon16-off.png", 48: "icon48-off.png", 128: "icon128-off.png" };
+  chrome.action.setIcon({ path: iconPath }, () => void chrome.runtime.lastError);
+  // OFF 상태임을 뱃지에도 표시 (통계 뱃지와 겹치지 않도록 빈 문자열 유지)
+}
+
 function applyRules(enabled) {
   applyStaticRulesets(enabled);
+  updateActionIcon(enabled);
   // YouTube Studio 허용 규칙은 항상 적용 (광고 차단 대상이 아님)
   const studioAllowRule = { id: 100, priority: 100, action: { type: "allow" }, condition: { domainType: "firstParty", domains: ["studio.youtube.com"] } };
   // 항상 적용되는 허용 규칙: Studio + dogdrip 감지 우회

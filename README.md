@@ -3,7 +3,7 @@
 크롬(Chrome)에서 유튜브 영상 광고와 일반 사이트 광고를 차단하는 Manifest V3 확장 프로그램입니다.
 개발자 모드에서 폴더 또는 ZIP을 불러와 사용합니다.
 
-**현재 버전: 2.1**
+**현재 버전: 2.2**
 
 ## 주요 기능
 
@@ -13,14 +13,14 @@
 - **안티애드블록 우회** — 감지 경고창·베이트 요소를 숨기고, dogdrip.net 서버 감지도 우회
 - **사이트별 누적 차단 수** — 툴바 뱃지와 팝업에 표시, 탭 전환·새로고침 후에도 유지
 - **차단 URL 목록** — 팝업의 「총 차단」 클릭 시 확인
-- **ON/OFF 토글** — 팝업에서 즉시 전환
+- **ON/OFF 토글** — 팝업에서 즉시 전환. 토글 시 현재 페이지가 자동 새로고침되고, OFF 상태에서는 툴바 아이콘이 회색으로 바뀌어 시각적으로 확인 가능
 - **우클릭 요소 차단** — 광고 영역 우클릭 → 「이 요소 차단」, 사이트별 저장
 
 ## 설치 방법
 
 ### ZIP 배포판 (권장)
 
-1. GitHub Release에서 `youtube-ad-blocker-v2.1.zip` 다운로드
+1. GitHub Release에서 `youtube-ad-blocker-v2.2.zip` 다운로드
 2. 압축 해제 (`manifest.json`이 들어있는 폴더 확인)
 3. `chrome://extensions/` 접속 → **개발자 모드** ON
 4. **압축해제된 확장 프로그램을 로드합니다** → 2번 폴더 선택
@@ -74,6 +74,7 @@ node tools/test-element-blocker.js   # 우클릭 요소 차단 테스트
 | [d3ward.com](https://d3ward.com/adblock) | 135개 도메인/스크립트/코스메틱 | 128 → 133+ 차단. 누락 도메인·`ads.js` 경로·우선순위 수정, d3Host 리스트 통합 |
 | [paileactivist/toolz](https://paileactivist.github.io/toolz/adblock.html) | d3ward 구버전 80개 | 88% → 미차단 14개 도메인(Google/Amazon/Facebook/Twitter/Pinterest/Reddit/Apple/Xiaomi) 규칙 추가 |
 | [raymondhill.net/ublock](https://raymondhill.net/ublock/tests.html) | uBO 공식 네트워크+코스메틱 | 광고 iframe(`ad.html`) 차단, `#ADSLOT_1` 코스메틱 제거 (대조군 iframe은 유지) |
+| [canyoublockit.com](https://canyoublockit.com/testing/) | 셀프호스팅 배너·인터스티셜·네이티브·팝언더·푸시·대체콘텐츠 | 광고 마커(`#adsense`, `#interads*`, `.an-advert-banner` 등) 숨김, 설명용 이미지는 유지 |
 | 유튜브 | 영상 전/중·Shorts·피드·배너 | 광고 필드·DOM 0개, 영상 정상 재생 확인 |
 
 ## 개선 내역 (버전별)
@@ -85,6 +86,7 @@ node tools/test-element-blocker.js   # 우클릭 요소 차단 테스트
 - **v1.8~v1.9**: d3ward 테스트 미차단 항목 보완, d3Host 리스트(131개) 통합
 - **v2.0**: paileactivist/toolz 미차단 14개 도메인 추가
 - **v2.1**: uBO 공식 테스트의 광고 iframe·`#ADSLOT_1` 차단 추가, README 정리
+- **v2.2**: canyoublockit 자체 호스팅 광고(배너·인터스티셜·네이티브·팝언더 등) 대응, 토글 ON/OFF 시 페이지 자동 새로고침 및 OFF 시 회색 아이콘 적용
 
 ## 참고 자료
 
@@ -93,7 +95,7 @@ node tools/test-element-blocker.js   # 우클릭 요소 차단 테스트
 - [NoriDev-AdBlock-Filter](https://github.com/noridev/NoriDev-AdBlock-Filter), [List-KR](https://github.com/List-KR/List-KR), [filterslists-ko](https://github.com/FilteringDev/filterslists-ko) — 한국 광고 도메인/필터
 - [AdAway](https://github.com/AdAway/AdAway), [hagezi/dns-blocklists](https://github.com/hagezi/dns-blocklists) — 호스트 기반 차단 참고 (hagezi는 규모가 커 미포함)
 - [Turtlecute Host List](https://adblock.turtlecute.org/d3host.adblock), [d3ward d3Host](https://raw.githubusercontent.com/d3ward/toolz/master/src/d3host.txt) — 호스트 목록 (보조 규칙셋 포함)
-- [tryblock.org](https://tryblock.org/ko), [d3ward.com](https://d3ward.com/adblock), [paileactivist/toolz](https://paileactivist.github.io/toolz/adblock.html) — 차단 테스트 사이트
+- [tryblock.org](https://tryblock.org/ko), [d3ward.com](https://d3ward.com/adblock), [paileactivist/toolz](https://paileactivist.github.io/toolz/adblock.html), [canyoublockit.com](https://canyoublockit.com/testing/) — 차단 테스트 사이트
 
 ## 주의
 

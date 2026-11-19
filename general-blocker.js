@@ -40,7 +40,12 @@
     // d3ward.com 코스메틱 필터 테스트 대상
     "#cts_test", "#ad_ctd",
     // raymondhill.net/ublock 코스메틱 필터 테스트 대상 (광고 슬롯만, 대조군 iframe은 유지)
-    "#ADSLOT_1"
+    "#ADSLOT_1",
+    // canyoublockit.com 자체 호스팅 광고 (설명용 이미지는 건드리지 않고 광고 마커만)
+    "#adsense.an-sponsored", ".an-advert-banner",
+    "#interads", "#interads-bar", "#interads-cnt", "#interads-tit",
+    ".interads-close", ".interads-kkcount-down",
+    ".fluid_controls_ad_markers_holder", ".sg-popup-id-6"
   ].join(",");
 
   const STYLE_ID = "yab-general-hide-style";
