@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YouTube Ad Blocker v3.0</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#1a1d24; --card2:#22262f; --line:#2c313c;
+    --accent:#ff4d6d; --accent2:#ff7a90; --text:#f2f3f5; --muted:#9aa3b2;
+    --green:#4ade80;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    background:var(--bg); color:var(--text); line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:840px;margin:0 auto;padding:0 20px 80px}
+
+  /* Hero */
+  .hero{padding:72px 0 40px;text-align:center}
+  .badge{
+    display:inline-block;font-size:12px;font-weight:700;letter-spacing:.5px;
+    color:var(--accent2);border:1px solid rgba(255,122,144,.35);
+    background:rgba(255,77,109,.08);padding:6px 14px;border-radius:999px;margin-bottom:22px;
+  }
+  .hero h1{font-size:40px;line-height:1.25;font-weight:800;letter-spacing:-1px}
+  .hero h1 em{font-style:normal;color:var(--accent)}
+  .hero p{margin-top:18px;color:var(--muted);font-size:16px}
+
+  .btn{
+    display:inline-block;margin-top:28px;padding:14px 30px;border-radius:10px;
+    background:linear-gradient(135deg,var(--accent),#ff2e55);color:#fff;
+    font-weight:700;text-decoration:none;font-size:15px;
+    box-shadow:0 8px 24px rgba(255,46,85,.28);transition:transform .2s,box-shadow .2s;
+  }
+  .btn:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(255,46,85,.4)}
+
+  /* Section */
+  section{margin-top:56px}
+  h2{font-size:22px;font-weight:750;display:flex;align-items:center;gap:10px;margin-bottom:20px}
+  h2::before{content:"";width:4px;height:20px;background:var(--accent);border-radius:2px}
+
+  .lead{color:var(--muted);margin-bottom:24px;font-size:15px}
+
+  /* Feature grid */
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:22px;transition:border-color .2s,transform .2s;
+  }
+  .card:hover{border-color:rgba(255,77,109,.5);transform:translateY(-3px)}
+  .card .ic{font-size:24px;margin-bottom:10px}
+  .card h3{font-size:15px;margin-bottom:6px}
+  .card p{font-size:13.5px;color:var(--muted)}
+
+  /* Screenshot */
+  .shot{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:18px;text-align:center;
+  }
+  .shot img{max-width:100%;border-radius:10px;display:block;margin:0 auto}
+  .shot .cap{margin-top:12px;font-size:13px;color:var(--muted)}
+  .shots{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+  @media(max-width:680px){.shots,.grid{grid-template-columns:1fr}}
+
+  /* Table */
+  .table{width:100%;border-collapse:collapse;font-size:14px;
+    background:var(--card);border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+  .table th,.table td{padding:13px 16px;text-align:left;border-bottom:1px solid var(--line)}
+  .table th{background:var(--card2);font-size:13px;color:var(--muted);width:34%}
+  .table tr:last-child td{border-bottom:none}
+
+  /* Steps */
+  .step-shot{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:14px;margin-bottom:16px;overflow:hidden}
+  .step-shot img{width:100%;display:block;border-radius:8px}
+  .step-shot .t{font-size:13px;color:#ff8fa3;font-weight:700;margin-bottom:8px}
+  .steps{counter-reset:s;list-style:none}
+  .steps li{
+    position:relative;padding:14px 16px 14px 56px;background:var(--card);
+    border:1px solid var(--line);border-radius:12px;margin-bottom:10px;font-size:14px;
+  }
+  .steps li::before{
+    counter-increment:s;content:counter(s);
+    position:absolute;left:16px;top:14px;width:26px;height:26px;border-radius:8px;
+    background:rgba(255,77,109,.15);color:var(--accent2);font-weight:800;
+    display:flex;align-items:center;justify-content:center;font-size:13px;
+  }
+  code{background:var(--card2);padding:2px 7px;border-radius:5px;font-size:13px;color:#ffd7de}
+
+  /* FAQ */
+  details{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:10px}
+  summary{padding:15px 18px;cursor:pointer;font-weight:650;font-size:14px;list-style:none}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";float:right;color:var(--accent)}
+  details[open] summary::after{content:"−"}
+  details p{padding:0 18px 16px;color:var(--muted);font-size:13.5px}
+
+  .note{
+    font-size:12.5px;color:var(--muted);border-left:3px solid var(--green);
+    background:rgba(74,222,128,.06);padding:12px 16px;border-radius:0 8px 8px 0;margin-top:16px;
+  }
+  footer{margin-top:64px;text-align:center;color:var(--muted);font-size:13px;
+    border-top:1px solid var(--line);padding-top:28px}
+  footer a{color:var(--accent2);text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <span class="badge">v3.0 · Chrome 확장 프로그램</span>
+    <h1>유튜브부터 일반 사이트까지<br><em>광고 없이</em> 쾌적하게</h1>
+    <p>영상 광고는 소스에서, 사이트 광고는 네트워크에서 차단하는 가벼운 광고 차단기입니다.</p>
+    <a class="btn" href="https://github.com/Donian-kor/All-adBlock-Kor/releases/tag/v3.0">다운로드 v3.0 →</a>
+  </div>
+
+  <section>
+    <h2>한눈에 보는 화면</h2>
+    <div class="shots">
+      <div class="shot">
+        <img src="screenshots/popup.png" alt="확장 프로그램 팝업 화면">
+        <div class="cap">Extensions → 진입점이 되는 팝업 UI</div>
+      </div>
+      <div class="shot">
+        <img src="screenshots/test-result.png" alt="광고 차단 테스트 결과">
+        <div class="cap">광고 차단 테스트 99% 달성</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>무엇이 다른가요?</h2>
+    <div class="lead">단순히 요청을 막는 데 그치지 않고, 광고가 생기는 지점마다 대응합니다.</div>
+    <div class="grid">
+      <div class="card"><div class="ic">▶️</div><h3>유튜브 광고 원천 차단</h3><p>재생 응답의 광고 데이터를 제거해 광고가 시작되지 않게 합니다. Shorts도 포함.</p></div>
+      <div class="card"><div class="ic">🌐</div><h3>10만 개 규칙 기반 차단</h3><p>EasyList·EasyPrivacy + 한국 광고 도메인을 DNR로 차단합니다.</p></div>
+      <div class="card"><div class="ic">🧹</div><h3>페이지 안쪽 광고까지</h3><p>네트워크로 잡히지 않는 배너·스폰서·팝업·오버레이를 CSS로 숨깁니다.</p></div>
+      <div class="card"><div class="ic">🛡️</div><h3>우회 기법도 무력화</h3><p>"광고 차단기 꺼라" 경고와 클릭 리다이렉트(popunder)를 막습니다.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>주요 기능</h2>
+    <table class="table">
+      <tr><th>유튜브 광고</th><td>영상 전·중·Shorts·피드 광고 제거</td></tr>
+      <tr><th>사이트 광고</th><td>도메인 규칙 + 인라인 DOM 숨김</td></tr>
+      <tr><th>차단 통계</th><td>사이트별 누적 차단 수를 뱃지·팝업에 표시</td></tr>
+      <tr><th>ON/OFF 토글</th><td>끄면 자동 새로고침 + 아이콘 회색 처리</td></tr>
+      <tr><th>우클릭 차단</th><td>광고 영역 우클릭 → 사이트별 저장</td></tr>
+      <tr><th>안티애드블록</th><td>감지 경고·팝언더 리다이렉트 차단</td></tr>
+    </table>
+    <div class="note">유튜브 스트리밍 지연 방지를 위해 <code>redirector.googlevideo.com</code>은 의도적으로 차단에서 제외했습니다.</div>
+  </section>
+
+  <section>
+    <h2>설치 방법</h2>
+    <p class="lead">아래 순서대로만 따라 하면 됩니다. 처음이라면 각 단계의 그림을 천천히 확인해 주세요.</p>
+
+    <div class="step-shot">
+      <div class="t">STEP 1 · 개발자 모드 켜기</div>
+      <img src="screenshots/step1.svg" alt="개발자 모드 켜는 화면">
+    </div>
+    <div class="step-shot">
+      <div class="t">STEP 2 · 확장 프로그램 불러오기</div>
+      <img src="screenshots/step2.svg" alt="압축해제된 확장 프로그램 로드 화면">
+    </div>
+    <div class="step-shot">
+      <div class="t">STEP 3 · 설치 확인 후 새로고침</div>
+      <img src="screenshots/step3.svg" alt="설치 완료 확인 화면">
+    </div>
+
+    <ol class="steps">
+      <li>GitHub Release에서 <code>youtube-ad-blocker-v3.0.zip</code> 다운로드 후 <strong>압축 해제</strong></li>
+      <li>크롬 주소창에 <code>chrome://extensions/</code> 입력 → <strong>개발자 모드 ON</strong></li>
+      <li><strong>압축해제된 확장 프로그램을 로드합니다</strong> 클릭 → <code>manifest.json</code>이 있는 폴더 선택</li>
+      <li>카드에 <strong>새로고침(↻)</strong> 버튼이 보이면 성공 — 누르고 유튜브에서 <code>F5</code></li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>자주 묻는 질문</h2>
+    <details><summary>통계 숫자가 올라가지 않아요</summary><p>개발자 모드로 불러왔는지 확인해 주세요. 통계는 개발자 모드 확장에서만 동작합니다.</p></details>
+    <details><summary>토글을 껐더니 아이콘이 회색이에요</summary><p>OFF 상태임을 알려주는 정상 동작입니다. 다시 켜면 원래 아이콘으로 돌아옵니다.</p></details>
+    <details><summary>특정 사이트 광고가 그대로 보여요</summary><p>광고 영역을 우클릭 → 「이 요소 차단」을 눌러 주세요. 사이트별로 저장됩니다.</p></details>
+  </section>
+
+  <footer>
+    <a href="https://github.com/Donian-kor/All-adBlock-Kor">GitHub 저장소</a> ·
+    <a href="https://github.com/Donian-kor/All-adBlock-Kor/releases/tag/v3.0">릴리즈 v3.0</a>
+  </footer>
+
+</div>
+</body>
+</html>
