@@ -3,7 +3,7 @@
 크롬(Chrome)에서 유튜브 영상 광고와 일반 사이트 광고를 차단하는 Manifest V3 확장 프로그램입니다.
 개발자 모드에서 폴더 또는 ZIP을 불러와 사용합니다.
 
-**현재 버전: 2.5**
+**현재 버전: 2.6**
 
 ## 주요 기능
 
@@ -20,7 +20,7 @@
 
 ### ZIP 배포판 (권장)
 
-1. GitHub Release에서 `youtube-ad-blocker-v2.5.zip` 다운로드
+1. GitHub Release에서 `youtube-ad-blocker-v2.6.zip` 다운로드
 2. 압축 해제 (`manifest.json`이 들어있는 폴더 확인)
 3. `chrome://extensions/` 접속 → **개발자 모드** ON
 4. **압축해제된 확장 프로그램을 로드합니다** → 2번 폴더 선택
@@ -80,6 +80,7 @@ node tools/test-element-blocker.js   # 우클릭 요소 차단 테스트
 | [skidrowreloaded.com](https://www.skidrowreloaded.com/) | 추적 베이트 + 클릭 리다이렉트(popunder) | `usrpubtrck.com` 차단, `aclib.runPop` popunder 무력화 (아무 데나 클릭해도 광고 사이트로 이동 안 함) |
 | [obfusgated.com](https://obfusgated.com/tools/ad-block-test) | 267개 도메인 | 55개 미차단 도메인을 `extra-hosts` 규칙셋에 추가 (AppLovin, Vungle, Supersonic, Consent/CMP, Video Ads 등) |
 | [ipcheck.ing](https://ipcheck.ing/tools/adblocktest) | 196개 도메인/스크립트 | 26개 미차단 도메인(Pangle, Baidu, LINE, vivo, Amazon devices 등) 추가 |
+| [superadblocktest.com](https://superadblocktest.com/) | 482개 도메인 | 105개 미차단 중 신규 48개 추가 (CMP 동의관리, 실험플랫폼, 모바일 애트리뷰션, Live Chat, FreeWheel 등) |
 | 유튜브 | 영상 전/중·Shorts·피드·배너 | 광고 필드·DOM 0개, 영상 정상 재생 확인 |
 
 ## 개선 내역 (버전별)
@@ -95,6 +96,7 @@ node tools/test-element-blocker.js   # 우클릭 요소 차단 테스트
 - **v2.3**: down.mdiaload 다운로드 대기화면 구글 광고 슬롯/iframe 차단, `usrpubtrck.com` 추적 도메인 차단 추가
 - **v2.4**: skidrowreloaded의 화면 클릭 시 광고 사이트로 이동하는 popunder(`aclib.runPop`)를 MAIN world에서 무력화
 - **v2.5**: obfusgated(55)+ipcheck(26) 테스트 미차단 도메인 72개를 `extra-hosts` 규칙셋에 추가 (정적 allow를 덮도록 priority 11 적용)
+- **v2.6**: superadblocktest 미차단 105개 중 신규 48개 도메인 추가 (보조 규칙셋 총 454개)
 
 ## 참고 자료
 
@@ -103,11 +105,10 @@ node tools/test-element-blocker.js   # 우클릭 요소 차단 테스트
 - [NoriDev-AdBlock-Filter](https://github.com/noridev/NoriDev-AdBlock-Filter), [List-KR](https://github.com/List-KR/List-KR), [filterslists-ko](https://github.com/FilteringDev/filterslists-ko) — 한국 광고 도메인/필터
 - [AdAway](https://github.com/AdAway/AdAway), [hagezi/dns-blocklists](https://github.com/hagezi/dns-blocklists) — 호스트 기반 차단 참고 (hagezi는 규모가 커 미포함)
 - [Turtlecute Host List](https://adblock.turtlecute.org/d3host.adblock), [d3ward d3Host](https://raw.githubusercontent.com/d3ward/toolz/master/src/d3host.txt) — 호스트 목록 (보조 규칙셋 포함)
-- [tryblock.org](https://tryblock.org/ko), [d3ward.com](https://d3ward.com/adblock), [paileactivist/toolz](https://paileactivist.github.io/toolz/adblock.html), [canyoublockit.com](https://canyoublockit.com/testing/), [raymondhill.net/ublock](https://raymondhill.net/ublock/tests.html), [obfusgated.com](https://obfusgated.com/tools/ad-block-test), [ipcheck.ing](https://ipcheck.ing/tools/adblocktest) — 차단 테스트 사이트
+- [tryblock.org](https://tryblock.org/ko), [d3ward.com](https://d3ward.com/adblock), [paileactivist/toolz](https://paileactivist.github.io/toolz/adblock.html), [canyoublockit.com](https://canyoublockit.com/testing/), [raymondhill.net/ublock](https://raymondhill.net/ublock/tests.html), [obfusgated.com](https://obfusgated.com/tools/ad-block-test), [ipcheck.ing](https://ipcheck.ing/tools/adblocktest), [superadblocktest.com](https://superadblocktest.com/) — 차단 테스트 사이트
 
 ## 주의
 
 - 통계는 `chrome.declarativeNetRequest.onRuleMatchedDebug`를 사용하므로 **개발자 모드 확장에서만** 동작합니다.
 - 사이트별 차단 수는 `chrome.storage.local`의 `siteCounts`, 직접 차단 요소는 `blockedSelectors`에 저장됩니다.
 - 정적 규칙 파일 수정 후에는 확장을 **재로드(↻)** 해야 반영됩니다.
-- dogdrip.net은 광고 수익으로 운영되므로, 감지 우회로 인해 향후 서버 정책이 강화되면 차단 페이지가 다시 나타날 수 있습니다.
