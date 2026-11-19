@@ -42,11 +42,18 @@
   const STYLE_ID = "yab-general-hide-style";
   const RULE = SELECTORS + "{display:none !important;visibility:hidden !important;opacity:0 !important;height:0 !important;overflow:hidden !important}";
 
+  // dogdrip.net은 광고 영역이 "보이는 상태"여야 서버가 정상 이용자로 판단한다.
+  // display:none 대신 화면 밖으로 밀어내 광고는 안 보이게 하되, 감지 스크립트는 속인다.
+  const DOGDRIP_HIDE_SELECTORS = "iframe[enjgioijew],.clayerbox-left-ad,.clayerbox-right-ad,.ddnad-wrapper,ins.kakao_ad_area,.ddnad";
+  const DOGDRIP_RULE = DOGDRIP_HIDE_SELECTORS +
+    "{position:absolute !important;left:-99999px !important;top:-99999px !important;visibility:visible !important;opacity:0 !important;pointer-events:none !important}";
+  const isDogdrip = /(^|\.)dogdrip\.net$/.test(location.hostname);
+
   function injectStyle() {
     if (document.getElementById(STYLE_ID)) return;
     const style = document.createElement("style");
     style.id = STYLE_ID;
-    style.textContent = RULE;
+    style.textContent = isDogdrip ? DOGDRIP_RULE : RULE;
     (document.head || document.documentElement).appendChild(style);
   }
 
@@ -78,6 +85,8 @@
   let removedCount = 0;
   function removeAds() {
     if (!enabled) return;
+    // dogdrip은 광고 요소를 DOM에 남겨야 서버 감지를 우회할 수 있다 (CSS 숨김만 적용)
+    if (isDogdrip) return;
     let removed = 0;
     try {
       document.querySelectorAll(SELECTORS).forEach((el) => {

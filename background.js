@@ -207,9 +207,25 @@ chrome.declarativeNetRequest.onRuleMatchedDebug.addListener((info) => {
 });
 
 // === 규칙 활성화/비활성화 ===
+// dogdrip.net은 광고 분석 스크립트가 로드되고 광고 영역이 보여야 서버가 정상 이용자로 판단한다.
+// 차단 시 "광고 허용" 페이지로 리다이렉트되므로, dogdrip에서만 감지용 스크립트를 허용한다.
+// (광고 배너 DOM은 general-blocker.js에서 계속 숨긴다.)
+const DOGDRIP_DETECTION_DOMAINS = [
+  "googletagmanager.com", "google-analytics.com", "googlesyndication.com",
+  "doubleclick.net", "coupang.com", "optad360.io", "veta.naver.com",
+  "cloudflareinsights.com", "daumcdn.net"
+];
+const dogdripAllowRules = DOGDRIP_DETECTION_DOMAINS.map((domain, i) => ({
+  id: 101 + i,
+  priority: 100,
+  action: { type: "allow" },
+  condition: { urlFilter: "||" + domain + "^", initiatorDomains: ["dogdrip.net"] }
+}));
+
 // 1~14: 이전 버전에서 등록된 잔여 규칙까지 모두 제거하기 위해 넓게 지정
-// 100: YouTube Studio 허용 규칙 — 재적용 시 중복 ID 오류를 막기 위해 반드시 함께 제거
-const ALL_RULE_IDS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 100];
+// 100: YouTube Studio 허용 규칙 / 101~109: dogdrip 감지 우회 허용 규칙
+// 재적용 시 중복 ID 오류를 막기 위해 모두 함께 제거한다.
+const ALL_RULE_IDS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109];
 
 // EasyList/EasyPrivacy 변환 규칙 (manifest의 정적 규칙 세트 ID)
 const STATIC_RULESET_IDS = [
@@ -233,9 +249,11 @@ function applyRules(enabled) {
   applyStaticRulesets(enabled);
   // YouTube Studio 허용 규칙은 항상 적용 (광고 차단 대상이 아님)
   const studioAllowRule = { id: 100, priority: 100, action: { type: "allow" }, condition: { domainType: "firstParty", domains: ["studio.youtube.com"] } };
+  // 항상 적용되는 허용 규칙: Studio + dogdrip 감지 우회
+  const alwaysAllowRules = [studioAllowRule, ...dogdripAllowRules];
   chrome.declarativeNetRequest.updateDynamicRules(
     {
-      addRules: enabled ? [studioAllowRule, ...adBlockRules] : [studioAllowRule],
+      addRules: enabled ? [...alwaysAllowRules, ...adBlockRules] : alwaysAllowRules,
       removeRuleIds: ALL_RULE_IDS
     },
     () => {
