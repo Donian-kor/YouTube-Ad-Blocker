@@ -45,7 +45,10 @@
     "#adsense.an-sponsored", ".an-advert-banner",
     "#interads", "#interads-bar", "#interads-cnt", "#interads-tit",
     ".interads-close", ".interads-kkcount-down",
-    ".fluid_controls_ad_markers_holder", ".sg-popup-id-6"
+    ".fluid_controls_ad_markers_holder", ".sg-popup-id-6",
+    // down.mdiaload.com 구글 광고 슬롯/iframe + 추적 베이트
+    ".demand-supply", "iframe[id^='google_ads_iframe_']",
+    "[id*='google_ads_iframe_']", "[id^='mdiaload.com_']"
   ].join(",");
 
   const STYLE_ID = "yab-general-hide-style";
