@@ -8,7 +8,6 @@
 0.0.0.0 api.fyber.com
 0.0.0.0 ironsource.mobi
 0.0.0.0 outcome-ssp.supersonicads.com
-0.0.0.0 s.youtube.com
 0.0.0.0 juicyads.com
 0.0.0.0 quantserve.com
 0.0.0.0 us.i.posthog.com
