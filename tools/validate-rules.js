@@ -44,6 +44,9 @@ for (const file of files) {
       console.error(where + ": urlFilter 길이 이상"); errors++;
     } else if (!/^[\x20-\x7e]+$/.test(c.urlFilter)) {
       console.error(where + ": urlFilter ASCII 아님: " + c.urlFilter); errors++;
+    } else if (/\|\|\*/.test(c.urlFilter)) {
+      // DNR urlFilter는 "||" 뒤에 "*"가 올 수 없음 (Chrome이 로드 거부)
+      console.error(where + ": urlFilter에 '||*' 사용: " + c.urlFilter); errors++;
     }
     if (c.resourceTypes) {
       if (!Array.isArray(c.resourceTypes) || c.resourceTypes.length === 0) { console.error(where + ": resourceTypes 비었음"); errors++; }

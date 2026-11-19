@@ -208,7 +208,8 @@ chrome.declarativeNetRequest.onRuleMatchedDebug.addListener((info) => {
 
 // === 규칙 활성화/비활성화 ===
 // 1~14: 이전 버전에서 등록된 잔여 규칙까지 모두 제거하기 위해 넓게 지정
-const ALL_RULE_IDS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+// 100: YouTube Studio 허용 규칙 — 재적용 시 중복 ID 오류를 막기 위해 반드시 함께 제거
+const ALL_RULE_IDS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 100];
 
 // EasyList/EasyPrivacy 변환 규칙 (manifest의 정적 규칙 세트 ID)
 const STATIC_RULESET_IDS = [

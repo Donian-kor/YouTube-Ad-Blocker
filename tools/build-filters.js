@@ -79,6 +79,9 @@ function convertLine(rawLine) {
   // HTML 필터링($$)과 요소 숨김 잔여물은 DNR urlFilter로 표현할 수 없으므로 제외
   if (line.includes("$$")) return null;
   if (/^[\w-]+$/.test(line.trim())) return null;
+  // DNR의 urlFilter는 "||"(도메인 앵커) 바로 뒤에 "*"가 올 수 없다.
+  // AdGuard 필터의 "||*.example.com^" 형태는 여기서 걸러낸다.
+  if (/\|\|\*/.test(line)) return null;
   let allow = false;
   if (line.startsWith("@@")) {
     allow = true;
