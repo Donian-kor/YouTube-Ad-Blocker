@@ -3,7 +3,7 @@
   <rect x="0" y="0" width="760" height="44" rx="16" fill="#262a34"/>
   <circle cx="24" cy="22" r="5" fill="#ff5f57"/><circle cx="42" cy="22" r="5" fill="#febc2e"/><circle cx="60" cy="22" r="5" fill="#28c840"/>
   <text x="86" y="28" fill="#c9ced8" font-size="14">chrome://extensions/</text>
-  <text x="40" y="82" fill="#f2f3f5" font-size="17" font-weight="700">① 오른쪽 위 '개발자 모드'를 켭니다</text>
+  <text x="40" y="82" fill="#f2f3f5" font-size="17" font-weight="700">오른쪽 위 '개발자 모드'를 켭니다</text>
   <!-- toggle mock -->
   <rect x="560" y="104" width="150" height="40" rx="20" fill="#ff4d6d"/>
   <circle cx="686" cy="124" r="15" fill="#fff"/>

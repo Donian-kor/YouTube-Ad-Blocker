@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="760" height="220" viewBox="0 0 760 220" font-family="-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif">
   <rect width="760" height="220" rx="16" fill="#1a1d24"/>
-  <text x="40" y="52" fill="#f2f3f5" font-size="17" font-weight="700">④ 설치 확인 + 마지막 새로고침</text>
+  <text x="40" y="52" fill="#f2f3f5" font-size="17" font-weight="700">설치 확인 + 마지막 새로고침</text>
   <!-- card -->
   <rect x="40" y="76" width="680" height="86" rx="12" fill="#22262f" stroke="#2c313c"/>
   <rect x="60" y="96" width="46" height="46" rx="10" fill="#2c313c"/>

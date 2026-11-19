@@ -76,7 +76,12 @@
   .step-shot{background:var(--card);border:1px solid var(--line);border-radius:14px;
     padding:14px;margin-bottom:16px;overflow:hidden}
   .step-shot img{width:100%;display:block;border-radius:8px}
-  .step-shot .t{font-size:13px;color:#ff8fa3;font-weight:700;margin-bottom:8px}
+  .step-shot .t{font-size:14px;color:#f2f3f5;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+  .step-shot .t .num{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;
+    border-radius:7px;background:var(--accent);color:#fff;font-size:13px;font-weight:800}
+  .step-shot .body{font-size:14px;color:#c9ced8;line-height:1.8}
+  .step-shot .body a{color:var(--accent2);text-decoration:underline}
+  .step-shot .sub{display:block;font-size:12.5px;color:var(--muted);margin-top:8px}
   .steps{counter-reset:s;list-style:none}
   .steps li{
     position:relative;padding:14px 16px 14px 56px;background:var(--card);
@@ -157,27 +162,28 @@
 
   <section>
     <h2>설치 방법</h2>
-    <p class="lead">아래 순서대로만 따라 하면 됩니다. 처음이라면 각 단계의 그림을 천천히 확인해 주세요.</p>
+    <p class="lead">1번부터 순서대로 따라 하면 끝납니다.</p>
 
     <div class="step-shot">
-      <div class="t">STEP 1 · 개발자 모드 켜기</div>
+      <div class="t"><span class="num">1</span> 파일 다운로드하고 압축 풀기</div>
+      <div class="body">
+        <a href="https://github.com/Donian-kor/All-adBlock-Kor/releases/tag/v3.0" target="_blank"><strong>youtube-ad-blocker-v3.0.zip</strong> 다운로드</a> → 압축 풀기<br>
+        <span class="sub">압축을 풀면 <code>manifest.json</code>이 들어있는 폴더가 나옵니다. (이 폴더를 선택합니다)</span>
+      </div>
+    </div>
+
+    <div class="step-shot">
+      <div class="t"><span class="num">2</span> 개발자 모드 켜고 불러오기</div>
       <img src="screenshots/step1.svg" alt="개발자 모드 켜는 화면">
-    </div>
-    <div class="step-shot">
-      <div class="t">STEP 2 · 확장 프로그램 불러오기</div>
       <img src="screenshots/step2.svg" alt="압축해제된 확장 프로그램 로드 화면">
-    </div>
-    <div class="step-shot">
-      <div class="t">STEP 3 · 설치 확인 후 새로고침</div>
-      <img src="screenshots/step3.svg" alt="설치 완료 확인 화면">
+      <div class="sub">크롬 주소창에 <code>chrome://extensions/</code> 입력 → 개발자 모드 ON → <strong>압축해제된 확장 프로그램을 로드합니다</strong> 클릭 → 1번에서 푼 폴더 선택</div>
     </div>
 
-    <ol class="steps">
-      <li>GitHub Release에서 <code>youtube-ad-blocker-v3.0.zip</code> 다운로드 후 <strong>압축 해제</strong></li>
-      <li>크롬 주소창에 <code>chrome://extensions/</code> 입력 → <strong>개발자 모드 ON</strong></li>
-      <li><strong>압축해제된 확장 프로그램을 로드합니다</strong> 클릭 → <code>manifest.json</code>이 있는 폴더 선택</li>
-      <li>카드에 <strong>새로고침(↻)</strong> 버튼이 보이면 성공 — 누르고 유튜브에서 <code>F5</code></li>
-    </ol>
+    <div class="step-shot">
+      <div class="t"><span class="num">3</span> 설치 확인하고 새로고침</div>
+      <img src="screenshots/step3.svg" alt="설치 완료 확인 화면">
+      <div class="sub">카드에 <strong>새로고침(↻)</strong> 버튼이 보이면 성공 — 누른 뒤 유튜브에서 <code>F5</code></div>
+    </div>
   </section>
 
   <section>
