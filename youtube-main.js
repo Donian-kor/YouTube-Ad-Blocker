@@ -1,6 +1,7 @@
 // YouTube Ad Blocker - MAIN world 스크립틀릿
 // 유튜브 페이지의 "메인 세계"에서 실행되어 플레이어 응답의 광고 데이터를 제거한다.
 // (content script는 격리된 세계라 페이지의 Promise/JSON.parse에 접근할 수 없음)
+// 참고: uBlock Origin uAssets 의 ytInitialPlayerResponse set-constant / json-prune 기법
 (function () {
   "use strict";
   // 유튜브 스튜디오는 광고 차단 대상이 아니므로 건너뜀
@@ -8,7 +9,9 @@
   if (window.__yabInstalled) return;
   window.__yabInstalled = true;
 
+  // 광고 데이터 키 (uBO filters.txt / uAssets 기준)
   const AD_KEYS = ["adSlots", "playerAds", "adPlacements", "adBreakHeartbeatParams"];
+  const NESTED_KEYS = ["playerResponse", "playerMicroformatRenderer"];
   const AD_KEY_REGEX = /"(adSlots|playerAds|adPlacements|adBreakHeartbeatParams)"\s*:/g;
 
   let enabled = true;
@@ -22,17 +25,43 @@
     }
   });
 
+  function hasOwn(obj, key) {
+    return Object.prototype.hasOwnProperty.call(obj, key);
+  }
+
+  // 객체 한 겹에서 광고 키를 제거한다 (playerResponse 같은 중첩 구조는 호출부에서 처리)
+  function deleteAdKeys(obj) {
+    if (!obj || typeof obj !== "object") return;
+    for (const key of AD_KEYS) {
+      if (hasOwn(obj, key)) delete obj[key];
+    }
+    // Shorts / 광고 클라이언트 파라미터의 isAd 플래그를 false로 되돌린다
+    if (obj.adClientParams && typeof obj.adClientParams === "object") {
+      obj.adClientParams.isAd = false;
+    }
+  }
+
   function cleanObject(value) {
     if (!value || typeof value !== "object") return value;
-    for (const key of AD_KEYS) {
-      if (Object.prototype.hasOwnProperty.call(value, key)) delete value[key];
+    deleteAdKeys(value);
+
+    // playerResponse 로 한 번 더 감싼 구조도 처리
+    for (const key of NESTED_KEYS) {
+      const nested = value[key];
+      if (nested && typeof nested === "object") deleteAdKeys(nested);
     }
-    // playerResponse 같은 한 겹 감싼 구조도 처리
-    if (value.playerResponse && typeof value.playerResponse === "object") {
-      for (const key of AD_KEYS) {
-        if (Object.prototype.hasOwnProperty.call(value.playerResponse, key)) {
-          delete value.playerResponse[key];
-        }
+
+    // Shorts 광고: reel_watch_sequence / get_watch 응답의 entries[].command...adClientParams.isAd
+    const entryArrays = [];
+    if (value.reelWatchSequenceResponse && value.reelWatchSequenceResponse.entries) {
+      entryArrays.push(value.reelWatchSequenceResponse.entries);
+    }
+    if (value.entries) entryArrays.push(value.entries);
+    for (const entries of entryArrays) {
+      if (!Array.isArray(entries)) continue;
+      for (const entry of entries) {
+        const endpoint = entry && entry.command && entry.command.reelWatchEndpoint;
+        if (endpoint && endpoint.adClientParams) endpoint.adClientParams.isAd = false;
       }
     }
     return value;
@@ -43,7 +72,8 @@
     if (
       text.indexOf("adSlots") === -1 &&
       text.indexOf("playerAds") === -1 &&
-      text.indexOf("adPlacements") === -1
+      text.indexOf("adPlacements") === -1 &&
+      text.indexOf("adBreakHeartbeatParams") === -1
     ) {
       return text;
     }
@@ -60,13 +90,15 @@
   // 모든 then 콜백을 건드리면 유튜브 전체가 느려지므로 대상만 선별한다.
   const nativeThen = Promise.prototype.then;
   Promise.prototype.then = function (onFulfilled, onRejected) {
-    // 빠른 패스: 함수가 아니면 바로 통과
     if (typeof onFulfilled === "function" && enabled) {
       const src = Function.prototype.toString.call(onFulfilled);
       const isAdCallback = src.indexOf(".next(") !== -1 || src.indexOf("jsonpResponseCtor") !== -1;
       if (isAdCallback) {
+        // 원본을 지역 변수에 반드시 캡처한다.
+        // (그냥 onFulfilled를 재할당하면 클로저가 새 함수를 가리켜 무한 재귀가 발생한다)
+        const original = onFulfilled;
         onFulfilled = function (value) {
-          return onFulfilled.call(this, clean(value));
+          return original.call(this, clean(value));
         };
       }
     }
@@ -81,29 +113,52 @@
   };
 
   // === 3) Response.json 후킹 ===
-  if (window.Response && Response.prototype.json) {
-    const nativeJson = Response.prototype.json;
-    Response.prototype.json = function () {
+  if (window.Response && window.Response.prototype && window.Response.prototype.json) {
+    const nativeJson = window.Response.prototype.json;
+    window.Response.prototype.json = function () {
       return nativeJson.call(this).then(clean);
     };
   }
 
-  // === 4) initial player response 후킹 ===
-  // 페이지가 인라인 스크립트로 넣는 ytInitialPlayerResponse 는 JSON.parse를 거치지 않는다.
-  // document_start 시점에는 아직 없으므로, setter를 미리 정의해 나중에 대입되는 값을 잡는다.
-  try {
-    let initial = window.ytInitialPlayerResponse;
-    if (initial && typeof initial === "object") cleanObject(initial);
-    Object.defineProperty(window, "ytInitialPlayerResponse", {
-      configurable: true,
-      get() {
-        return initial;
-      },
-      set(value) {
-        initial = enabled ? cleanObject(value) : value;
+  // === 4) XMLHttpRequest 응답 후킹 (uBO trusted-replace-xhr-response 대응) ===
+  // 유튜브는 /youtubei/v1/player, /get_watch 응답을 XHR로 읽기도 한다.
+  if (typeof XMLHttpRequest !== "undefined" && XMLHttpRequest.prototype) {
+    ["responseText", "response"].forEach((prop) => {
+      try {
+        const desc = Object.getOwnPropertyDescriptor(XMLHttpRequest.prototype, prop);
+        if (!desc || typeof desc.get !== "function") return;
+        Object.defineProperty(XMLHttpRequest.prototype, prop, {
+          configurable: true,
+          get: function () {
+            return clean(desc.get.call(this));
+          }
+        });
+      } catch (e) {
+        // 브라우저가 redefining을 막으면 이 후킹만 건너뛴다
       }
     });
-  } catch (e) {
-    // 정의 실패는 무시 (일반적인 경우 문제 없음)
   }
+
+  // === 5) 초기 플레이어/데이터 응답 후킹 ===
+  // 인라인 스크립트로 넣는 ytInitialPlayerResponse / ytInitialData 는 JSON.parse를 거치지 않는다.
+  // document_start 시점에 setter를 미리 정의해 나중에 대입되는 값을 잡는다.
+  function hookInitial(name) {
+    try {
+      let initial = window[name];
+      if (initial && typeof initial === "object") cleanObject(initial);
+      Object.defineProperty(window, name, {
+        configurable: true,
+        get() {
+          return initial;
+        },
+        set(value) {
+          initial = enabled ? cleanObject(value) : value;
+        }
+      });
+    } catch (e) {
+      // 정의 실패는 무시 (일반적인 경우 문제 없음)
+    }
+  }
+  hookInitial("ytInitialPlayerResponse");
+  hookInitial("ytInitialData");
 })();

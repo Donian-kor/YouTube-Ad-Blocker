@@ -40,6 +40,7 @@ const sandbox = {
   JSON,
   Object,
   Function,
+  Array,
   console
 };
 vm.createContext(sandbox);
@@ -96,6 +97,41 @@ function hookableCallback(collect) {
   setEnabled(true);
   const cleaned = JSON.parse(raw);
   check("ON 상태에서는 광고 키 제거", cleaned, { videoDetails: { title: "t" } });
+
+  // 7) adBreakHeartbeatParams 까지 제거 (신규 광고 키)
+  const withHeartbeat = JSON.parse(
+    '{"adBreakHeartbeatParams":"hb","playerAds":[1],"videoDetails":{"title":"t"}}'
+  );
+  check("adBreakHeartbeatParams 제거", withHeartbeat, { videoDetails: { title: "t" } });
+
+  // 8) Shorts/재생목록의 중첩 adClientParams.isAd 플래그 무력화
+  const shorts = JSON.parse(
+    '{"reelWatchSequenceResponse":{"entries":[{"command":{"reelWatchEndpoint":{"adClientParams":{"isAd":true}}}}]},' +
+      '"entries":[{"command":{"reelWatchEndpoint":{"adClientParams":{"isAd":true}}}}],"videoDetails":{"title":"t"}}'
+  );
+  check(
+    "Shorts isAd 플래그 무력화",
+    shorts,
+    {
+      reelWatchSequenceResponse: {
+        entries: [{ command: { reelWatchEndpoint: { adClientParams: { isAd: false } } } }]
+      },
+      entries: [{ command: { reelWatchEndpoint: { adClientParams: { isAd: false } } } }],
+      videoDetails: { title: "t" }
+    }
+  );
+
+  // 9) Promise.then 콜백이 재귀 없이 한 번만 실행되는지 (무한 재귀 회귀 테스트)
+  let callCount = 0;
+  await new Promise((resolve) => {
+    Promise.resolve('{"adSlots":[1],"videoDetails":{"title":"t"}}').then(
+      hookableCallback(() => {
+        callCount++;
+      })
+    );
+    setTimeout(resolve, 10);
+  });
+  check("후킹 콜백 단일 실행 (무한 재귀 방지)", callCount, 1);
 
   if (failures > 0) {
     console.error("실패: " + failures + "건");

@@ -12,6 +12,14 @@ const LISTS = [
   ["easyprivacy", "https://easylist.to/easylist/easyprivacy.txt"],
 ];
 
+// 한국 사이트 광고 도메인 보강 (AdAway / NoriDev / List-KR 참고)
+// node tools/build-filters.js --korean  로 별도 규칙셋만 생성한다.
+const KOREAN_LISTS = [
+  ["noridev", "https://raw.githubusercontent.com/noridev/NoriDev-AdBlock-Filter/master/filter/filter.txt"],
+];
+const KOREAN_ONLY = process.argv.includes("--korean");
+const ACTIVE_LISTS = KOREAN_ONLY ? KOREAN_LISTS : LISTS;
+
 // EasyList 리소스 타입 -> DNR resourceTypes
 const TYPE_MAP = {
   script: "script",
@@ -68,6 +76,9 @@ function sanitizeDomain(d) {
 
 function convertLine(rawLine) {
   let line = rawLine;
+  // HTML 필터링($$)과 요소 숨김 잔여물은 DNR urlFilter로 표현할 수 없으므로 제외
+  if (line.includes("$$")) return null;
+  if (/^[\w-]+$/.test(line.trim())) return null;
   let allow = false;
   if (line.startsWith("@@")) {
     allow = true;
@@ -158,7 +169,7 @@ async function main() {
   fs.mkdirSync(OUT_DIR, { recursive: true });
 
   let allLines = [];
-  for (const [name, url] of LISTS) {
+  for (const [name, url] of ACTIVE_LISTS) {
     const res = await fetch(url, { headers: { "user-agent": "Mozilla/5.0" } });
     if (!res.ok) throw new Error(name + " 다운로드 실패: HTTP " + res.status);
     const text = await res.text();
@@ -199,6 +210,14 @@ async function main() {
   const allowCount = rules.filter((r) => r.action.type === "allow").length;
   console.log("변환 규칙: " + rules.length + "개 (allow " + allowCount + ", block " + (rules.length - allowCount) + ")");
   console.log("제외된 줄: " + skipped);
+
+  if (KOREAN_ONLY) {
+    const file = path.join(OUT_DIR, "ruleset_korean.json");
+    fs.writeFileSync(file, JSON.stringify(rules));
+    console.log("filters/" + path.basename(file) + ": " + rules.length + "개");
+    if (rules.length === 0) throw new Error("변환된 규칙이 없습니다");
+    return;
+  }
 
   const CHUNK = 25000;
   let fileIndex = 0;

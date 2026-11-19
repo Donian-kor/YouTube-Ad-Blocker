@@ -148,7 +148,13 @@
       ".anti-adblock", "#anti-adblock", ".adblock-warning",
       ".adblock-detected", "#adblock-detected", ".disable-adblock",
       ".ddnad-wrapper", "ins.adsbygoogle", "[class*='adsbygoogle']",
-      "iframe[src*='googlesyndication']", "iframe[src*='doubleclick']"
+      "iframe[src*='googlesyndication']", "iframe[src*='doubleclick']",
+      // List-KR / NoriDev Adblock Warning Removal List 참고 확장
+      "#adblock-modal", "#adBlockAlert", "#adblockDetect", "#ad_blocker",
+      "#adb-warning", "#adblock-overlay", "#adblock_tooltip", "#anti_adblock",
+      ".ad-block-detected", ".adblock-notice", ".adblocker-message",
+      ".adblock-modal", ".adblock-overlay", ".ads-blocked",
+      "[class*='adblock-warning']", "[id*='adblock-detected']"
     ];
     var observer = new MutationObserver(function () {
       selectorsToHide.forEach(function (sel) {
@@ -161,7 +167,9 @@
       });
     });
     try {
-      observer.observe(document.documentElement || document.body, { childList: true, subtree: true });
+      // document_start 시점에는 documentElement/body가 아직 없을 수 있다.
+      // document는 항상 존재하므로 이를 감시해 이후 추가되는 노드를 놓치지 않는다.
+      observer.observe(document, { childList: true, subtree: true });
     } catch (e) {}
   })();
 

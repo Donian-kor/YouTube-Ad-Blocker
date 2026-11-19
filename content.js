@@ -56,8 +56,15 @@
       "ytd-display-ad-renderer",
       "ytd-banner-promo-renderer",
       "ytd-companion-slot-renderer",
+      "ytd-merch-shelf-renderer",
+      "ytd-inline-survey-renderer",
+      "ytm-ad-banner-renderer",
       ".ytp-ad-overlay-container",
-      ".ytp-ad-overlay-slot"
+      ".ytp-ad-overlay-slot",
+      ".ytp-ad-player-overlay",
+      ".ytp-ad-progress-list",
+      "[data-ad-t]",
+      "[data-ad-slot]"
     ].join(",") + "{display:none !important}";
     (document.head || document.documentElement).appendChild(style);
   }
@@ -101,19 +108,30 @@
     ".video-renderer .ad-badge",
     ".ad-under-video",
     ".ytp-ads",
-    ".ytm-ad-player-overlay"
+    ".ytm-ad-player-overlay",
+    // 최신 레이아웃 / 공통 광고 속성
+    "ytd-merch-shelf-renderer",
+    "ytd-inline-survey-renderer",
+    ".ytp-ad-progress-list",
+    "[data-ad-t]",
+    "[data-ad-slot]"
   ];
 
   let removedCount = 0;
 
+  // 선택자에 해당하는 요소를 "전부" 제거한다.
+  // (querySelector 한 건만 지우면 같은 광고가 여러 개 있을 때 남는다)
   function removeAd(selector) {
-    const el = document.querySelector(selector);
-    if (el && el.parentNode) {
-      el.remove();
-      removedCount++;
-      return true;
+    const elements = document.querySelectorAll(selector);
+    let count = 0;
+    for (const el of elements) {
+      if (el && el.parentNode) {
+        el.remove();
+        count++;
+      }
     }
-    return false;
+    if (count > 0) removedCount += count;
+    return count > 0;
   }
 
   function cleanupAds() {

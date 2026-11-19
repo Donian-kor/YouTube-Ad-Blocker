@@ -15,6 +15,13 @@ const adBlockRules = [
   { id: 7, priority: 1, action: { type: "block" }, condition: { urlFilter: "||youtube.com/pagead/" } },
   // 구글 검색/콘텐츠 광고 경로
   { id: 8, priority: 1, action: { type: "block" }, condition: { urlFilter: "||google.com/pagead/" } },
+  // 참고 필터(AdAway / NoriDev / List-KR) 기준 광고 전용 도메인 추가
+  { id: 9,  priority: 1, action: { type: "block" }, condition: { urlFilter: "||2mdn.net^" } },
+  { id: 10, priority: 1, action: { type: "block" }, condition: { urlFilter: "||googletagservices.com^" } },
+  { id: 11, priority: 1, action: { type: "block" }, condition: { urlFilter: "||adservice.google.com^" } },
+  { id: 12, priority: 1, action: { type: "block" }, condition: { urlFilter: "||ad.daum.net^" } },
+  { id: 13, priority: 1, action: { type: "block" }, condition: { urlFilter: "||ad.naver.com^" } },
+  { id: 14, priority: 1, action: { type: "block" }, condition: { urlFilter: "||wcs.naver.net^" } },
 ];
 
 // === 통계 관리 ===
@@ -204,7 +211,9 @@ chrome.declarativeNetRequest.onRuleMatchedDebug.addListener((info) => {
 const ALL_RULE_IDS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 
 // EasyList/EasyPrivacy 변환 규칙 (manifest의 정적 규칙 세트 ID)
-const STATIC_RULESET_IDS = ["general_1", "general_2", "general_3", "general_4", "general_5"];
+const STATIC_RULESET_IDS = [
+  "general_1", "general_2", "general_3", "general_4", "general_5", "general_korean"
+];
 
 function applyStaticRulesets(enabled) {
   chrome.declarativeNetRequest.updateEnabledRulesets(
