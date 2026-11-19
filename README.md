@@ -3,12 +3,13 @@
 크롬(Chrome)에서 유튜브 영상 광고와 일반 사이트 광고를 차단하는 확장 프로그램입니다.
 Manifest V3 기반이며, 개발자 모드에서 폴더 또는 ZIP을 불러와 사용합니다.
 
-**현재 버전: 1.2**
+**현재 버전: 1.3**
 
 ## 주요 기능
 
 - **유튜브 영상 광고 차단** — 플레이어 응답의 `adSlots` / `playerAds` / `adPlacements` / `adBreakHeartbeatParams` 를 제거하고 Shorts 광고 플래그(`isAd`)를 무력화
 - **일반 사이트 광고 차단** — EasyList + EasyPrivacy(약 10만 규칙)에 NoriDev 한국 광고 도메인 + Turtlecute 호스트 목록(총 330개)을 더해 DNR로 차단
+- **페이지 내부 인라인 광고 차단** — 네트워크 차단으로 잡히지 않는 배너/사이드바/스폰서/팝업/오버레이 광고를 CSS와 DOM 제거로 숨김 (`general-blocker.js`, tryblock.org 테스트 대응)
 - **사이트별 누적 차단 수** — 툴바 뱃지와 팝업에 표시. 페이지를 옮기거나 탭을 바꿔도 유지
 - **차단 URL 목록** — 팝업의 「총 차단」을 누르면 확인 가능
 - **광고 차단 ON/OFF 토글** — 팝업에서 즉시 전환
@@ -19,7 +20,7 @@ Manifest V3 기반이며, 개발자 모드에서 폴더 또는 ZIP을 불러와 
 
 ### ZIP 배포판으로 설치 (권장)
 
-1. GitHub Release 페이지에서 `youtube-ad-blocker-v1.2.zip` 을 내려받습니다.
+1. GitHub Release 페이지에서 `youtube-ad-blocker-v1.3.zip` 을 내려받습니다.
 2. ZIP의 압축을 풀어 폴더를 만듭니다. (`manifest.json`이 들어있는 폴더)
 3. 크롬 주소창에 `chrome://extensions/` 를 입력합니다.
 4. 오른쪽 위 **개발자 모드**를 켭니다.
@@ -41,6 +42,7 @@ background.js          DNR 규칙 제어, 사이트별 통계/뱃지, 우클릭 
 youtube-main.js        유튜브 페이지 MAIN world 후킹
 content.js             유튜브 DOM 정리 및 광고 자동 스킵 보조
 anti-bypass.js         안티애드블록 감지 무력화
+general-blocker.js     일반 사이트 인라인 광고 CSS 숨김 + DOM 제거
 element-blocker.js     우클릭 요소 차단
 popup.html / popup.js  팝업 UI
 options.html / options.js  설정 페이지
@@ -75,6 +77,7 @@ node tools/test-element-blocker.js
 - 안티애드블록 감시 Observer가 `document_start` 시점에 등록되지 않던 문제를 `document` 감시로 수정했습니다.
 - DNR 정적 규칙의 `||*` 패턴, 동적 규칙 id 중복 등 실제 브라우저에서만 드러나던 로드 오류를 수정했습니다.
 - 한국 광고 도메인 + Turtlecute 규칙(330개)을 별도 규칙셋으로 추가했습니다.
+- **v1.3**: 네트워크 차단으로 잡히지 않는 페이지 내부 광고(배너·사이드바·스폰서·인라인·동적·오버레이·가짜 다운로드·안티애드블록 경고)를 `general-blocker.js`로 숨기고 제거하도록 했습니다. tryblock.org 3단계 테스트에서 확인했습니다.
 
 ## 참고 자료
 
@@ -86,6 +89,7 @@ node tools/test-element-blocker.js
 - [AdAway](https://github.com/AdAway/AdAway) — 호스트 기반 차단 도메인 참고
 - [Turtlecute Host List](https://adblock.turtlecute.org/d3host.adblock) — 간단 호스트 차단 목록 (보조 규칙셋에 포함)
 - [hagezi/dns-blocklists](https://github.com/hagezi/dns-blocklists) — DNS 차단 목록 구조 참고 (규모가 커서 현재 미포함)
+- [tryblock.org](https://tryblock.org/ko) — 인라인 DOM 광고 차단 테스트 (기본/중급/고급 3단계 검증)
 
 ## 참고
 
