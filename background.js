@@ -23,11 +23,12 @@ const adBlockRules = [
   { id: 13, priority: 1, action: { type: "block" }, condition: { urlFilter: "||ad.naver.com^" } },
   { id: 14, priority: 1, action: { type: "block" }, condition: { urlFilter: "||wcs.naver.net^" } },
   // d3ward.com 광고 차단 테스트에서 누락된 도메인/스크립트
-  { id: 15, priority: 1, action: { type: "block" }, condition: { urlFilter: "||udc.yahoo.com^" } },
-  { id: 16, priority: 1, action: { type: "block" }, condition: { urlFilter: "||metrics.icloud.com^" } },
-  { id: 17, priority: 1, action: { type: "block" }, condition: { urlFilter: "||iadsdk.apple.com^" } },
-  { id: 18, priority: 1, action: { type: "block" }, condition: { urlFilter: "||d3ward.com/js/ads.js" } },
-  { id: 19, priority: 1, action: { type: "block" }, condition: { urlFilter: "||d3ward.com/js/pagead.js" } },
+  // priority 11: 정적 필터의 allow(priority 10) 규칙을 덮어 차단되도록 보장
+  { id: 15, priority: 11, action: { type: "block" }, condition: { urlFilter: "||udc.yahoo.com^" } },
+  { id: 16, priority: 11, action: { type: "block" }, condition: { urlFilter: "||metrics.icloud.com^" } },
+  { id: 17, priority: 11, action: { type: "block" }, condition: { urlFilter: "||iadsdk.apple.com^" } },
+  { id: 18, priority: 11, action: { type: "block" }, condition: { urlFilter: "||d3ward.com/js/widget/ads.js" } },
+  { id: 19, priority: 11, action: { type: "block" }, condition: { urlFilter: "||d3ward.com/js/pagead.js" } },
 ];
 
 // === 통계 관리 ===
