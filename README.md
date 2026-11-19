@@ -63,6 +63,7 @@ node tools/validate-rules.js         # 규칙 검증
 node tools/test-main-hook.js         # 유튜브 후킹 테스트
 node tools/test-site-badge.js        # 사이트별 뱃지 테스트
 node tools/test-element-blocker.js   # 우클릭 요소 차단 테스트
+node tools/test-filehost-blocker.js  # 해외 파일 공유 사이트 차단 테스트
 ```
 
 ## 테스트 사이트 검증 내역
@@ -83,6 +84,10 @@ node tools/test-element-blocker.js   # 우클릭 요소 차단 테스트
 | [obfusgated.com](https://obfusgated.com/tools/ad-block-test) | 267개 도메인 | 55개 미차단 도메인을 `extra-hosts` 규칙셋에 추가 (AppLovin, Vungle, Supersonic, Consent/CMP, Video Ads 등) |
 | [ipcheck.ing](https://ipcheck.ing/tools/adblocktest) | 196개 도메인/스크립트 | 26개 미차단 도메인(Pangle, Baidu, LINE, vivo, Amazon devices 등) 추가 |
 | [superadblocktest.com](https://superadblocktest.com/) | 482개 도메인 | 105개 미차단 중 신규 48개 추가 (CMP 동의관리, 실험플랫폼, 모바일 애트리뷰션, Live Chat, FreeWheel 등) |
+| [gigafile.nu](https://gigafile.nu/) | 배너·전면(인테리셔널) 광고 + Ad-Shield 안티애드블록 | 광고 슬롯·iframe·오버레이 제거, Ad-Shield 광고 도메인 차단 (DOM+네트워크 병행) |
+| [gofile.io](https://gofile.io/) | 다운로드 페이지 광고 슬롯 | `#ad-slot` 광고 영역 제거, 실제 다운로드 버튼 유지 |
+| [akirabox.com](https://akirabox.com/) | 다운로드 클릭 시 가짜 팝업/리다이렉트 | 팝오버·팝언더·외부 광고 링크 차단 |
+| [buzzheavier.com](https://buzzheavier.com/) | 팝오버/언더 + 가짜 다운로드 | 팝업/리다이렉트 차단, 실제 다운로드(hx-get /download) 버튼 보존 |
 | 유튜브 | 영상 전/중·Shorts·피드·배너 | 광고 필드·DOM 0개, 영상 정상 재생 확인 |
 
 ## 개선 내역 (버전별)
