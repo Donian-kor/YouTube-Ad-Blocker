@@ -3,7 +3,7 @@
 크롬(Chrome)에서 유튜브 영상 광고와 일반 사이트 광고를 차단하는 Manifest V3 확장 프로그램입니다.
 개발자 모드에서 폴더 또는 ZIP을 불러와 사용합니다.
 
-**현재 버전: 3.0**
+**현재 버전: 3.1**
 
 ## 주요 기능
 
@@ -21,7 +21,7 @@
 
 ### ZIP 배포판 (권장)
 
-1. GitHub Release에서 `youtube-ad-blocker-v3.0.zip` 다운로드
+1. GitHub Release에서 `youtube-ad-blocker-v3.1.zip` 다운로드
 2. 압축 해제 (`manifest.json`이 들어있는 폴더 확인)
 3. `chrome://extensions/` 접속 → **개발자 모드** ON
 4. **압축해제된 확장 프로그램을 로드합니다** → 2번 폴더 선택
@@ -108,6 +108,7 @@ node tools/test-filehost-blocker.js  # 해외 파일 공유 사이트 차단 테
 - **v2.8**: `redirector.googlevideo.com` 차단 제거 — 유튜브 영상 로딩이 약 5초 지연되는 문제가 확인되어 예외 처리 (나머지 3개는 유지, 총 457개)
 - **v2.9**: `s.youtube.com` 차단 제거 — 광고 도메인이 아닌 시청 통계/재생 위치 저장용 telemetry라 차단 불필요 (광고 전용 `ads.youtube.com`은 유지, 총 456개)
 - **v3.0**: 해외 파일 공유 사이트(gigafile·gofile·akirabox·buzzheavier) 광고·팝오버/언더·가짜 다운로드 차단 추가 — DNR 광고 도메인 33개 추가, `filehost-blocker.js` 신규 도입 (실제 다운로드 버튼은 보존)
+- **v3.1**: 유튜브 홈 그리드에서 광고 렌더러만 제거되어 빈 칸(325×260px)이 남던 문제 수정 — 광고를 감싼 `ytd-rich-item-renderer` 셀째로 숨기고 제거
 
 ## 참고 자료
 

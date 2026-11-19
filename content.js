@@ -46,7 +46,7 @@
     if (document.getElementById("yab-ad-hide-style")) return;
     const style = document.createElement("style");
     style.id = "yab-ad-hide-style";
-    style.textContent = [
+    const adSelectors = [
       "#masthead-ad",
       "#player-ads",
       "ytd-ad-slot-renderer",
@@ -65,7 +65,14 @@
       ".ytp-ad-progress-list",
       "[data-ad-t]",
       "[data-ad-slot]"
-    ].join(",") + "{display:none !important}";
+    ];
+    // 유튜브 홈 그리드의 광고는 ytd-rich-item-renderer 셀 안에 들어 있다.
+    // 광고 렌더러만 숨기면 셀이 빈 채로 남아 325x260px 공간이 보이므로 셀째로 숨긴다.
+    const adGridCellSelector = "ytd-rich-item-renderer:has(ytd-ad-slot-renderer," +
+      "ytd-promoted-sparkles-web-renderer,ytd-promoted-video-renderer," +
+      "ytd-in-feed-ad-layout-renderer,ytd-display-ad-renderer," +
+      "ytd-banner-promo-renderer,[data-ad-slot])";
+    style.textContent = adSelectors.join(",") + "," + adGridCellSelector + "{display:none !important}";
     (document.head || document.documentElement).appendChild(style);
   }
 
@@ -126,7 +133,13 @@
     let count = 0;
     for (const el of elements) {
       if (el && el.parentNode) {
+        // 홈 그리드에서는 광고 렌더러를 감싼 셀도 함께 지워야 빈 칸이 남지 않는다.
+        const cell = el.closest("ytd-rich-item-renderer");
         el.remove();
+        if (cell && cell.parentNode) {
+          const content = cell.querySelector("#content");
+          if (content && content.children.length === 0) cell.remove();
+        }
         count++;
       }
     }
@@ -220,9 +233,28 @@
     subtree: true
   });
 
+  // 다른 스크립트(general-blocker.js)에 의해 안쪽만 지워진 그리드 셀도 정리한다.
+  // 로딩 중인 셀을 지우지 않도록 일정 시간 이상 비어 있는 셀만 대상으로 한다.
+  const emptyCellSince = new WeakMap();
+  function cleanupEmptyGridCells() {
+    if (!enabled) return;
+    const now = Date.now();
+    document.querySelectorAll("ytd-rich-item-renderer").forEach((cell) => {
+      const content = cell.querySelector("#content");
+      if (content && content.children.length === 0) {
+        const since = emptyCellSince.get(cell);
+        if (since === undefined) emptyCellSince.set(cell, now);
+        else if (now - since >= 5000) cell.remove();
+      } else {
+        emptyCellSince.delete(cell);
+      }
+    });
+  }
+
   // 주기적 재확인
   setInterval(() => {
     cleanupAds();
+    cleanupEmptyGridCells();
   }, 2000);
 
   // 광고 스킵은 0.5초 간격으로 빠르게 감지
