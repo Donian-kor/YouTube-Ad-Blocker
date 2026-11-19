@@ -14,3 +14,6 @@ tools/tmp/*
 node_modules/
 Thumbs.db
 .DS_Store
+
+# 배포 게시글 (로컬에서만 관리, 저장소에는 올리지 않음)
+docs/배포게시글.md
