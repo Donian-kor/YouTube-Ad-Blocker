@@ -154,7 +154,9 @@
       "#adb-warning", "#adblock-overlay", "#adblock_tooltip", "#anti_adblock",
       ".ad-block-detected", ".adblock-notice", ".adblocker-message",
       ".adblock-modal", ".adblock-overlay", ".ads-blocked",
-      "[class*='adblock-warning']", "[id*='adblock-detected']"
+      "[class*='adblock-warning']", "[id*='adblock-detected']",
+      // tryblock.org 광고 차단 우회 챌린지의 감지 결과 메시지
+      ".test-area .text-center", ".test-area .text-red-400"
     ];
     var observer = new MutationObserver(function () {
       selectorsToHide.forEach(function (sel) {

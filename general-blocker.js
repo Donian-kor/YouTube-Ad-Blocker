@@ -27,6 +27,8 @@
     ".trigger-popup", ".fake-close-button",
     // 악성 리디렉션 체인 (고급 테스트)
     ".redirect-test", ".redirect-preview", ".redirect-icon",
+    // 광고 차단 우회 챌린지의 감지 결과 메시지
+    ".test-area .text-center", ".test-area .text-red-400",
     // 일반 사이트에서 흔한 광고 클래스
     ".adsbygoogle", ".advertisement", ".advert", ".ad-banner", ".ad-slot",
     ".ad-wrapper", ".ad-unit", ".ad-overlay", ".ad-modal", ".ad-popup",
