@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "YouTube Ad Blocker",
-  "version": "2.3",
+  "version": "2.4",
   "description": "PC 크롬에서 유튜브 광고를 차단하고 통계를 확인합니다.",
   "permissions": [
     "declarativeNetRequest",
@@ -60,6 +60,12 @@
       "matches": ["*://*.youtube.com/*"],
       "js": ["content.js"],
       "run_at": "document_idle"
+    },
+    {
+      "matches": ["*://*.skidrowreloaded.com/*"],
+      "js": ["popunder-blocker.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
     },
     {
       "matches": ["http://*/*", "https://*/*"],

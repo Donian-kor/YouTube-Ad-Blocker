@@ -3,7 +3,7 @@
 크롬(Chrome)에서 유튜브 영상 광고와 일반 사이트 광고를 차단하는 Manifest V3 확장 프로그램입니다.
 개발자 모드에서 폴더 또는 ZIP을 불러와 사용합니다.
 
-**현재 버전: 2.3**
+**현재 버전: 2.4**
 
 ## 주요 기능
 
@@ -20,7 +20,7 @@
 
 ### ZIP 배포판 (권장)
 
-1. GitHub Release에서 `youtube-ad-blocker-v2.3.zip` 다운로드
+1. GitHub Release에서 `youtube-ad-blocker-v2.4.zip` 다운로드
 2. 압축 해제 (`manifest.json`이 들어있는 폴더 확인)
 3. `chrome://extensions/` 접속 → **개발자 모드** ON
 4. **압축해제된 확장 프로그램을 로드합니다** → 2번 폴더 선택
@@ -41,6 +41,7 @@ background.js          DNR 규칙/통계/뱃지/우클릭 메뉴, 사이트별 a
 youtube-main.js        유튜브 MAIN world 응답 후킹
 content.js             유튜브 DOM 정리/광고 스킵
 general-blocker.js     일반 사이트 인라인 광고 숨김 (tryblock, dogdrip, d3ward, uBO 테스트)
+popunder-blocker.js    skidrowreloaded 클릭 리다이렉트(popunder) 차단 (MAIN world)
 anti-bypass.js         안티애드블록 감지 무력화
 element-blocker.js     우클릭 요소 차단
 popup.html / popup.js  팝업 UI
@@ -76,7 +77,7 @@ node tools/test-element-blocker.js   # 우클릭 요소 차단 테스트
 | [raymondhill.net/ublock](https://raymondhill.net/ublock/tests.html) | uBO 공식 네트워크+코스메틱 | 광고 iframe(`ad.html`) 차단, `#ADSLOT_1` 코스메틱 제거 (대조군 iframe은 유지) |
 | [canyoublockit.com](https://canyoublockit.com/testing/) | 셀프호스팅 배너·인터스티셜·네이티브·팝언더·푸시·대체콘텐츠 | 광고 마커(`#adsense`, `#interads*`, `.an-advert-banner` 등) 숨김, 설명용 이미지는 유지 |
 | [down.mdiaload.com](https://down.mdiaload.com/download5295101) | 구글 광고 슬롯/iframe + 추적 | 다운로드 대기화면의 `.demand-supply`·`google_ads_iframe_*`·`usrpubtrck.com` 차단 |
-| [skidrowreloaded.com](https://www.skidrowreloaded.com/) | 추적 베이트 | `usrpubtrck.com` 차단 확인, 실제 광고 배너 없음 |
+| [skidrowreloaded.com](https://www.skidrowreloaded.com/) | 추적 베이트 + 클릭 리다이렉트(popunder) | `usrpubtrck.com` 차단, `aclib.runPop` popunder 무력화 (아무 데나 클릭해도 광고 사이트로 이동 안 함) |
 | 유튜브 | 영상 전/중·Shorts·피드·배너 | 광고 필드·DOM 0개, 영상 정상 재생 확인 |
 
 ## 개선 내역 (버전별)
@@ -90,6 +91,7 @@ node tools/test-element-blocker.js   # 우클릭 요소 차단 테스트
 - **v2.1**: uBO 공식 테스트의 광고 iframe·`#ADSLOT_1` 차단 추가, README 정리
 - **v2.2**: canyoublockit 자체 호스팅 광고(배너·인터스티셜·네이티브·팝언더 등) 대응, 토글 ON/OFF 시 페이지 자동 새로고침 및 OFF 시 회색 아이콘 적용
 - **v2.3**: down.mdiaload 다운로드 대기화면 구글 광고 슬롯/iframe 차단, `usrpubtrck.com` 추적 도메인 차단 추가
+- **v2.4**: skidrowreloaded의 화면 클릭 시 광고 사이트로 이동하는 popunder(`aclib.runPop`)를 MAIN world에서 무력화
 
 ## 참고 자료
 
