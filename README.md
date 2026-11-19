@@ -3,7 +3,7 @@
 크롬(Chrome)에서 유튜브 영상 광고와 일반 사이트 광고를 차단하는 Manifest V3 확장 프로그램입니다.
 개발자 모드에서 폴더 또는 ZIP을 불러와 사용합니다.
 
-**현재 버전: 2.4**
+**현재 버전: 2.5**
 
 ## 주요 기능
 
@@ -20,7 +20,7 @@
 
 ### ZIP 배포판 (권장)
 
-1. GitHub Release에서 `youtube-ad-blocker-v2.4.zip` 다운로드
+1. GitHub Release에서 `youtube-ad-blocker-v2.5.zip` 다운로드
 2. 압축 해제 (`manifest.json`이 들어있는 폴더 확인)
 3. `chrome://extensions/` 접속 → **개발자 모드** ON
 4. **압축해제된 확장 프로그램을 로드합니다** → 2번 폴더 선택
@@ -55,7 +55,7 @@ _metadata/             DNR 인덱스 캐시 (배포 ZIP 미포함)
 
 ```bash
 node tools/build-filters.js          # EasyList + EasyPrivacy → ruleset_1~5.json
-node tools/build-filters.js --korean # NoriDev + Turtlecute + d3Host → ruleset_korean.json
+node tools/build-filters.js --korean # NoriDev + Turtlecute + d3Host + extra-hosts → ruleset_korean.json
 
 node tools/validate-rules.js         # 규칙 검증
 node tools/test-main-hook.js         # 유튜브 후킹 테스트
@@ -78,6 +78,8 @@ node tools/test-element-blocker.js   # 우클릭 요소 차단 테스트
 | [canyoublockit.com](https://canyoublockit.com/testing/) | 셀프호스팅 배너·인터스티셜·네이티브·팝언더·푸시·대체콘텐츠 | 광고 마커(`#adsense`, `#interads*`, `.an-advert-banner` 등) 숨김, 설명용 이미지는 유지 |
 | [down.mdiaload.com](https://down.mdiaload.com/download5295101) | 구글 광고 슬롯/iframe + 추적 | 다운로드 대기화면의 `.demand-supply`·`google_ads_iframe_*`·`usrpubtrck.com` 차단 |
 | [skidrowreloaded.com](https://www.skidrowreloaded.com/) | 추적 베이트 + 클릭 리다이렉트(popunder) | `usrpubtrck.com` 차단, `aclib.runPop` popunder 무력화 (아무 데나 클릭해도 광고 사이트로 이동 안 함) |
+| [obfusgated.com](https://obfusgated.com/tools/ad-block-test) | 267개 도메인 | 55개 미차단 도메인을 `extra-hosts` 규칙셋에 추가 (AppLovin, Vungle, Supersonic, Consent/CMP, Video Ads 등) |
+| [ipcheck.ing](https://ipcheck.ing/tools/adblocktest) | 196개 도메인/스크립트 | 26개 미차단 도메인(Pangle, Baidu, LINE, vivo, Amazon devices 등) 추가 |
 | 유튜브 | 영상 전/중·Shorts·피드·배너 | 광고 필드·DOM 0개, 영상 정상 재생 확인 |
 
 ## 개선 내역 (버전별)
@@ -92,6 +94,7 @@ node tools/test-element-blocker.js   # 우클릭 요소 차단 테스트
 - **v2.2**: canyoublockit 자체 호스팅 광고(배너·인터스티셜·네이티브·팝언더 등) 대응, 토글 ON/OFF 시 페이지 자동 새로고침 및 OFF 시 회색 아이콘 적용
 - **v2.3**: down.mdiaload 다운로드 대기화면 구글 광고 슬롯/iframe 차단, `usrpubtrck.com` 추적 도메인 차단 추가
 - **v2.4**: skidrowreloaded의 화면 클릭 시 광고 사이트로 이동하는 popunder(`aclib.runPop`)를 MAIN world에서 무력화
+- **v2.5**: obfusgated(55)+ipcheck(26) 테스트 미차단 도메인 72개를 `extra-hosts` 규칙셋에 추가 (정적 allow를 덮도록 priority 11 적용)
 
 ## 참고 자료
 
@@ -100,7 +103,7 @@ node tools/test-element-blocker.js   # 우클릭 요소 차단 테스트
 - [NoriDev-AdBlock-Filter](https://github.com/noridev/NoriDev-AdBlock-Filter), [List-KR](https://github.com/List-KR/List-KR), [filterslists-ko](https://github.com/FilteringDev/filterslists-ko) — 한국 광고 도메인/필터
 - [AdAway](https://github.com/AdAway/AdAway), [hagezi/dns-blocklists](https://github.com/hagezi/dns-blocklists) — 호스트 기반 차단 참고 (hagezi는 규모가 커 미포함)
 - [Turtlecute Host List](https://adblock.turtlecute.org/d3host.adblock), [d3ward d3Host](https://raw.githubusercontent.com/d3ward/toolz/master/src/d3host.txt) — 호스트 목록 (보조 규칙셋 포함)
-- [tryblock.org](https://tryblock.org/ko), [d3ward.com](https://d3ward.com/adblock), [paileactivist/toolz](https://paileactivist.github.io/toolz/adblock.html), [canyoublockit.com](https://canyoublockit.com/testing/), [raymondhill.net/ublock](https://raymondhill.net/ublock/tests.html) — 차단 테스트 사이트
+- [tryblock.org](https://tryblock.org/ko), [d3ward.com](https://d3ward.com/adblock), [paileactivist/toolz](https://paileactivist.github.io/toolz/adblock.html), [canyoublockit.com](https://canyoublockit.com/testing/), [raymondhill.net/ublock](https://raymondhill.net/ublock/tests.html), [obfusgated.com](https://obfusgated.com/tools/ad-block-test), [ipcheck.ing](https://ipcheck.ing/tools/adblocktest) — 차단 테스트 사이트
 
 ## 주의
 

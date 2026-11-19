@@ -19,6 +19,8 @@ const KOREAN_LISTS = [
   ["noridev", "https://raw.githubusercontent.com/noridev/NoriDev-AdBlock-Filter/master/filter/filter.txt"],
   ["turtlecute", "https://adblock.turtlecute.org/d3host.adblock"],
   ["d3host", "https://raw.githubusercontent.com/d3ward/toolz/master/src/d3host.txt"],
+  // obfusgated/ipcheck 테스트에서 미차단된 도메인 (로컬 호스트 목록)
+  ["extra-hosts", "file:tools/tmp/extra-hosts.txt"],
 ];
 const KOREAN_ONLY = process.argv.includes("--korean");
 const ACTIVE_LISTS = KOREAN_ONLY ? KOREAN_LISTS : LISTS;
@@ -85,7 +87,8 @@ function convertLine(rawLine) {
     const domain = hostsMatch[1].toLowerCase();
     if (!domain || domain.indexOf(".") === -1) return null;
     return {
-      priority: 1,
+      // 정적 필터의 allow(priority 10) 규칙을 덮어 차단이 보장되도록 11 사용
+      priority: 11,
       action: { type: "block" },
       condition: { urlFilter: "||" + domain + "^" }
     };
@@ -187,9 +190,16 @@ async function main() {
 
   let allLines = [];
   for (const [name, url] of ACTIVE_LISTS) {
-    const res = await fetch(url, { headers: { "user-agent": "Mozilla/5.0" } });
-    if (!res.ok) throw new Error(name + " 다운로드 실패: HTTP " + res.status);
-    const text = await res.text();
+    let text;
+    if (url.startsWith("file:")) {
+      // 로컬 파일 소스 (file:tools/tmp/...)
+      const local = path.resolve(ROOT, url.slice(5));
+      text = fs.readFileSync(local, "utf8");
+    } else {
+      const res = await fetch(url, { headers: { "user-agent": "Mozilla/5.0" } });
+      if (!res.ok) throw new Error(name + " 다운로드 실패: HTTP " + res.status);
+      text = await res.text();
+    }
     fs.writeFileSync(path.join(TMP_DIR, name + ".txt"), text);
     const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
     allLines = allLines.concat(lines);

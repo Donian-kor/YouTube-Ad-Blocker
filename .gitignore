@@ -2,7 +2,8 @@
 _metadata/
 
 # 필터 원본 다운로드 임시 폴더 (tools/build-filters.js 로 다시 받을 수 있음)
-tools/tmp/
+tools/tmp/*
+!tools/tmp/extra-hosts.txt
 
 # 패키징 결과물
 *.zip
