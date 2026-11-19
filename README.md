@@ -118,6 +118,17 @@ node tools/test-filehost-blocker.js  # 해외 파일 공유 사이트 차단 테
 - [Turtlecute Host List](https://adblock.turtlecute.org/d3host.adblock), [d3ward d3Host](https://raw.githubusercontent.com/d3ward/toolz/master/src/d3host.txt) — 호스트 목록 (보조 규칙셋 포함)
 - [tryblock.org](https://tryblock.org/ko), [d3ward.com](https://d3ward.com/adblock), [paileactivist/toolz](https://paileactivist.github.io/toolz/adblock.html), [canyoublockit.com](https://canyoublockit.com/testing/), [raymondhill.net/ublock](https://raymondhill.net/ublock/tests.html), [obfusgated.com](https://obfusgated.com/tools/ad-block-test), [ipcheck.ing](https://ipcheck.ing/tools/adblocktest), [superadblocktest.com](https://superadblocktest.com/) — 차단 테스트 사이트
 
+## 라이선스
+
+이 프로젝트는 **CC BY-NC-SA 4.0** (Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International) 라이선스를 따릅니다.
+
+- 저작자를 표시하고 비상업적 용도로 사용하는 한 공유·수정이 가능합니다.
+- 수정·변형한 결과물은 동일한 라이선스로 배포해야 합니다.
+- 상업적 이용은 별도 문의가 필요합니다.
+- 자세한 내용은 [LICENSE](LICENSE) 파일과 [공식 라이선스 전문](https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode)을 참고하세요.
+
+> 내장된 필터 데이터(Turtlecute, d3Host)도 CC BY-NC-SA이며, EasyList/EasyPrivacy는 CC BY-SA 3.0입니다. 프로젝트 라이선스를 이에 맞췄습니다.
+
 ## 주의
 
 - 통계는 `chrome.declarativeNetRequest.onRuleMatchedDebug`를 사용하므로 **개발자 모드 확장에서만** 동작합니다.
