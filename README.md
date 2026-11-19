@@ -3,7 +3,7 @@
 크롬(Chrome)에서 유튜브 영상 광고와 일반 사이트 광고를 차단하는 Manifest V3 확장 프로그램입니다.
 개발자 모드에서 폴더 또는 ZIP을 불러와 사용합니다.
 
-**현재 버전: 2.7**
+**현재 버전: 2.8**
 
 ## 주요 기능
 
@@ -20,7 +20,7 @@
 
 ### ZIP 배포판 (권장)
 
-1. GitHub Release에서 `youtube-ad-blocker-v2.7.zip` 다운로드
+1. GitHub Release에서 `youtube-ad-blocker-v2.8.zip` 다운로드
 2. 압축 해제 (`manifest.json`이 들어있는 폴더 확인)
 3. `chrome://extensions/` 접속 → **개발자 모드** ON
 4. **압축해제된 확장 프로그램을 로드합니다** → 2번 폴더 선택
@@ -98,6 +98,7 @@ node tools/test-element-blocker.js   # 우클릭 요소 차단 테스트
 - **v2.5**: obfusgated(55)+ipcheck(26) 테스트 미차단 도메인 72개를 `extra-hosts` 규칙셋에 추가 (정적 allow를 덮도록 priority 11 적용)
 - **v2.6**: superadblocktest 미차단 105개 중 신규 48개 도메인 추가 (보조 규칙셋 총 454개)
 - **v2.7**: 잔여 4개 도메인(`redirector.googlevideo.com`, `analytics.x.com`, `ads.x.com`, `mon.tiktokv.com`) 추가 (총 458개)
+- **v2.8**: `redirector.googlevideo.com` 차단 제거 — 유튜브 영상 로딩이 약 5초 지연되는 문제가 확인되어 예외 처리 (나머지 3개는 유지, 총 457개)
 
 ## 참고 자료
 
@@ -113,3 +114,4 @@ node tools/test-element-blocker.js   # 우클릭 요소 차단 테스트
 - 통계는 `chrome.declarativeNetRequest.onRuleMatchedDebug`를 사용하므로 **개발자 모드 확장에서만** 동작합니다.
 - 사이트별 차단 수는 `chrome.storage.local`의 `siteCounts`, 직접 차단 요소는 `blockedSelectors`에 저장됩니다.
 - 정적 규칙 파일 수정 후에는 확장을 **재로드(↻)** 해야 반영됩니다.
+- `redirector.googlevideo.com`은 유튜브 스트리밍 리다이렉터로, 차단 시 영상 로딩이 지연되어 의도적으로 예외 처리했습니다 (테스트 점수보다 실제 이용 우선).

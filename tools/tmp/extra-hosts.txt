@@ -118,7 +118,6 @@
 0.0.0.0 prd.jwpltx.com
 0.0.0.0 bea4.v.fwmrm.net
 0.0.0.0 2975c.v.fwmrm.net
-0.0.0.0 redirector.googlevideo.com
 0.0.0.0 analytics.x.com
 0.0.0.0 ads.x.com
 0.0.0.0 mon.tiktokv.com
