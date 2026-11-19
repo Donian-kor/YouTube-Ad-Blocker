@@ -3,7 +3,7 @@
 크롬(Chrome)에서 유튜브 영상 광고와 일반 사이트 광고를 차단하는 확장 프로그램입니다.
 Manifest V3 기반이며, 개발자 모드에서 폴더 또는 ZIP을 불러와 사용합니다.
 
-**현재 버전: 1.9**
+**현재 버전: 2.0**
 
 ## 주요 기능
 
@@ -20,7 +20,7 @@ Manifest V3 기반이며, 개발자 모드에서 폴더 또는 ZIP을 불러와 
 
 ### ZIP 배포판으로 설치 (권장)
 
-1. GitHub Release 페이지에서 `youtube-ad-blocker-v1.9.zip` 을 내려받습니다.
+1. GitHub Release 페이지에서 `youtube-ad-blocker-v2.0.zip` 을 내려받습니다.
 2. ZIP의 압축을 풀어 폴더를 만듭니다. (`manifest.json`이 들어있는 폴더)
 3. 크롬 주소창에 `chrome://extensions/` 를 입력합니다.
 4. 오른쪽 위 **개발자 모드**를 켭니다.
@@ -85,6 +85,7 @@ node tools/test-element-blocker.js
 - **v1.8**: d3ward.com 광고 차단 테스트의 미차단 6건을 보완했습니다. 누락 도메인, 광고 스크립트, 코스메틱 테스트 대상(`#cts_test`, `#ad_ctd`)을 차단합니다.
 - **v1.9**: d3ward 잔여 3건 수정 — 잘못된 `ads.js` 경로(`/js/widget/ads.js`)로 변경하고, 정적 allow 규칙에 밀리던 도메인 차단 규칙의 우선순위를 11로 올렸습니다.
 - **d3Host 통합**: d3ward 공식 호스트 리스트(131개 도메인)를 보조 규칙셋에 추가했습니다 (hosts 형식 `0.0.0.0` → DNR `||domain^` 변환 지원).
+- **v2.0**: paileactivist/toolz(d3ward 구버전) 테스트의 미차단 14개 도메인(Google/Amazon/Facebook/Twitter/Pinterest/Reddit/Apple/Xiaomi 광고)을 차단 규칙에 추가했습니다.
 
 ## 참고 자료
 

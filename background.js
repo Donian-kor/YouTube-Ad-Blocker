@@ -29,6 +29,21 @@ const adBlockRules = [
   { id: 17, priority: 11, action: { type: "block" }, condition: { urlFilter: "||iadsdk.apple.com^" } },
   { id: 18, priority: 11, action: { type: "block" }, condition: { urlFilter: "||d3ward.com/js/widget/ads.js" } },
   { id: 19, priority: 11, action: { type: "block" }, condition: { urlFilter: "||d3ward.com/js/pagead.js" } },
+  // paileactivist/toolz (d3ward 구버전) 테스트에서 누락된 도메인
+  { id: 20, priority: 11, action: { type: "block" }, condition: { urlFilter: "||ads.google.com^" } },
+  { id: 21, priority: 11, action: { type: "block" }, condition: { urlFilter: "||affiliationjs.s3.amazonaws.com^" } },
+  { id: 22, priority: 11, action: { type: "block" }, condition: { urlFilter: "||advertising-api-eu.amazon.com^" } },
+  { id: 23, priority: 11, action: { type: "block" }, condition: { urlFilter: "||ads.facebook.com^" } },
+  { id: 24, priority: 11, action: { type: "block" }, condition: { urlFilter: "||advertising.twitter.com^" } },
+  { id: 25, priority: 11, action: { type: "block" }, condition: { urlFilter: "||ads-dev.pinterest.com^" } },
+  { id: 26, priority: 11, action: { type: "block" }, condition: { urlFilter: "||widgets.pinterest.com^" } },
+  { id: 27, priority: 11, action: { type: "block" }, condition: { urlFilter: "||ads.reddit.com^" } },
+  { id: 28, priority: 11, action: { type: "block" }, condition: { urlFilter: "||d.reddit.com^" } },
+  { id: 29, priority: 11, action: { type: "block" }, condition: { urlFilter: "||data.mistat.intl.xiaomi.com^" } },
+  { id: 30, priority: 11, action: { type: "block" }, condition: { urlFilter: "||tracking.intl.miui.com^" } },
+  { id: 31, priority: 11, action: { type: "block" }, condition: { urlFilter: "||tracking.india.miui.com^" } },
+  { id: 32, priority: 11, action: { type: "block" }, condition: { urlFilter: "||securemetrics.apple.com^" } },
+  { id: 33, priority: 11, action: { type: "block" }, condition: { urlFilter: "||supportmetrics.apple.com^" } },
 ];
 
 // === 통계 관리 ===
@@ -232,7 +247,11 @@ const dogdripAllowRules = DOGDRIP_DETECTION_DOMAINS.map((domain, i) => ({
 // 1~14: 이전 버전에서 등록된 잔여 규칙까지 모두 제거하기 위해 넓게 지정
 // 100: YouTube Studio 허용 규칙 / 101~109: dogdrip 감지 우회 허용 규칙
 // 재적용 시 중복 ID 오류를 막기 위해 모두 함께 제거한다.
-const ALL_RULE_IDS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109];
+const ALL_RULE_IDS = [
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+  20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33,
+  100, 101, 102, 103, 104, 105, 106, 107, 108, 109
+];
 
 // EasyList/EasyPrivacy 변환 규칙 (manifest의 정적 규칙 세트 ID)
 const STATIC_RULESET_IDS = [
