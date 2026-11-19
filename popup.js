@@ -11,6 +11,7 @@
     const enabled = result.adBlockerEnabled !== undefined ? result.adBlockerEnabled : true;
     toggle.checked = enabled;
     updateToggleUI(enabled);
+    updateActionIcon(enabled);
   });
 
   toggle.addEventListener("change", () => {
@@ -18,14 +19,29 @@
     chrome.storage.local.set({ adBlockerEnabled: enabled });
     updateToggleUI(enabled);
 
+    // 아이콘을 회색/원래 상태로 즉시 전환 (시각적 OFF 표시)
+    updateActionIcon(enabled);
+
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs[0] && tabs[0].url && tabs[0].url.includes("youtube.com")) {
-        chrome.tabs.sendMessage(tabs[0].id, { type: "toggle", enabled }, () => {
+      const tab = tabs[0];
+      if (!tab) return;
+      if (tab.url && tab.url.includes("youtube.com")) {
+        chrome.tabs.sendMessage(tab.id, { type: "toggle", enabled }, () => {
           void chrome.runtime.lastError; // content script가 없으면 무시
         });
       }
+      // 토글 ON/OFF 후 페이지를 새로고침해 광고 차단 상태를 즉시 반영
+      if (tab.id !== undefined) chrome.tabs.reload(tab.id);
     });
   });
+
+  function updateActionIcon(enabled) {
+    if (!chrome.action || !chrome.action.setIcon) return;
+    const path = enabled
+      ? { 16: "icon16.png", 48: "icon48.png", 128: "icon128.png" }
+      : { 16: "icon16-off.png", 48: "icon48-off.png", 128: "icon128-off.png" };
+    chrome.action.setIcon({ path }, () => void chrome.runtime.lastError);
+  }
 
   function updateToggleUI(enabled) {
     if (enabled) {
