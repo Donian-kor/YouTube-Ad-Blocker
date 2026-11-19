@@ -48,7 +48,17 @@
     ".fluid_controls_ad_markers_holder", ".sg-popup-id-6",
     // down.mdiaload.com 구글 광고 슬롯/iframe + 추적 베이트
     ".demand-supply", "iframe[id^='google_ads_iframe_']",
-    "[id*='google_ads_iframe_']", "[id^='mdiaload.com_']"
+    "[id*='google_ads_iframe_']", "[id^='mdiaload.com_']",
+    // 해외 파일 공유 사이트(gigafile/gofile/akirabox/buzzheavier) 광고 컨테이너
+    // - gigafile: 광고 슬롯/배너/오버레이
+    "#smarttag-adx-inst", "#im_interstitial_b", ".iminterstitial", "#gStickyAd",
+    "#gigafile_pc_overlay", ".gSticky-slot", "[id^='gigafile-slot-']",
+    ".banner_type_sky", ".banner_type_336", ".banner_type_468",
+    "#wrap_banner_billboard", ".text-ad", ".textAd", ".text_ad",
+    // - gofile: 광고 슬롯
+    "#ad-slot", "[id='ad-slot']",
+    // - akirabox/buzzheavier: 광고 오버레이/스폰서
+    "[class*='advert']", "[class*='sponsored']", ".ad-overlay"
   ].join(",");
 
   const STYLE_ID = "yab-general-hide-style";

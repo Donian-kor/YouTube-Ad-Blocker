@@ -47,6 +47,44 @@ const adBlockRules = [
   // raymondhill.net/ublock 네트워크 필터 테스트용 광고 iframe
   { id: 34, priority: 11, action: { type: "block" }, condition: { urlFilter: "||raymondhill.net/ublock/ad.html" } },
   { id: 35, priority: 11, action: { type: "block" }, condition: { urlFilter: "||usrpubtrck.com^" } },
+
+  // === 해외 파일 공유 사이트 광고/추적 도메인 (v3.0) ===
+  // gigafile / gofile / akirabox / buzzheavier 에서 사용하는 광고·추적·리다이렉트 도메인
+  // - GigaFile: Ad-Shield, Geniee, i-mobile, tapad, gliastudios
+  { id: 36, priority: 11, action: { type: "block" }, condition: { urlFilter: "||ad-shield.io^" } },
+  { id: 37, priority: 11, action: { type: "block" }, condition: { urlFilter: "||geniee.jp^" } },
+  { id: 38, priority: 11, action: { type: "block" }, condition: { urlFilter: "||genieesspv.jp^" } },
+  { id: 39, priority: 11, action: { type: "block" }, condition: { urlFilter: "||i-mobile.co.jp^" } },
+  { id: 40, priority: 11, action: { type: "block" }, condition: { urlFilter: "||3-q.cc^" } },
+  { id: 41, priority: 11, action: { type: "block" }, condition: { urlFilter: "||tapad.com^" } },
+  { id: 42, priority: 11, action: { type: "block" }, condition: { urlFilter: "||gliastudios.com^" } },
+  { id: 43, priority: 11, action: { type: "block" }, condition: { urlFilter: "||shop.gliastudios.com^" } },
+  // - 공통: 애드터스크(Adsterra) 계열 팝오버/언더 리다이렉트
+  { id: 44, priority: 11, action: { type: "block" }, condition: { urlFilter: "||highperformanceformat.com^" } },
+  { id: 45, priority: 11, action: { type: "block" }, condition: { urlFilter: "||effectivecpmnetwork.com^" } },
+  { id: 46, priority: 11, action: { type: "block" }, condition: { urlFilter: "||profitablecpmrate.com^" } },
+  { id: 47, priority: 11, action: { type: "block" }, condition: { urlFilter: "||profitablegatecpm.com^" } },
+  { id: 48, priority: 11, action: { type: "block" }, condition: { urlFilter: "||clickadu.com^" } },
+  { id: 49, priority: 11, action: { type: "block" }, condition: { urlFilter: "||hilltopads.net^" } },
+  { id: 50, priority: 11, action: { type: "block" }, condition: { urlFilter: "||popads.net^" } },
+  { id: 51, priority: 11, action: { type: "block" }, condition: { urlFilter: "||popcash.net^" } },
+  { id: 52, priority: 11, action: { type: "block" }, condition: { urlFilter: "||onclickads.net^" } },
+  { id: 53, priority: 11, action: { type: "block" }, condition: { urlFilter: "||onclksrv.com^" } },
+  { id: 54, priority: 11, action: { type: "block" }, condition: { urlFilter: "||adcash.com^" } },
+  { id: 55, priority: 11, action: { type: "block" }, condition: { urlFilter: "||exoclick.com^" } },
+  { id: 56, priority: 11, action: { type: "block" }, condition: { urlFilter: "||exosrv.com^" } },
+  { id: 57, priority: 11, action: { type: "block" }, condition: { urlFilter: "||juicyads.com^" } },
+  { id: 58, priority: 11, action: { type: "block" }, condition: { urlFilter: "||admaven.com^" } },
+  { id: 59, priority: 11, action: { type: "block" }, condition: { urlFilter: "||monetag.com^" } },
+  { id: 60, priority: 11, action: { type: "block" }, condition: { urlFilter: "||adskeeper.com^" } },
+  { id: 61, priority: 11, action: { type: "block" }, condition: { urlFilter: "||adpushup.com^" } },
+  { id: 62, priority: 11, action: { type: "block" }, condition: { urlFilter: "||propellerads.com^" } },
+  { id: 63, priority: 11, action: { type: "block" }, condition: { urlFilter: "||propellerclick.com^" } },
+  { id: 64, priority: 11, action: { type: "block" }, condition: { urlFilter: "||adsterra.com^" } },
+  { id: 65, priority: 11, action: { type: "block" }, condition: { urlFilter: "||adsco.re^" } },
+  { id: 66, priority: 11, action: { type: "block" }, condition: { urlFilter: "||pushpros.com^" } },
+  { id: 67, priority: 11, action: { type: "block" }, condition: { urlFilter: "||trafficforce.com^" } },
+  { id: 68, priority: 11, action: { type: "block" }, condition: { urlFilter: "||clickfuse.com^" } },
 ];
 
 // === 통계 관리 ===
@@ -249,10 +287,14 @@ const dogdripAllowRules = DOGDRIP_DETECTION_DOMAINS.map((domain, i) => ({
 
 // 1~14: 이전 버전에서 등록된 잔여 규칙까지 모두 제거하기 위해 넓게 지정
 // 100: YouTube Studio 허용 규칙 / 101~109: dogdrip 감지 우회 허용 규칙
+// 36~68: 해외 파일 공유 사이트 광고 도메인 차단 규칙 (v3.0)
 // 재적용 시 중복 ID 오류를 막기 위해 모두 함께 제거한다.
 const ALL_RULE_IDS = [
   1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
   20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
+  36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
+  50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
+  60, 61, 62, 63, 64, 65, 66, 67, 68,
   100, 101, 102, 103, 104, 105, 106, 107, 108, 109
 ];
 

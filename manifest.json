@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "YouTube Ad Blocker",
-  "version": "2.8",
+  "version": "3.0",
   "description": "PC 크롬에서 유튜브 광고를 차단하고 통계를 확인합니다.",
   "permissions": [
     "declarativeNetRequest",
@@ -60,6 +60,20 @@
       "matches": ["*://*.youtube.com/*"],
       "js": ["content.js"],
       "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "*://*.gigafile.nu/*",
+        "*://*.gofile.io/*",
+        "*://*.gofile.to/*",
+        "*://*.akirabox.com/*",
+        "*://*.akirabox.to/*",
+        "*://*.buzzheavier.com/*",
+        "*://*.bzzhr.to/*"
+      ],
+      "js": ["filehost-blocker.js"],
+      "run_at": "document_idle",
+      "all_frames": true
     },
     {
       "matches": ["*://*.skidrowreloaded.com/*"],

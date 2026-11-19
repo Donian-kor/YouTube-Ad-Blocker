@@ -3,7 +3,7 @@
 크롬(Chrome)에서 유튜브 영상 광고와 일반 사이트 광고를 차단하는 Manifest V3 확장 프로그램입니다.
 개발자 모드에서 폴더 또는 ZIP을 불러와 사용합니다.
 
-**현재 버전: 2.8**
+**현재 버전: 3.0**
 
 ## 주요 기능
 
@@ -15,12 +15,13 @@
 - **차단 URL 목록** — 팝업의 「총 차단」 클릭 시 확인
 - **ON/OFF 토글** — 팝업에서 즉시 전환. 토글 시 현재 페이지가 자동 새로고침되고, OFF 상태에서는 툴바 아이콘이 회색으로 바뀌어 시각적으로 확인 가능
 - **우클릭 요소 차단** — 광고 영역 우클릭 → 「이 요소 차단」, 사이트별 저장
+- **해외 파일 공유 사이트 차단** — gigafile·gofile·akirabox·buzzheavier의 배너/전면 광고, 팝오버·팝언더, 가짜 다운로드 버튼 차단 (실제 다운로드는 유지)
 
 ## 설치 방법
 
 ### ZIP 배포판 (권장)
 
-1. GitHub Release에서 `youtube-ad-blocker-v2.8.zip` 다운로드
+1. GitHub Release에서 `youtube-ad-blocker-v3.0.zip` 다운로드
 2. 압축 해제 (`manifest.json`이 들어있는 폴더 확인)
 3. `chrome://extensions/` 접속 → **개발자 모드** ON
 4. **압축해제된 확장 프로그램을 로드합니다** → 2번 폴더 선택
@@ -42,6 +43,7 @@ youtube-main.js        유튜브 MAIN world 응답 후킹
 content.js             유튜브 DOM 정리/광고 스킵
 general-blocker.js     일반 사이트 인라인 광고 숨김 (tryblock, dogdrip, d3ward, uBO 테스트)
 popunder-blocker.js    skidrowreloaded 클릭 리다이렉트(popunder) 차단 (MAIN world)
+filehost-blocker.js    해외 파일 공유 사이트(gigafile/gofile/akirabox/buzzheavier) 광고·팝업·가짜 다운로드 차단
 anti-bypass.js         안티애드블록 감지 무력화
 element-blocker.js     우클릭 요소 차단
 popup.html / popup.js  팝업 UI
@@ -99,6 +101,8 @@ node tools/test-element-blocker.js   # 우클릭 요소 차단 테스트
 - **v2.6**: superadblocktest 미차단 105개 중 신규 48개 도메인 추가 (보조 규칙셋 총 454개)
 - **v2.7**: 잔여 4개 도메인(`redirector.googlevideo.com`, `analytics.x.com`, `ads.x.com`, `mon.tiktokv.com`) 추가 (총 458개)
 - **v2.8**: `redirector.googlevideo.com` 차단 제거 — 유튜브 영상 로딩이 약 5초 지연되는 문제가 확인되어 예외 처리 (나머지 3개는 유지, 총 457개)
+- **v2.9**: `s.youtube.com` 차단 제거 — 광고 도메인이 아닌 시청 통계/재생 위치 저장용 telemetry라 차단 불필요 (광고 전용 `ads.youtube.com`은 유지, 총 456개)
+- **v3.0**: 해외 파일 공유 사이트(gigafile·gofile·akirabox·buzzheavier) 광고·팝오버/언더·가짜 다운로드 차단 추가 — DNR 광고 도메인 33개 추가, `filehost-blocker.js` 신규 도입 (실제 다운로드 버튼은 보존)
 
 ## 참고 자료
 
