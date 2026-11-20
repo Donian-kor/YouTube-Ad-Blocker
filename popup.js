@@ -5,7 +5,7 @@
   // === 토글 기능 ===
   const toggle = document.getElementById("enabledToggle");
   const toggleStatus = document.getElementById("toggleStatus");
-  const statusText = document.getElementById("statusText");
+  const toggleStatusText = document.getElementById("toggleStatusText");
 
   chrome.storage.local.get(["adBlockerEnabled"], (result) => {
     const enabled = result.adBlockerEnabled !== undefined ? result.adBlockerEnabled : true;
@@ -45,15 +45,11 @@
 
   function updateToggleUI(enabled) {
     if (enabled) {
-      toggleStatus.textContent = "활성화됨";
-      toggleStatus.style.color = "#4ade80";
-      statusText.classList.add("on");
-      statusText.innerHTML = '<span class="dot"></span><span>광고 차단 중</span>';
+      toggleStatus.style.color = "#15803d";
+      toggleStatusText.textContent = "광고 차단 중";
     } else {
-      toggleStatus.textContent = "비활성화됨";
-      toggleStatus.style.color = "#888";
-      statusText.classList.remove("on");
-      statusText.innerHTML = '<span class="dot"></span><span>광고 차단 일시 중지</span>';
+      toggleStatus.style.color = "#94a3b8";
+      toggleStatusText.textContent = "광고 차단 일시 중지";
     }
   }
 
