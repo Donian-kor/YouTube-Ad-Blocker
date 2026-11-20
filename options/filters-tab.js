@@ -70,13 +70,8 @@ function renderFilterList() {
     desc.className = "filter-desc";
     desc.textContent = filter.description;
 
-    const source = document.createElement("div");
-    source.className = "filter-source";
-    source.textContent = "출처: " + filter.source;
-
     left.appendChild(nameRow);
     left.appendChild(desc);
-    left.appendChild(source);
 
     const toggle = document.createElement("label");
     toggle.className = "toggle" + (LOCKED_GROUPS.has(filter.id) ? " locked" : "");
