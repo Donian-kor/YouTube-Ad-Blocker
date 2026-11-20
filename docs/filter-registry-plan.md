@@ -57,9 +57,9 @@ export const FILTER_GROUPS = [
 
 ---
 
-## 3. 그룹 재정의 (8개, 소스 성격별)
+## 3. 그룹 재정의 (7개, 소스 성격별)
 
-기존 6개 → **소스별로 8개로 확장**. 억지로 6개 유지하지 않음.
+기존 6개 → **소스별로 7개로 확장**. 억지로 6개 유지하지 않음.
 
 | 그룹 ID | 이름 | 소스 | 개수 |
 |---------|------|------|------|
@@ -70,11 +70,12 @@ export const FILTER_GROUPS = [
 | `privacy` | 🔒 개인정보 | Fanboy's Social, AdGuard URL Tracking, uAssets privacy | 3 |
 | `anti_cv` | 🚫 안티애드블록 | abp-filters-anti-cv 11개 언어 | 11 |
 | `annoyances` | 🧹 성가신 요소 | Fanboy's Annoyance | 1 |
-| `chzzk` | 🎬 치지직 | crackle 유지보수 기법 (응답 후킹) — 소스라기보다 코드지만 토글로 노출 가능 | 0~1 |
 
-> 참고: `chzzk`는 필터 소스가 아니라 MAIN world 후킹 스크립트이지만,
-> 사용자가 "치지직 전용 토글"을 원하면 별도 그룹으로 표시 가능.
-> 기본은 `security` 또는 별도 노출 여부는 구현 시 결정.
+> **참고 (치지직은 그룹이 아님)**: 초안에 `chzzk` 그룹을 넣었으나 정정함.
+> 치지직 대응은 `chzzk-main.js`(응답 후킹) / `chzzk-ad-skip.js`(DOM 스킵)라는
+> **MAIN world 스크립트 기능**이지, URL 기반 필터 소스가 아니다.
+> 따라서 필터 레지스트리의 그룹(소스 묶음)에 포함하지 않고,
+> 전체 ON/OFF(`adBlockerEnabled`) 토글을 따르는 **별도 기능**으로 유지한다.
 
 ---
 
