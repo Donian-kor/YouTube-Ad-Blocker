@@ -2,15 +2,19 @@
 import { FILTER_LIST, LOCKED_GROUPS } from "./config.js";
 
 function loadFilterStates() {
-  chrome.storage.local.get(["filterStates"], (result) => {
+  chrome.storage.local.get(["filterStates", "adBlockerEnabled"], (result) => {
     const states = result.filterStates || {};
+    const masterOn = result.adBlockerEnabled !== false; // 기본값 true
     FILTER_LIST.forEach((filter) => {
       const checkbox = document.getElementById("filter-" + filter.id);
       if (checkbox) {
-        // 잠금 그룹은 항상 true
-        checkbox.checked = LOCKED_GROUPS.has(filter.id) ? true : (states[filter.id] !== undefined ? states[filter.id] : true);
-        checkbox.disabled = LOCKED_GROUPS.has(filter.id);
+        // 팝업에서 전체 일시중지 시 모든 필터가 꺼진 것으로 표시
+        checkbox.checked = masterOn && (LOCKED_GROUPS.has(filter.id) ? true : (states[filter.id] !== undefined ? states[filter.id] : true));
+        // 잠금 그룹은 원래 비활성화, 마스터 OFF 시에는 나머지도 조작 불가
+        checkbox.disabled = LOCKED_GROUPS.has(filter.id) || !masterOn;
       }
+      const card = document.getElementById("filter-card-" + filter.id);
+      if (card) card.classList.toggle("master-off", !masterOn);
     });
   });
 }
@@ -39,6 +43,7 @@ function renderFilterList() {
   FILTER_LIST.forEach((filter) => {
     const card = document.createElement("div");
     card.className = "filter-card";
+    card.id = "filter-card-" + filter.id;
 
     const left = document.createElement("div");
     left.className = "filter-info";
@@ -57,8 +62,8 @@ function renderFilterList() {
     nameRow.appendChild(name);
 
     const badge = document.createElement("span");
-    badge.className = "filter-badge" + (LOCKED_GROUPS.has(filter.id) ? " lock" : "");
-    badge.textContent = LOCKED_GROUPS.has(filter.id) ? "🔒 항상 켜짐" : filter.license;
+    badge.className = "filter-badge count" + (LOCKED_GROUPS.has(filter.id) ? " lock" : "");
+    badge.textContent = "필터 " + (filter.filterCount || 0) + "개";
     nameRow.appendChild(badge);
 
     const desc = document.createElement("div");
@@ -142,6 +147,13 @@ export function initFiltersTab() {
   });
 
   initUpdateHistory();
+
+  // 팝업에서 전체 ON/OFF를 바꾸면 설정 페이지도 즉시 반영
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === "local" && (changes.adBlockerEnabled || changes.filterStates)) {
+      loadFilterStates();
+    }
+  });
 }
 
 // === 업데이트 내역 (접기/펼치기) ===
