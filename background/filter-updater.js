@@ -142,22 +142,25 @@ async function updateFilters() {
     }
 
     if (allRules.length === 0) throw new Error("변환된 규칙이 없습니다");
-    if (allRules.length > MAX_DYNAMIC_RULES) allRules.length = MAX_DYNAMIC_RULES;
+    // 한도보다 여유 있게 상한 설정 (기존 규칙과 동시 존재 시에도 안전)
+    const SAFE_LIMIT = Math.floor(MAX_DYNAMIC_RULES * 0.9); // 27,000개
+    if (allRules.length > SAFE_LIMIT) allRules.length = SAFE_LIMIT;
 
-    // 이전 업데이트 규칙 ID 수 계산 (저장된 개수만큼만 제거)
+    const committed = allRules.map((r, i) => Object.assign({}, r, { id: COMMIT_ID_START + i }));
+
+    // 1단계: 이전 업데이트 규칙 모두 제거 (한도 여유 확보)
     const prev = await new Promise((resolve) => {
       chrome.storage.local.get(["dynamicRuleCount"], (res) => resolve(res.dynamicRuleCount || 0));
     });
     const oldIds = [];
     for (let i = 0; i < prev; i++) oldIds.push(COMMIT_ID_START + i);
 
-    // 새 규칙을 COMMIT ID 대역으로 준비
-    const committed = allRules.map((r, i) => Object.assign({}, r, { id: COMMIT_ID_START + i }));
+    if (oldIds.length > 0) {
+      await dnrUpdate({ removeRuleIds: oldIds });
+    }
 
-    // 원자적 교체: 제거 + 추가를 한 번의 호출로 처리
-    // 주의: 스테이징(임시 추가) 방식은 기존 규칙 + 신규 규칙이 동시에 존재해
-    //       Chrome 전체 동적 규칙 한도(30,000개)를 초과하므로 사용하지 않는다.
-    await dnrUpdate({ removeRuleIds: oldIds, addRules: committed });
+    // 2단계: 새 규칙 추가 (이제 한도 여유가 있음)
+    await dnrUpdate({ addRules: committed });
 
     chrome.storage.local.set({
       updateStatus: { updatedAt: now, count: committed.length },
@@ -166,10 +169,6 @@ async function updateFilters() {
     updateInProgress = false;
     return { ok: true, count: committed.length };
   } catch (e) {
-    // 실패 시 새로 추가된 규칙 롤백 (이전 확정 규칙은 보존됨)
-    const rollbackIds = [];
-    for (let i = 0; i < MAX_DYNAMIC_RULES; i++) rollbackIds.push(COMMIT_ID_START + i);
-    try { await dnrUpdate({ removeRuleIds: rollbackIds }); } catch (ignore) { /* 무시 */ }
     updateInProgress = false;
     return { ok: false, reason: e.message };
   }
