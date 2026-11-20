@@ -2,6 +2,14 @@
 // manifest.json의 declarative_net_request.rule_resources와 1:1 대응
 export const FILTER_LIST = [
   {
+    id: "security",
+    name: "보안",
+    description: "악성 도메인, 피싱, cryptomining 차단",
+    license: "MIT / CC0 1.0",
+    source: "NoCoin, URLhaus",
+    icon: "🚨"
+  },
+  {
     id: "ads",
     name: "광고 차단",
     description: "전 세계 광고를 차단하는 기본 필터 (EasyList + EasyPrivacy + Ultimate Ad Filter)",
@@ -40,14 +48,6 @@ export const FILTER_LIST = [
     license: "CC BY 3.0",
     source: "Fanboy's Annoyance List",
     icon: "🧹"
-  },
-  {
-    id: "security",
-    name: "보안",
-    description: "악성 도메인, 피싱, cryptomining 차단",
-    license: "MIT / CC0 1.0",
-    source: "NoCoin, URLhaus",
-    icon: "🚨"
   }
 ];
 
@@ -56,10 +56,10 @@ export const LOCKED_GROUPS = new Set(["ads", "security"]);
 
 // 출처 및 라이선스 표 데이터
 export const LICENSE_TABLE = [
+  { name: "보안", source: "NoCoin, URLhaus", license: "MIT / CC0 1.0", home: "https://gitlab.com/curben/urlhaus-filter" },
   { name: "광고 차단", source: "EasyList, EasyPrivacy, Ultimate Ad Filter", license: "CC BY-SA 3.0 / GNU GPLv3", home: "https://easylist.to/" },
   { name: "한국 광고 필터", source: "NoriDev, Turtlecute, d3Host, List-KR", license: "CC BY-NC-SA 4.0 / GNU GPLv3", home: "https://github.com/List-KR/List-KR" },
   { name: "개인정보 보호", source: "Fanboy's Social, AdGuard URL Tracking", license: "CC BY 3.0 / GNU GPLv3", home: "https://github.com/AdguardTeam/AdguardFilters" },
   { name: "안티서클", source: "abp-filters-anti-cv", license: "GNU GPLv3", home: "https://github.com/abp-filters/abp-filters-anti-cv" },
   { name: "성가신 요소", source: "Fanboy's Annoyance", license: "CC BY 3.0", home: "https://easylist.to/" },
-  { name: "보안", source: "NoCoin, URLhaus", license: "MIT / CC0 1.0", home: "https://gitlab.com/curben/urlhaus-filter" },
 ];
