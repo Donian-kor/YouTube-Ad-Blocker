@@ -35,12 +35,18 @@
     };
   } catch (e) {}
 
-  // content script에서 토글 상태 전달
+  // content script에서 토글 상태 전달 (토큰 불일치는 위조로 간주)
   window.addEventListener("message", (event) => {
     if (event.source !== window) return;
     const d = event.data;
-    if (d && d.source === "yab-extension" && d.type === "enabled") {
-      enabled = d.value !== false;
-    }
+    if (!d || d.source !== "yab-extension" || d.type !== "enabled") return;
+    let token = null;
+    try {
+      token = document.documentElement
+        ? document.documentElement.getAttribute("data-yab-state-token")
+        : null;
+    } catch (e) { /* 무시 */ }
+    if (!token || d.token !== token) return;
+    enabled = d.value !== false;
   });
 })();

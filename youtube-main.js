@@ -16,13 +16,25 @@
 
   let enabled = true;
 
-  // content script(격리 세계)에서 토글 상태를 전달받는다
+  // content script(격리 세계)에서 토글 상태를 전달받는다.
+  // 고정 문자열만으로 위조할 수 없도록 매 로드마다 생성된 토큰을 함께 확인한다.
+  function readStateToken() {
+    try {
+      return document.documentElement
+        ? document.documentElement.getAttribute("data-yab-state-token")
+        : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   window.addEventListener("message", (event) => {
     if (event.source !== window) return;
     const data = event.data;
-    if (data && data.source === "yab-extension" && data.type === "enabled") {
-      enabled = data.value !== false;
-    }
+    if (!data || data.source !== "yab-extension" || data.type !== "enabled") return;
+    const token = readStateToken();
+    if (!token || data.token !== token) return; // 토큰 불일치 → 위조로 간주
+    enabled = data.value !== false;
   });
 
   function hasOwn(obj, key) {

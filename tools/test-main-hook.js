@@ -25,6 +25,14 @@ MockResponse.prototype.json = function () {
   return Promise.resolve({ adSlots: [1], videoDetails: { title: "t" } });
 };
 
+const TEST_TOKEN = "test-token-12345";
+const documentObj = {
+  documentElement: {
+    getAttribute(name) {
+      return name === "data-yab-state-token" ? TEST_TOKEN : null;
+    }
+  }
+};
 const windowObj = {
   addEventListener(type, fn) {
     if (type === "message") messageListeners.push(fn);
@@ -35,6 +43,7 @@ windowObj.window = windowObj;
 
 const sandbox = {
   window: windowObj,
+  document: documentObj,
   Response: MockResponse,
   Promise,
   JSON,
@@ -46,9 +55,9 @@ const sandbox = {
 vm.createContext(sandbox);
 vm.runInContext(source, sandbox);
 
-function setEnabled(value) {
+function setEnabled(value, token) {
   messageListeners.forEach((fn) =>
-    fn({ source: windowObj, data: { source: "yab-extension", type: "enabled", value } })
+    fn({ source: windowObj, data: { source: "yab-extension", token: token === undefined ? TEST_TOKEN : token, type: "enabled", value } })
   );
 }
 
@@ -87,9 +96,15 @@ function hookableCallback(collect) {
     videoDetails: { title: "t" }
   });
 
-  // 5) 토글 OFF면 원본 유지
-  setEnabled(false);
   const raw = '{"adSlots":[1],"videoDetails":{"title":"t"}}';
+
+  // 5) 토큰이 다른 위조 메시지는 무시되어야 함 (ON 상태 유지)
+  setEnabled(true);
+  setEnabled(false, "forged-token");
+  check("위조 토큰 메시지 무시", JSON.parse(raw), { videoDetails: { title: "t" } });
+
+  // 6) 토글 OFF면 원본 유지
+  setEnabled(false);
   const kept = JSON.parse(raw);
   check("OFF 상태에서는 광고 키 유지", kept, { adSlots: [1], videoDetails: { title: "t" } });
 

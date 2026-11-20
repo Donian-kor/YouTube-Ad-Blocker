@@ -9,6 +9,21 @@
   // === 활성화 상태 관리 ===
   let enabled = true;
 
+  // MAIN world(youtube-main.js)와 주고받을 임시 토큰.
+  // 페이지 로드마다 새로 만들고 DOM에 심어두어, 웹사이트가 고정 문자열만으로
+  // 토글 상태 메시지를 위조하지 못하게 한다.
+  const STATE_TOKEN = (function () {
+    try {
+      if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+        return crypto.randomUUID();
+      }
+    } catch (e) { /* 구형 브라우저에서는 아래 폴백 사용 */ }
+    return "yab-" + Math.random().toString(36).slice(2) + "-" + Date.now().toString(36);
+  })();
+  try {
+    document.documentElement.setAttribute("data-yab-state-token", STATE_TOKEN);
+  } catch (e) { /* DOM 준비 전이면 무시 */ }
+
   function applyEnabled(value) {
     enabled = value;
     const style = document.getElementById("yab-ad-hide-style");
@@ -16,7 +31,7 @@
 
     // MAIN world(youtube-main.js)에 토글 상태 전달
     try {
-      window.postMessage({ source: "yab-extension", type: "enabled", value: enabled }, "*");
+      window.postMessage({ source: "yab-extension", token: STATE_TOKEN, type: "enabled", value: enabled }, "*");
     } catch (e) {
       // 전달 실패 시 무시
     }
