@@ -193,7 +193,7 @@ www_AD_Blocker/
 
 - 필터 규칙 자체의 내용 변경 (차단 도메인 추가/삭제)
 - content script 파일 이동·분리
-- 확장 이름/아이콘/버전 변경 (이미 `www_AD_Blocker` v3.2로 확정)
+- 확장 이름/아이콘/버전 변경 (이미 `www_AD_Blocker` v0.34로 확정)
 - GitHub 저장소 설정 변경 (이미 `Donian-kor/www_AD_Blocker`로 완료)
 - 설정 페이지 UI 디자인 변경 (탭 구조는 `filter-update-plan.md` §3에서 별도 확정)
 
