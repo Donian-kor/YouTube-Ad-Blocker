@@ -57,25 +57,67 @@ export const FILTER_GROUPS = [
 
 ---
 
-## 3. 그룹 재정의 (7개, 소스 성격별)
+## 3. 2단 구조: 소스 그룹(세분화) + UI 카테고리(통합)
 
-기존 6개 → **소스별로 7개로 확장**. 억지로 6개 유지하지 않음.
+### 3.1 원칙
 
-| 그룹 ID | 이름 | 소스 | 개수 |
-|---------|------|------|------|
-| `security` | 🛡️ 보안 | NoCoin, URLhaus, uAssets badware/resource-abuse | 4 |
-| `easylist` | 📢 EasyList | easylist, easyprivacy, AdGuard Base(2.txt) | 3 |
-| `uassets` | 🔧 uAssets 광고 | uAssets filters/general/2024/2025/2026, Peter Lowe | 6 |
-| `korean` | 🇰🇷 한국 필터 | NoriDev, Turtlecute, d3Host, List-KR, filterslists-KO, extra-hosts | 6 |
-| `privacy` | 🔒 개인정보 | Fanboy's Social, AdGuard URL Tracking, uAssets privacy | 3 |
-| `anti_cv` | 🚫 안티애드블록 | abp-filters-anti-cv 11개 언어 | 11 |
-| `annoyances` | 🧹 성가신 요소 | Fanboy's Annoyance | 1 |
+- `group` (소스 단위) — **소스added 시 어디 넣을지 명확**하도록 성격/관리 주체별로 세분화 (늘려도 됨)
+- `category` (UI 단위) — **사용자가 보기 편하도록** 상위 묶음으로 통합 (토글 개수 최소화)
 
-> **참고 (치지직은 그룹이 아님)**: 초안에 `chzzk` 그룹을 넣었으나 정정함.
-> 치지직 대응은 `chzzk-main.js`(응답 후킹) / `chzzk-ad-skip.js`(DOM 스킵)라는
-> **MAIN world 스크립트 기능**이지, URL 기반 필터 소스가 아니다.
-> 따라서 필터 레지스트리의 그룹(소스 묶음)에 포함하지 않고,
-> 전체 ON/OFF(`adBlockerEnabled`) 토글을 따르는 **별도 기능**으로 유지한다.
+레지스트리에는 두 필드를 모두 둔다:
+
+```javascript
+{
+  id: "easylist",           // 고정 ID
+  group: "easylist",        // 소스 단위 그룹 (세분화, 11개)
+  category: "intl_ads",     // UI 카테고리 (통합, 5개)
+  name: "EasyList",
+  license: "CC BY-SA 3.0",
+  url: "https://easylist.to/easylist/easylist.txt",
+  ruleset: "intl_ads",      // 빌드될 규칙셋
+}
+```
+
+### 3.2 소스 그룹 (11개, 세분화 — 레지스트리 내부용)
+
+| group | 소스 | 개수 |
+|-------|------|------|
+| `easylist` | easylist, easyprivacy | 2 |
+| `adguard` | AdGuard Base(2.txt) | 1 |
+| `peterlowe` | Peter Lowe's Blocklist | 1 |
+| `uassets` | uAssets filters/general/2024/2025/2026 | 5 |
+| `korean` | NoriDev, Turtlecute, d3Host, List-KR, filterslists-KO, extra-hosts | 6 |
+| `social` | Fanboy's Social, AdGuard URL Tracking, uAssets privacy | 3 |
+| `anti_cv` | abp-filters-anti-cv 11개 언어 | 11 |
+| `annoyances` | Fanboy's Annoyance | 1 |
+| `malware` | URLhaus, uAssets badware/resource-abuse | 3 |
+| `mining` | NoCoin | 1 |
+| `(예약)` | 필요 시 자유 추가 | - |
+
+→ **소스 추가 시 `group` 선택만 하면 되고, 기존 그룹을 억지로 늘리지 않아도 됨.**
+
+### 3.3 UI 카테고리 (5개, 토글 단위)
+
+| category ID | 이름 | 포함 group | 아이콘 |
+|-------------|------|-----------|--------|
+| `intl_ads` | 국제 광고 | easylist, adguard, peterlowe, uassets | 📢 |
+| `korean` | 한국 필터 | korean | 🇰🇷 |
+| `privacy` | 개인정보 | social | 🔒 |
+| `anti_cv` | 안티애드블록 | anti_cv, annoyances | 🚫 |
+| `security` | 보안 | malware, mining | 🛡️ |
+
+### 3.4 UI 동작
+
+- 기본: **카테고리 5개 토글**만 표시 → 깔끔
+- 각 카테고리를 **펼치면(▼)** 소스별 체크박스 노출 → "uAssets만 끄기" 등 세부 제어 가능
+- 카테고리 토글 OFF → 하위 모든 소스 일괄 OFF
+- 개별 소스 토글 OFF → 해당 소스만 제외 (카테고리는 ON 유지)
+
+### 3.5 치지직은 그룹이 아님 (정정 유지)
+
+초안의 `chzzk` 그룹은 제거함. 치지직은 URL 기반 필터 소스가 아니라
+`chzzk-main.js`(응답 후킹) / `chzzk-ad-skip.js`(DOM 스킵)라는 **MAIN world 스크립트 기능**이므로
+레지스트리(소스 묶음)에 포함하지 않는다. 전체 ON/OFF(`adBlockerEnabled`) 토글을 따른다.
 
 ---
 
@@ -118,7 +160,8 @@ export const FILTER_GROUPS = [
 | 새 필터 소스 추가 | 3~4 파일 수정 | **레지스트리 1줄** |
 | 그룹 이름 변경 | config + 문서 | 레지스트리 `name` 1곳 |
 | 출처/라이선스 갱신 | config + 문서 | 레지스트리에서 **자동 생성** |
-| 그룹 분리/통합 | manifest + background + config 전부 수정 | 레지스트리 `group` 값만 |
+| 소스 그룹 추가 | manifest + background + config 전부 수정 | 레지스트리 `group` 값 1개 |
+| UI 토글 분리/통합 | config + manifest 수정 | 레지스트리 `category` 값만 (코드 무수정) |
 | 필터 개수 표시 | 하드코딩 | 빌드 메타데이터에서 자동 |
 
 ---
