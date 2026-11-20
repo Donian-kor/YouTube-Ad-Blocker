@@ -49,6 +49,12 @@ const GROUPS = {
       ["easylist", "https://easylist.to/easylist/easylist.txt"],
       ["easyprivacy", "https://easylist.to/easylist/easyprivacy.txt"],
       ["ultimate", "https://filters.adtidy.org/extension/chromium/filters/2.txt"],
+      ["peter-lowe", "https://pgl.yoyo.org/adservers/serverlist.php?hostformat=adblockplus&showintro=0&mimetype=plaintext"],
+      ["uassets-filters", "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/filters.txt"],
+      ["uassets-general", "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/filters-general.txt"],
+      ["uassets-2024", "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/filters-2024.txt"],
+      ["uassets-2025", "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/filters-2025.txt"],
+      ["uassets-2026", "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/filters-2026.txt"],
     ],
   },
 
@@ -64,6 +70,7 @@ const GROUPS = {
     sources: [
       ["fanboy-social", "https://www.fanboy.co.nz/fanboy-social.txt"],
       ["url-tracking", "https://filters.adtidy.org/extension/chromium/filters/17.txt"],
+      ["uassets-privacy", "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/privacy.txt"],
     ],
   },
 
@@ -71,17 +78,17 @@ const GROUPS = {
   anti_circumvention: {
     name: "안티서클",
     sources: [
-      ["anti-cv-en", "https://raw.githubusercontent.com/abp-filters/abp-filters-anti-cv/master/english.txt"],
-      ["anti-cv-zh", "https://raw.githubusercontent.com/abp-filters/abp-filters-anti-cv/master/chinese.txt"],
-      ["anti-cv-cs", "https://raw.githubusercontent.com/abp-filters/abp-filters-anti-cv/master/czech.txt"],
-      ["anti-cv-fr", "https://raw.githubusercontent.com/abp-filters/abp-filters-anti-cv/master/french.txt"],
-      ["anti-cv-de", "https://raw.githubusercontent.com/abp-filters/abp-filters-anti-cv/master/german.txt"],
-      ["anti-cv-pl", "https://raw.githubusercontent.com/abp-filters/abp-filters-anti-cv/master/polish.txt"],
-      ["anti-cv-pt", "https://raw.githubusercontent.com/abp-filters/abp-filters-anti-cv/master/portuguese.txt"],
-      ["anti-cv-ru", "https://raw.githubusercontent.com/abp-filters/abp-filters-anti-cv/master/russian.txt"],
-      ["anti-cv-es", "https://raw.githubusercontent.com/abp-filters/abp-filters-anti-cv/master/spanish.txt"],
-      ["anti-cv-tr", "https://raw.githubusercontent.com/abp-filters/abp-filters-anti-cv/master/turkish.txt"],
-      ["anti-cv-vi", "https://raw.githubusercontent.com/abp-filters/abp-filters-anti-cv/master/vietnamese.txt"],
+      ["anti-cv-en", "https://gitlab.com/eyeo/anti-cv/abp-filters-anti-cv/-/raw/master/english.txt"],
+      ["anti-cv-zh", "https://gitlab.com/eyeo/anti-cv/abp-filters-anti-cv/-/raw/master/chinese.txt"],
+      ["anti-cv-cs", "https://gitlab.com/eyeo/anti-cv/abp-filters-anti-cv/-/raw/master/czech.txt"],
+      ["anti-cv-fr", "https://gitlab.com/eyeo/anti-cv/abp-filters-anti-cv/-/raw/master/french.txt"],
+      ["anti-cv-de", "https://gitlab.com/eyeo/anti-cv/abp-filters-anti-cv/-/raw/master/german.txt"],
+      ["anti-cv-pl", "https://gitlab.com/eyeo/anti-cv/abp-filters-anti-cv/-/raw/master/polish.txt"],
+      ["anti-cv-pt", "https://gitlab.com/eyeo/anti-cv/abp-filters-anti-cv/-/raw/master/portuguese.txt"],
+      ["anti-cv-ru", "https://gitlab.com/eyeo/anti-cv/abp-filters-anti-cv/-/raw/master/russian.txt"],
+      ["anti-cv-es", "https://gitlab.com/eyeo/anti-cv/abp-filters-anti-cv/-/raw/master/spanish.txt"],
+      ["anti-cv-tr", "https://gitlab.com/eyeo/anti-cv/abp-filters-anti-cv/-/raw/master/turkish.txt"],
+      ["anti-cv-vi", "https://gitlab.com/eyeo/anti-cv/abp-filters-anti-cv/-/raw/master/vietnamese.txt"],
     ],
   },
 
@@ -99,6 +106,8 @@ const GROUPS = {
     sources: [
       ["nocoin", "https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/nocoin.txt"],
       ["urlhaus", "https://gitlab.com/curben/urlhaus-filter/-/raw/master/urlhaus-filter.txt"],
+      ["uassets-badware", "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/badware.txt"],
+      ["uassets-resource-abuse", "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/resource-abuse.txt"],
     ],
   },
 };

@@ -559,7 +559,7 @@ README "참고 자료"에 나열된 항목 중 **실제 필터 소스로 사용�
 
 | 참고자료 | 용도 | 출처 표 항목 |
 |----------|------|-------------|
-| uBlock Origin / uBOL-home | 유튜브 응답 후킹 기법 참고 → `youtube-main.js` 구현에 반영. **단, uBO가 쓰는 필터 데이터(EasyList/EasyPrivacy/URLhaus)는 이미 포함됨** | 코드 기법 참고 + 필터 일부 포함 |
+| uBlock Origin / uBOL-home | 유튜브 응답 후킹 기법 참고 → `youtube-main.js` 구현에 반영. **2026-11-20 Peter Lowe's + uAssets도 실제 필터로 추가** (아래 14.4 참조) | ✅ 기법 참고 + 필터 추가 |
 | NoriDev-AdBlock-Filter | 한국 광고 필터 소스 | ✅ NoriDev-AdBlock-Filter |
 | List-KR | 한국 광고 필터 소스 | ✅ List-KR |
 | filterslists-ko | 한국 광고 필터 소스 (2026-11-20 추가, List-KR 포크 분기) | ✅ filterslists-KO (Unified) |
@@ -571,7 +571,7 @@ README "참고 자료"에 나열된 항목 중 **실제 필터 소스로 사용�
 
 | 참고자료 | 미사용 사유 |
 |----------|------------|
-| **uBlock (gorhill/uBlock)** | **정정**: '기법 연구용'이라는 표현은 부정확. 실제로는 uBO가 기본 사용하는 5개 필터 중 3개(EasyList/EasyPrivacy/URLhaus)는 이미 포함했고, 나머지 **Peter Lowe's / uAssets는 검토 과정에서 누락**됨 (의도적 제외 아님). 2026-11-20 데이터 검증 완료 |
+| **uBlock (gorhill/uBlock)** | **정정 및 조치 완료**: 이전 '기법 연구용' 표현은 부정확. uBO 기본 5개 필터 중 3개는 기존 포함, Peter Lowe's / uAssets는 검토 누락이었으나 **2026-11-20 실제 필터로 추가함** |
 | **AdAway** | 호스트 기반 차단 참고. 실제 필터 미포함 (DNR 변환 대상이 아님) |
 | **hagezi/dns-blocklists** | 규모가 너무 커 미포함 (README에도 명시) |
 | **tryblock.org / d3ward.com / paileactivist/toolz / canyoublockit.com / obfusgated.com / ipcheck.ing / superadblocktest.com** | 차단 동작 검증용 테스트 사이트. 필터 소스가 아니라 검증 대상 |
@@ -590,3 +590,28 @@ README "참고 자료"에 나열된 항목 중 **실제 필터 소스로 사용�
    - uAssets `filters.txt`: 변환 872개 중 중복 229개 / **신규 634개**
    - uAssets는 단일 필터가 아니라 **22개 파일** (filters.txt, filters-2020~2026, privacy.txt, badware.txt, annoyances계열, resource-abuse, ubo-link-shorteners, unbreak 등). 이전에 "필터 2개"라고 표현한 것도 부정확.
    - **결론**: 중복이 아닌 신규 도메인이 수천 개 있으므로, 추가 여부는 별도 결정 필요 (현재는 미추가 상태).
+
+### 14.4 uBO 필터 추가 및 eyeo anti-cv 검토 (2026-11-20 조치 완료)
+
+**추가한 필터**
+- **Peter Lowe's Blocklist** (pgl.yoyo.org, 광고 차단 그룹): 변환 3,568개 중 정적 중복 1,656개 제거 → **신규 1,912개**
+- **uAssets filters 계열** (uBlockOrigin/uAssets, GPLv3):
+  - `filters.txt` 신규 634개, `filters-general.txt` 신규 305개, `filters-2024~2026` 신규 182+201+240개 → **광고 차단 그룹**
+  - `privacy.txt` 신규 804개 → **개인정보 보호 그룹**
+  - `badware.txt` 신규 2,945개, `resource-abuse.txt` 신규 14개 → **보안 그룹**
+- **eyeo anti-cv로 소스 교체** (gitlab.com/eyeo/anti-cv/abp-filters-anti-cv): 기존 GitHub abp-filters-anti-cv 11개 언어는 정적 필터에 이미 포함되어 신규 0개였으나, **eyeo 버 english.txt에서 신규 488개**를 확인 → 11개 언어 전체를 eyeo raw URL로 교체 (안티서클 142 → 1,041개)
+
+**중복/누락 검증 결과 (데이터 기반)**
+| 소스 | 변환 | 정적 중복 | 신규 |
+|------|------|-----------|------|
+| GitHub anti-cv 11개 언어 | 해당 | 전부 포함 | **0** |
+| eyeo anti-cv 11개 언어 | 해당 | 일부 | **504** (영문 488 포함) |
+| eyeo 전용 추가 언어 15개 | 매우 적음 (cosmetic 위주) | 0 | **2** |
+| Peter Lowe's | 3,568 | 1,656 | **1,912** |
+| uAssets badware | 2,967 | 15 | **2,945** |
+
+→ **"중복이라서 안 넣었다"는 설명은 틀렸음.** 실제로는 검토 누락이었고, 데이터상 신규 도메인이 수천 개였음.
+
+**빌드 결과**: 전체 정적 규칙 262,246 → **272,248개** (14개 ruleset JSON), 정적 인덱스 259,853 → **268,213개 urlFilter**.
+
+**eyeo 전용 추가 언어(arabic/bulgarian/dutch/hebrew/hungarian/indian/indonesian/italian/latvian/lithuanian/romanian/tamil/nordic/fb_non-graph/mobile-anti-cv)**는 대부분 cosmetic 필터라 DNR 변환 대상이 거의 없어(신규 2개) 미포함.

@@ -57,8 +57,11 @@ export const LOCKED_GROUPS = new Set(["ads", "security"]);
 // 출처 및 라이선스 표 데이터 — 개별 필터 소스별로 분리
 export const LICENSE_TABLE = [
   { name: "NoCoin", group: "보안", license: "MIT", url: "https://github.com/hoshsadiq/adblock-nocoin-list" },
+  { name: "uAssets badware / resource-abuse", group: "보안", license: "GPLv3", url: "https://github.com/uBlockOrigin/uAssets" },
   { name: "URLhaus", group: "보안", license: "MIT / CC0 1.0", url: "https://gitlab.com/curben/urlhaus-filter" },
   { name: "EasyList", group: "광고 차단", license: "CC BY-SA 3.0", url: "https://easylist.to/" },
+  { name: "Peter Lowe Blocklist", group: "광고 차단", license: "See source", url: "https://pgl.yoyo.org/adservers/" },
+  { name: "uAssets filters (general/2024~2026)", group: "광고 차단", license: "GPLv3", url: "https://github.com/uBlockOrigin/uAssets" },
   { name: "EasyPrivacy", group: "광고 차단", license: "CC BY-SA 3.0", url: "https://easylist.to/easylist/easyprivacy.txt" },
   { name: "AdGuard Base (Ultimate Ad Filter)", group: "광고 차단", license: "GNU GPLv3 / CC BY 3.0", url: "https://github.com/AdguardTeam/AdguardFilters" },
   { name: "NoriDev-AdBlock-Filter", group: "한국 광고", license: "CC BY-NC-SA 4.0", url: "https://github.com/noridev/NoriDev-AdBlock-Filter" },
@@ -68,6 +71,7 @@ export const LICENSE_TABLE = [
   { name: "filterslists-KO (Unified)", group: "한국 광고", license: "GNU GPLv3", url: "https://github.com/FilteringDev/filterslists-KO" },
   { name: "Fanboy's Social Blocking", group: "개인정보 보호", license: "CC BY 3.0", url: "https://www.fanboy.co.nz/" },
   { name: "AdGuard URL Tracking", group: "개인정보 보호", license: "GNU GPLv3", url: "https://github.com/AdguardTeam/AdguardFilters" },
-  { name: "abp-filters-anti-cv", group: "안티서클", license: "GNU GPLv3", url: "https://github.com/abp-filters/abp-filters-anti-cv" },
+  { name: "uAssets privacy", group: "개인정보 보호", license: "GPLv3", url: "https://github.com/uBlockOrigin/uAssets" },
+  { name: "abp-filters-anti-cv (eyeo)", group: "안티서클", license: "GNU GPLv3", url: "https://gitlab.com/eyeo/anti-cv/abp-filters-anti-cv" },
   { name: "Fanboy's Annoyance", group: "성가신 요소", license: "CC BY 3.0", url: "https://www.fanboy.co.nz/" },
 ];
