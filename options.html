@@ -253,6 +253,13 @@
     .empty { font-size: 11px; color: #94a3b8; text-align: center; padding: 20px 0; }
 
     /* 차단 기록 탭 */
+    .log-tabs { display: flex; gap: 6px; margin-bottom: 10px; }
+    .log-tab-btn {
+      flex: 1; padding: 7px; font-size: 11px; font-weight: 600; cursor: pointer;
+      border: 1px solid #dbe2ee; border-radius: 6px; background: #fff; color: #64748b;
+    }
+    .log-tab-btn:hover { background: #f1f5f9; }
+    .log-tab-btn.active { background: #ffedf0; border-color: #fecdd3; color: #e94560; }
     .log-summary { font-size: 11px; color: #475569; font-weight: 600; margin-bottom: 8px; }
     .log-search { margin-bottom: 10px; }
     .log-search input {
@@ -385,10 +392,15 @@
       </div>
       <p class="info" style="margin-top:0;padding-top:0;border-top:none">
         필터가 자동으로 막은 요청입니다. 사이트별로 묶어서 보여줍니다.<br>
-        • <b>기록은 최근 5,000건까지</b> 저장됩니다. 이전 버전은 300건까지만 저장했기 때문에, 확장을 재로드한 뒤에는 <b>300건 조금 넘는 기록부터 다시 쌓이기 시작합니다.</b><br>
+        • <b>네트워크 차단 기록과 DOM 제거 기록을 각각 최근 5,000건까지</b> 저장합니다. 두 기록은 별도로 저장되어 서로의 용량에 영향을 주지 않습니다.<br>
+        • 이전 버전은 네트워크 기록만 300건까지 저장했기 때문에, 재로드 직후에는 <b>300건 조금 넘는 기록부터 다시 쌓입니다.</b><br>
         • 위의 <b>총 차단 건수</b>는 기록과 별개로 무제한 누적되며, 팝업의 「총 차단」과 같은 값입니다 (네트워크 차단 + DOM 제거).<br>
-        • 기록 1건 = <b>네트워크로 막힌 요청</b> 1개의 주소와 시간입니다. DOM 제거(광고 요소 숨김)는 횟수에만 포함되고 개별 기록은 남지 않습니다.
+        • DOM 제거 기록은 <b>사이트 · 제거한 광고 요소 개수 · 시간</b>만 저장하고, 요소의 HTML이나 선택자는 저장하지 않습니다.
       </p>
+      <div class="log-tabs">
+        <button class="log-tab-btn active" data-log="network">네트워크 차단</button>
+        <button class="log-tab-btn" data-log="dom">DOM 제거</button>
+      </div>
       <div class="log-summary" id="logSummary">불러오는 중...</div>
       <div class="log-search">
         <input type="search" id="logSearch" placeholder="사이트 또는 주소 검색">

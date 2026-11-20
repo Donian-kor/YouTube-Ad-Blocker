@@ -12,12 +12,14 @@ importScripts("background/filter-updater.js");
 chrome.runtime.onInstalled.addListener(() => {
   initRules();
   loadStats();
+  loadDomLog();
   console.log("www_AD_Blocker: 규칙 등록 완료");
 });
 
 chrome.runtime.onStartup.addListener(() => {
   initRules();
   loadStats();
+  loadDomLog();
 });
 
 // === 전체 ON/OFF 토글 상태 변경 감지 ===
@@ -48,6 +50,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     const tabId = sender && sender.tab ? sender.tab.id : -1;
     const pageUrl = sender && sender.tab ? sender.tab.url : "";
     const site = siteOf(pageUrl);
+
+    // DOM 제거 기록 (사이트 + 개수 + 시간만 저장, 요소 HTML은 저장하지 않음)
+    AppState.domLog.unshift({ site: site || "알 수 없는 사이트", count, time: Date.now() });
+    if (AppState.domLog.length > MAX_DOM_LOG_ENTRIES) AppState.domLog.length = MAX_DOM_LOG_ENTRIES;
+    saveDomLog();
     if (site) {
       if (tabId >= 0) AppState.tabSites.set(tabId, site);
       getSiteCount(site).dom += count;
@@ -77,6 +84,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
   else if (message.type === "getBlockedLog") {
     sendResponse({ log: AppState.stats.blockedLog || [] });
+  }
+  else if (message.type === "getDomLog") {
+    sendResponse({ log: AppState.domLog || [] });
   }
   else if (message.type === "getTabCount") {
     // 탭이 현재 보고 있는 사이트에 저장된 누적 차단 수
@@ -134,3 +144,4 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 // (확장 새로고침 시 onInstalled가 안 불릴 수 있으므로)
 initRules();
 loadStats();
+loadDomLog();

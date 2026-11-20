@@ -3,8 +3,12 @@
 
 // 차단 주소 로그는 최대 5,000개까지만 보관 (전체 차단 횟수는 blockedRequests에 별도 누적)
 const MAX_LOG_ENTRIES = 5000;
+// DOM 제거 기록도 별도로 최대 5,000개 보관 (네트워크 로그와 저장 키 분리)
+const MAX_DOM_LOG_ENTRIES = 5000;
+const DOM_SAVE_DELAY_MS = 3000;
 let saveTimer = null;
 let siteSaveTimer = null;
+let domSaveTimer = null;
 
 // 저장된 통계 로드
 function loadStats() {
@@ -98,6 +102,22 @@ function updateBadgeForTab(tabId) {
   });
 }
 
+// DOM 제거 기록 로드 / 저장 (네트워크 로그와 별도 키, 3초 디바운스)
+function loadDomLog() {
+  chrome.storage.local.get(["adBlockerDomLog"], (result) => {
+    const stored = result && result.adBlockerDomLog;
+    AppState.domLog = Array.isArray(stored) ? stored.slice(0, MAX_DOM_LOG_ENTRIES) : [];
+  });
+}
+
+function saveDomLog() {
+  if (domSaveTimer) return;
+  domSaveTimer = setTimeout(() => {
+    domSaveTimer = null;
+    chrome.storage.local.set({ adBlockerDomLog: AppState.domLog });
+  }, DOM_SAVE_DELAY_MS);
+}
+
 // 사이트별 카운트를 local 저장소에 보관 (브라우저를 껐다 켜도 유지)
 function saveSiteCounts() {
   if (siteSaveTimer) return;
@@ -120,9 +140,11 @@ function resetStats() {
   };
   saveStats();
 
-  // 사이트별 카운트와 뱃지도 함께 초기화
+  // 사이트별 카운트·DOM 기록·뱃지도 함께 초기화
   AppState.siteCounts.clear();
   saveSiteCounts();
+  AppState.domLog = [];
+  saveDomLog();
   updateBadgeForTab(AppState.activeTabId);
 }
 

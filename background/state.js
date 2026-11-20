@@ -13,6 +13,10 @@ const AppState = {
     lastReset: Date.now(),
   },
 
+  // DOM 제거 기록: 네트워크 로그와 별도로 저장 (최대 5,000건)
+  // 각 항목 = { site, count, time } — 요소 HTML/선택자는 저장하지 않음
+  domLog: [],
+
   // 사이트(호스트)별 차단 수: "youtube.com" -> { net, dom }
   siteCounts: new Map(),
   tabSites: new Map(),           // 탭 ID -> 현재 사이트(호스트)
