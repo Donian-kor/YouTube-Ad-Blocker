@@ -7,196 +7,214 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      width: 560px;
+      width: min(560px, 100vw - 32px);
+      margin: 0 auto;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: #1a1a2e;
       color: #e0e0e0;
       padding: 24px;
     }
-    h2 { font-size: 18px; margin-bottom: 20px; color: #fff; }
+    h2 { font-size: 18px; margin-bottom: 16px; color: #fff; }
+
+    /* 탭 바 */
+    .tab-bar { display: flex; gap: 4px; border-bottom: 1px solid #2a2a4a; margin-bottom: 20px; }
+    .tab-btn {
+      flex: 1; padding: 10px 6px; border: none; background: transparent;
+      color: #888; font-size: 12px; font-weight: 600; cursor: pointer;
+      border-bottom: 2px solid transparent; transition: color .2s, border-color .2s;
+    }
+    .tab-btn:hover { color: #ccc; }
+    .tab-btn.active { color: #e94560; border-bottom-color: #e94560; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
     .section { margin-bottom: 24px; }
     .section h3 {
-      font-size: 13px;
-      color: #e94560;
-      margin-bottom: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      font-size: 13px; color: #e94560; margin-bottom: 12px;
+      text-transform: uppercase; letter-spacing: 0.5px;
     }
     .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .stat-card {
-      background: #16213e;
-      border-radius: 8px;
-      padding: 8px 10px;
-      text-align: center;
-      border: 1px solid #2a2a4a;
+      background: #16213e; border-radius: 8px; padding: 8px 10px;
+      text-align: center; border: 1px solid #2a2a4a;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
     }
-    .stat-card.compact {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 6px 10px;
-    }
-    .stat-card .number { font-size: 22px; font-weight: 700; color: #e94560; }
-    .stat-card.compact .number { font-size: 20px; }
-    .stat-card .label { font-size: 11px; color: #888; margin-top: 4px; }
-    .stat-card.compact .label { margin-top: 0; }
+    .stat-card .number { font-size: 20px; font-weight: 700; color: #e94560; }
+    .stat-card .label { font-size: 11px; color: #888; }
     .total-box {
-      background: #16213e;
-      border-radius: 8px;
-      padding: 16px;
-      text-align: center;
-      margin-bottom: 12px;
-      border: 1px solid #2a2a4a;
+      background: #16213e; border-radius: 8px; padding: 16px; text-align: center;
+      margin-bottom: 12px; border: 1px solid #2a2a4a;
     }
     .total-box .number { font-size: 32px; font-weight: 700; color: #e94560; }
     .total-box .label { font-size: 12px; color: #888; margin-top: 4px; }
     .btn-row { display: flex; gap: 8px; margin-top: 12px; }
-    .last-reset {
-      font-size: 11px;
-      color: #666;
-      text-align: center;
-      margin-top: 8px;
-    }
+    .last-reset { font-size: 11px; color: #666; text-align: center; margin-top: 8px; }
+
     button {
-      flex: 1;
-      padding: 10px;
-      border: none;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity 0.2s;
+      flex: 1; padding: 10px; border: none; border-radius: 6px;
+      font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity .2s;
     }
-    button:hover { opacity: 0.85; }
+    button:hover { opacity: .85; }
+    button:disabled { opacity: .5; cursor: not-allowed; }
     button.danger { background: #e94560; color: white; }
     button.primary { background: #0f3460; color: white; }
     button.secondary { background: #2a2a4a; color: #e0e0e0; }
+    button.tiny { flex: none; padding: 4px 8px; font-size: 11px; }
 
-    .filter-toolbar {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
+    .filter-toolbar { display: flex; gap: 8px; margin-bottom: 12px; }
+    .update-status { font-size: 11px; color: #888; margin-top: 8px; min-height: 14px; }
+    .update-status.ok { color: #4ade80; }
+    .update-status.err { color: #ff6b6b; }
+
     .filter-card {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #16213e;
-      border-radius: 8px;
-      padding: 14px;
-      margin-bottom: 8px;
-      border: 1px solid #2a2a4a;
-      transition: border-color 0.2s;
+      display: flex; align-items: center; justify-content: space-between;
+      background: #16213e; border-radius: 8px; padding: 14px;
+      margin-bottom: 8px; border: 1px solid #2a2a4a; transition: border-color .2s;
     }
     .filter-card:hover { border-color: #3a3a5a; }
     .filter-info { flex: 1; min-width: 0; }
-    .filter-name-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .filter-name-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap; }
     .filter-icon { font-size: 16px; flex-shrink: 0; }
     .filter-name { font-size: 14px; font-weight: 600; color: #fff; }
     .filter-badge {
-      font-size: 10px;
-      color: #e94560;
-      background: rgba(233, 69, 96, 0.15);
-      padding: 2px 6px;
-      border-radius: 10px;
+      font-size: 10px; color: #e94560; background: rgba(233,69,96,.15);
+      padding: 2px 6px; border-radius: 10px;
     }
-    .filter-desc {
-      font-size: 12px;
-      color: #999;
-      margin-bottom: 2px;
-      line-height: 1.4;
-    }
-    .filter-source {
-      font-size: 10px;
-      color: #666;
-    }
+    .filter-badge.lock { color: #888; background: rgba(136,136,136,.15); }
+    .filter-desc { font-size: 12px; color: #999; line-height: 1.4; }
+    .filter-source { font-size: 10px; color: #666; }
 
     .toggle { position: relative; width: 44px; height: 24px; cursor: pointer; flex-shrink: 0; margin-left: 12px; }
     .toggle input { opacity: 0; width: 0; height: 0; }
-    .slider {
-      position: absolute;
-      inset: 0;
-      background: #3a3a5a;
-      border-radius: 24px;
-      transition: .3s;
-    }
+    .slider { position: absolute; inset: 0; background: #3a3a5a; border-radius: 24px; transition: .3s; }
     .slider:before {
-      content: "";
-      position: absolute;
-      height: 18px;
-      width: 18px;
-      left: 3px;
-      top: 3px;
-      background: #e0e0e0;
-      border-radius: 50%;
-      transition: .3s;
+      content: ""; position: absolute; height: 18px; width: 18px; left: 3px; top: 3px;
+      background: #e0e0e0; border-radius: 50%; transition: .3s;
     }
     input:checked + .slider { background: #e94560; }
     input:checked + .slider:before { transform: translateX(20px); }
+    .toggle.locked { opacity: .45; cursor: not-allowed; }
 
     .info {
-      font-size: 11px;
-      color: #666;
-      line-height: 1.7;
-      margin-top: 16px;
-      padding-top: 12px;
-      border-top: 1px solid #2a2a4a;
+      font-size: 11px; color: #666; line-height: 1.7;
+      margin-top: 16px; padding-top: 12px; border-top: 1px solid #2a2a4a;
     }
-    .info a { color: #e94560; text-decoration: none; }
-    .info a:hover { text-decoration: underline; }
+
+    /* 내 차단 목록 탭 */
+    .site-card {
+      background: #16213e; border: 1px solid #2a2a4a; border-radius: 8px;
+      padding: 12px; margin-bottom: 10px;
+    }
+    .site-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .site-name { font-size: 13px; font-weight: 600; color: #fff; word-break: break-all; }
+    .site-count { font-size: 10px; color: #888; }
+    .selector-row {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 0; border-top: 1px solid #22223a;
+    }
+    .selector-text {
+      flex: 1; min-width: 0; font-size: 11px; color: #9ab;
+      font-family: monospace; word-break: break-all;
+    }
+    .selector-input {
+      flex: 1; min-width: 0; background: #0f1424; color: #e0e0e0;
+      border: 1px solid #2a2a4a; border-radius: 4px; padding: 5px; font-size: 11px;
+    }
+    .add-row { display: flex; gap: 6px; margin-top: 8px; }
+    .empty { font-size: 12px; color: #666; text-align: center; padding: 24px 0; }
+
+    /* 출처 및 라이선스 탭 */
+    .lic-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+    .lic-table th, .lic-table td {
+      text-align: left; padding: 7px 6px; border-bottom: 1px solid #2a2a4a; vertical-align: top;
+    }
+    .lic-table th { color: #e94560; font-weight: 600; }
+    .lic-table td { color: #aaa; line-height: 1.5; }
   </style>
 </head>
 <body>
   <h2>www_AD_Blocker 설정</h2>
 
-  <div class="section">
-    <h3>통계</h3>
-    <div class="total-box">
-      <div class="number" id="optTotal">0</div>
-      <div class="label">차단된 총 광고</div>
-    </div>
-    <div class="stat-grid">
-      <div class="stat-card compact">
-        <div class="number" id="optNetwork">0</div>
-        <div class="label">네트워크 차단</div>
-      </div>
-      <div class="stat-card compact">
-        <div class="number" id="optDom">0</div>
-        <div class="label">DOM 제거</div>
-      </div>
-    </div>
-    <div class="btn-row">
-      <button class="danger" id="optResetBtn">통계 재설정</button>
-    </div>
-    <p class="last-reset">마지막 재설정: <span id="optReset">-</span></p>
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="filters">필터 목록</button>
+    <button class="tab-btn" data-tab="blocked">내 차단 목록</button>
+    <button class="tab-btn" data-tab="licenses">출처 및 라이선스</button>
   </div>
 
-  <div class="section">
-    <h3>광고 차단 필터</h3>
-    <div class="filter-toolbar">
-      <button class="primary" id="filterAllOnBtn">전체 활성화</button>
-      <button class="secondary" id="filterAllOffBtn">전체 비활성화</button>
+  <div class="tab-content active" id="tab-filters">
+    <div class="section">
+      <h3>통계</h3>
+      <div class="total-box">
+        <div class="number" id="optTotal">0</div>
+        <div class="label">차단된 총 광고</div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="number" id="optNetwork">0</div>
+          <div class="label">네트워크 차단</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" id="optDom">0</div>
+          <div class="label">DOM 제거</div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="danger" id="optResetBtn">통계 재설정</button>
+      </div>
+      <p class="last-reset">마지막 재설정: <span id="optReset">-</span></p>
     </div>
-    <div id="filterList"></div>
-    <div class="info">
-      <p>• <b>광고 차단</b>: 전 세계 광고를 차단하는 기본 필터입니다.</p>
-      <p>• <b>한국 광고 필터</b>: 국내 광고·트래커 차단에 특화되어 있습니다.</p>
-      <p>• <b>개인정보 보호</b>: 소셜 미디어 통합 제거 및 URL 추적 파라미터를 제거합니다.</p>
-      <p>• <b>안티서클</b>: 광고 우회 스크립트를 차단합니다.</p>
-      <p>• <b>성가신 요소</b>: 팝업, 쿠키 동의, 배너 등 성가신 요소를 차단합니다.</p>
-      <p>• <b>보안</b>: 악성 도메인, 피싱, cryptomining을 차단합니다.</p>
-      <p>• 필터를 비활성화하면 해당 필터의 광고 차단이 중단됩니다. 여러 필터를 동시에 켜두면 역할이 중복될 수 있습니다.</p>
+
+    <div class="section">
+      <h3>광고 차단 필터</h3>
+      <div class="filter-toolbar">
+        <button class="primary" id="filterAllOnBtn">전체 활성화</button>
+        <button class="secondary" id="filterAllOffBtn">전체 비활성화</button>
+      </div>
+      <div id="filterList"></div>
+      <div class="btn-row">
+        <button class="primary" id="filterUpdateBtn">필터 전체 업데이트</button>
+      </div>
+      <div class="update-status" id="filterUpdateStatus"></div>
+      <div class="info">
+        <p>• <b>광고 차단 / 보안</b>: 대용량 필터로 항상 켜져 있습니다.</p>
+        <p>• <b>나머지 4개 그룹</b>: 필요에 따라 끄고 켤 수 있습니다.</p>
+        <p>• 업데이트 중 브라우저를 종료해도 다음 실행 시 자동 복구됩니다.</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>동작 방식</h3>
+      <div class="info">
+        <p>• <b>네트워크 차단</b>: declarativeNetRequest API로 광고 요청을 블록</p>
+        <p>• <b>DOM 제거</b>: 이미 로드된 광고 요소를 제거</p>
+        <p>• YouTube의 정책 변화로 인해 완전한 차단은 어려울 수 있습니다.</p>
+      </div>
     </div>
   </div>
 
-  <div class="section">
-    <h3>동작 방식</h3>
-    <div class="info">
-      <p>• <b>네트워크 차단</b>: declarativeNetRequest API로 광고 요청을 블록</p>
-      <p>• <b>DOM 제거</b>: 이미 로드된 광고 요소를 제거</p>
-      <p>• YouTube의 정책 변화로 인해 완전한 차단은 어려울 수 있습니다.</p>
-      <p>• 광고를 시청하지 않으면 일부 콘텐츠 재생이 제한될 수 있습니다.</p>
+  <div class="tab-content" id="tab-blocked">
+    <div class="section">
+      <h3>내 차단 목록</h3>
+      <p class="info" style="margin-top:0;padding-top:0;border-top:none">
+        웹사이트에서 우클릭으로 차단한 요소입니다. 선택자를 직접 편집·추가·삭제할 수 있습니다.
+      </p>
+      <div id="blockedList"></div>
+      <div class="btn-row">
+        <button class="danger" id="blockedResetBtn">전체 차단 목록 초기화</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-licenses">
+    <div class="section">
+      <h3>필터 출처 및 라이선스</h3>
+      <table class="lic-table">
+        <thead><tr><th>그룹</th><th>출처</th><th>라이선스</th></tr></thead>
+        <tbody id="licenseTable"></tbody>
+      </table>
+      <div class="info">
+        <p><b>프로젝트 라이선스</b>: CC BY-NC-SA 4.0 (저작자 표시 · 비상업적 · 동일 라이선스)</p>
+      </div>
     </div>
   </div>
 

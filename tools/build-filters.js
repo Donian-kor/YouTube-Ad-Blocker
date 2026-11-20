@@ -25,6 +25,7 @@ const KOREAN_LISTS = [
   ["noridev", "https://raw.githubusercontent.com/noridev/NoriDev-AdBlock-Filter/master/filter/filter.txt"],
   ["turtlecute", "https://adblock.turtlecute.org/d3host.adblock"],
   ["d3host", "https://raw.githubusercontent.com/d3ward/toolz/master/src/d3host.txt"],
+  ["list-kr", "https://cdn.jsdelivr.net/npm/@list-kr/filterslists@latest/dist/filterslist-AdGuard.txt"],
   ["extra-hosts", "file:tools/tmp/extra-hosts.txt"],
 ];
 
