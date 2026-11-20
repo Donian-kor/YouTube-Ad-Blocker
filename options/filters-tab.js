@@ -88,7 +88,7 @@ function renderFilterList() {
 
       const groupTag = document.createElement("span");
       groupTag.className = "subgroup-group";
-      groupTag.textContent = source.group;
+      groupTag.textContent = source.groupName || source.group;
 
       const count = document.createElement("span");
       count.className = "subgroup-count";

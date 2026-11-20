@@ -32,10 +32,10 @@ const LISTS = REG.getGroupSources("easylist").map((s) => [s.id, s.url]);
 const SOURCE_ORDER = [
   // 한국
   "noridev", "turtlecute", "d3host", "list-kr", "filterslists-ko", "extra-hosts",
-  // 안티서클
+  // 광고 감지 대응
   "anti-cv-en", "anti-cv-zh", "anti-cv-cs", "anti-cv-fr", "anti-cv-de", "anti-cv-pl",
   "anti-cv-ru", "anti-cv-es",
-  // 개인정보 / 성가신 요소 (Social이 Annoyance와 겹치므로 먼저 소유)
+  // 개인정보 / 팝업·쿠키 정리 (Social이 Annoyance와 겹치므로 먼저 소유)
   "fanboy-social", "url-tracking", "uassets-privacy", "fanboy-annoyance",
   // 보안
   "nocoin", "urlhaus", "uassets-badware", "uassets-resource-abuse",

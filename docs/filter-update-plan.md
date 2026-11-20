@@ -13,7 +13,7 @@
 - 일반 사용자는 **주소 입력·복사·붙여넣기·설정을 하지 않는다.** 버튼만 누른다.
 - **Chrome 동적 규칙 30,000개 한도를 준수한다.**
 - **광고 차단 / 보안 그룹(정적 263,432개)은 활성화/비활성화 불가** — 항상 켜져 있어야 한다.
-- 나머지 4개 그룹(한국 광고, 개인정보 보호, 안티서클, 성가신 요소)은 필요에 따라 끄고 켤 수 있다.
+- 나머지 4개 그룹(한국 광고, 개인정보 보호, 광고 감지 대응, 팝업·쿠키 정리)은 필요에 따라 끄고 켤 수 있다.
 - List-KR 저장소 필터를 한국 광고 필터 그룹에 추가한다.
 - **설정 페이지에서 그룹별로 펼쳐서 내부 필터 목록을 볼 수 있어야 한다.**
 - **설정 페이지를 탭(Tab) 형식으로 재구성한다.**
@@ -53,8 +53,8 @@
 | 광고 차단 (EasyList + EasyPrivacy + Ultimate) | 123,075 | 19,000 | 상위 19,000개만 | ❌ 불가 (항상 ON) | EasyList, EasyPrivacy, Ultimate Ad Filter |
 | 한국 광고 필터 (NoriDev + Turtlecute + d3Host + extra-hosts + **List-KR**) | 1,856 | 1,856 (전체) | 전체 | ✅ 가능 | NoriDev, Turtlecute, d3Host, List-KR, extra-hosts |
 | 개인정보 보호 (Fanboy's Social + URL Tracking) | 270 | 270 (전체) | 전체 | ✅ 가능 | Fanboy's Social, URL Tracking |
-| 안티서클 (abp-filters-anti-cv) | 142 | 142 (전체) | 전체 | ✅ 가능 | anti-cv (영문/중문/유럽어) |
-| 성가신 요소 (Fanboy's Annoyance) | 2,445 | 2,445 (전체) | 전체 | ✅ 가능 | Fanboy's Annoyance |
+| 광고 감지 대응 (abp-filters-anti-cv) | 142 | 142 (전체) | 전체 | ✅ 가능 | anti-cv (영문/중문/유럽어) |
+| 팝업·쿠키 정리 (Fanboy's Annoyance) | 2,445 | 2,445 (전체) | 전체 | ✅ 가능 | Fanboy's Annoyance |
 | 보안 (NoCoin + URLhaus) | 134,458 | 6,000 | 상위 6,000개만 | ❌ 불가 (항상 ON) | NoCoin, URLhaus |
 
 > **중요 정정**: 30,000개는 **그룹별이 아니라 확장 전체 동적 규칙 합계 한도**다.
@@ -86,8 +86,8 @@
 │   │   ├── 📢 광고 차단 [🔒 항상 켜짐]
 │   │   ├── 🇰🇷 한국 광고 필터 [토글]
 │   │   ├── 🔒 개인정보 보호 [토글]
-│   │   ├── 🛡️ 안티서클 [토글]
-│   │   └── 🧹 성가신 요소 [토글]
+│   │   ├── 🛡️ 광고 감지 대응 [토글]
+│   │   └── 🧹 팝업·쿠키 정리 [토글]
 │   ├── [최신 필터 업데이트] 버튼 (1개)
 │   └── 안내: 정적 필터 27만 개(272,248개)는 재배포 시 갱신, 이 버튼은 정적 필터에 없는 신규 도메인만 동적 등록(최대 30,000개 한도)
 │
@@ -139,7 +139,7 @@
 | 요소 | 설명 |
 |------|------|
 | 아이콘 + 그룹명 | 예: 📢 광고 차단 |
-| 개수 배지 | 제목 우측에 **"규칙 N개"** 표시 (보안 137,434 / 광고 127,583 / 한국 2,286 / 개인정보 1,459 / 안티서클 1,041 / 성가신 2,445 — 합계 272,248개). 라이선스는 이 탭에서 표시하지 않고 '출처 및 라이선스' 탭에만 표시 |
+| 개수 배지 | 제목 우측에 **"규칙 N개"** 표시 (보안 137,434 / 광고 127,583 / 한국 2,286 / 개인정보 1,459 / 광고 감지 대응 1,041 / 성가신 2,445 — 합계 272,248개). 라이선스는 이 탭에서 표시하지 않고 '출처 및 라이선스' 탭에만 표시 |
 | 토글 스위치 | 광고 차단/보안은 비활성화(잠금), 나머지는 활성화 |
 
 #### 최신 도메인 업데이트 버튼 (1개)
@@ -211,8 +211,8 @@
 | List-KR | 한국 광고 | GNU GPLv3 | github.com/List-KR/List-KR |
 | Fanboy's Social Blocking | 개인정보 보호 | CC BY 3.0 | fanboy.co.nz |
 | AdGuard URL Tracking | 개인정보 보호 | GNU GPLv3 | github.com/AdguardTeam/AdguardFilters |
-| abp-filters-anti-cv | 안티서클 | GNU GPLv3 | github.com/abp-filters/abp-filters-anti-cv |
-| Fanboy's Annoyance | 성가신 요소 | CC BY 3.0 | fanboy.co.nz |
+| abp-filters-anti-cv | 광고 감지 대응 | GNU GPLv3 | github.com/abp-filters/abp-filters-anti-cv |
+| Fanboy's Annoyance | 팝업·쿠키 정리 | CC BY 3.0 | fanboy.co.nz |
 
 #### 프로젝트 라이선스 안내
 
@@ -304,7 +304,7 @@ await dnrUpdate({ removeRuleIds: oldIds, addRules: committed });
 >
 > **변환 주의**: `17.txt`는 주로 `$removeparam` 규칙(URI 파라미터 제거)으로 구성되어 **DNR로 변환 불가**합니다. 변환 가능한 규칙은 block 48개 + allow 109개 = **157개**뿐이며, 나머지는 빌드 시 제외됩니다. (참고: DNR은 `$removeparam`을 지원하지 않음)
 
-### 4.4 안티서클 (전체 동적 업데이트, UI 토글 가능)
+### 4.4 광고 감지 대응 (전체 동적 업데이트, UI 토글 가능)
 
 | 소스 | 실제 제목 | 정확한 URL | 검증 | 라이선스 |
 |------|-----------|------------|------|----------|
@@ -322,7 +322,7 @@ await dnrUpdate({ removeRuleIds: oldIds, addRules: committed });
 
 > 위 언어 파일들은 **모두 같은 저장소**(abp-filters/abp-filters-anti-cv)에 있으며, 브랜치는 `master`입니다. 파일명만 언어별로 다릅니다.
 
-### 4.5 성가신 요소 (전체 동적 업데이트, UI 토글 가능)
+### 4.5 팝업·쿠키 정리 (전체 동적 업데이트, UI 토글 가능)
 
 | 소스 | 실제 제목 | 정확한 URL | 검증 | 라이선스 |
 |------|-----------|------------|------|----------|
@@ -601,7 +601,7 @@ README "참고 자료"에 나열된 항목 중 **실제 필터 소스로 사용�
   - `filters.txt` 신규 634개, `filters-general.txt` 신규 305개, `filters-2024~2026` 신규 182+201+240개 → **광고 차단 그룹**
   - `privacy.txt` 신규 804개 → **개인정보 보호 그룹**
   - `badware.txt` 신규 2,945개, `resource-abuse.txt` 신규 14개 → **보안 그룹**
-- **eyeo anti-cv로 소스 교체** (gitlab.com/eyeo/anti-cv/abp-filters-anti-cv): 기존 GitHub abp-filters-anti-cv 11개 언어는 정적 필터에 이미 포함되어 신규 0개였으나, **eyeo 버 english.txt에서 신규 488개**를 확인 → 11개 언어 전체를 eyeo raw URL로 교체 (안티서클 142 → 1,041개)
+- **eyeo anti-cv로 소스 교체** (gitlab.com/eyeo/anti-cv/abp-filters-anti-cv): 기존 GitHub abp-filters-anti-cv 11개 언어는 정적 필터에 이미 포함되어 신규 0개였으나, **eyeo 버 english.txt에서 신규 488개**를 확인 → 11개 언어 전체를 eyeo raw URL로 교체 (광고 감지 대응 142 → 1,041개)
 
 **중복/누락 검증 결과 (데이터 기반)**
 | 소스 | 변환 | 정적 중복 | 신규 |
@@ -624,7 +624,7 @@ README "참고 자료"에 나열된 항목 중 **실제 필터 소스로 사용�
 - 네트워크 차단: `ruleset_korean.json`에 치지직 전용 규칙 **14개** 존재
   - `api.chzzk.naver.com/service/v1/lives/*/ads/current` (현재 광고 API)
   - `api.chzzk.naver.com/ad-polling/v1/lives/*/ad` (광고 폴링)
-  - `nam.veta.naver.com/*` allow 3개 (안티애드블록 감지 우회용)
+  - `nam.veta.naver.com/*` allow 3개 (광고 차단 감지 감지 우회용)
 - **동영상 광고 자체**: API 차단에만 의존하며, 이미 로드된 광고 영상/배너는 DNR로 잡히지 않음
 - `$replace` 옵션 규칙 3개(id 823~825)는 DNR 미지원 옵션이 urlFilter에 그대로 들어가 **무효**
 
@@ -669,7 +669,7 @@ README "참고 자료"에 나열된 항목 중 **실제 필터 소스로 사용�
    - GFP Video Ad Schedule → `adBreaks: [빈]`
    - Naver SSP Waterfall List → `ads: []`
    - /seoraksan endpoint → `preRoll: false, midRoll: false`
-2. 안티애드블록 우회 — 광고 클래스 요소의 `getComputedStyle().display`를 `block`으로 속임
+2. 광고 감지 우회 — 광고 클래스 요소의 `getComputedStyle().display`를 `block`으로 속임
 3. XHR OPTIONS 요청 위조 — `nam.veta.naver.com` OPTIONS에 200/OK 반환
 
 **출처**: https://github.com/FilteringDev/crackle (MPL-2.0). 기법만 참고하여 우리 확장 구조(MAIN world content script)에 맞게 재작성.

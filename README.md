@@ -10,7 +10,7 @@
 - **유튜브 광고 차단** — 플레이어 응답의 `adSlots` / `playerAds` / `adPlacements` / `adBreakHeartbeatParams` 제거, Shorts `isAd` 플래그 무력화
 - **네트워크 광고 차단** — 5개 카테고리·34개 소스(소스별 개별 토글), 정적 271,415개 + 동적 신규 규칙(최대 30,000개 한도)를 DNR로 차단
 - **인라인 광고 차단** — 네트워크 차단으로 잡히지 않는 배너·사이드바·스폰서·팝업·오버레이 광고를 CSS 숨김 + DOM 제거 (`general-blocker.js`)
-- **안티애드블록 우회** — 감지 경고창·베이트 요소를 숨기고, dogdrip.net 서버 감지도 우회
+- **광고 감지 우회** — 감지 경고창·베이트 요소를 숨기고, dogdrip.net 서버 감지도 우회
 - **사이트별 누적 차단 수** — 툴바 뱃지와 팝업에 표시, 탭 전환·새로고침 후에도 유지
 - **차단 URL 목록** — 팝업의 「총 차단」 클릭 시 확인
 - **ON/OFF 토글** — 팝업에서 즉시 전환. 토글 시 현재 페이지가 자동 새로고침되고, OFF 상태에서는 툴바 아이콘이 회색으로 바뀌어 시각적으로 확인 가능
@@ -46,7 +46,7 @@ content.js             유튜브 DOM 정리/광고 스킵
 general-blocker.js     일반 사이트 인라인 광고 숨김 (tryblock, dogdrip, d3ward, uBO 테스트)
 popunder-blocker.js    skidrowreloaded 클릭 리다이렉트(popunder) 차단 (MAIN world)
 filehost-blocker.js    해외 파일 공유 사이트(gigafile/gofile/akirabox/buzzheavier) 광고·팝업·가짜 다운로드 차단
-anti-bypass.js         안티애드블록 감지 무력화
+anti-bypass.js         광고 차단 감지 감지 무력화
 element-blocker.js     우클릭 요소 차단
 popup.html / popup.js  팝업 UI
 options.html / options.js  설정 페이지
@@ -86,7 +86,7 @@ node tools/test-filehost-blocker.js  # 해외 파일 공유 사이트 차단 테
 | [obfusgated.com](https://obfusgated.com/tools/ad-block-test) | 267개 도메인 | 55개 미차단 도메인을 `extra-hosts` 규칙셋에 추가 (AppLovin, Vungle, Supersonic, Consent/CMP, Video Ads 등) |
 | [ipcheck.ing](https://ipcheck.ing/tools/adblocktest) | 196개 도메인/스크립트 | 26개 미차단 도메인(Pangle, Baidu, LINE, vivo, Amazon devices 등) 추가 |
 | [superadblocktest.com](https://superadblocktest.com/) | 482개 도메인 | 105개 미차단 중 신규 48개 추가 (CMP 동의관리, 실험플랫폼, 모바일 애트리뷰션, Live Chat, FreeWheel 등) |
-| [gigafile.nu](https://gigafile.nu/) | 배너·전면(인테리셔널) 광고 + Ad-Shield 안티애드블록 | 광고 슬롯·iframe·오버레이 제거, Ad-Shield 광고 도메인 차단 (DOM+네트워크 병행) |
+| [gigafile.nu](https://gigafile.nu/) | 배너·전면(인테리셔널) 광고 + Ad-Shield 광고 차단 감지 | 광고 슬롯·iframe·오버레이 제거, Ad-Shield 광고 도메인 차단 (DOM+네트워크 병행) |
 | [gofile.io](https://gofile.io/) | 다운로드 페이지 광고 슬롯 | `#ad-slot` 광고 영역 제거, 실제 다운로드 버튼 유지 |
 | [akirabox.com](https://akirabox.com/) | 다운로드 클릭 시 가짜 팝업/리다이렉트 | 팝오버·팝언더·외부 광고 링크 차단 |
 | [buzzheavier.com](https://buzzheavier.com/) | 팝오버/언더 + 가짜 다운로드 | 팝업/리다이렉트 차단, 실제 다운로드(hx-get /download) 버튼 보존 |
@@ -111,7 +111,7 @@ node tools/test-filehost-blocker.js  # 해외 파일 공유 사이트 차단 테
 - **v2.9**: `s.youtube.com` 차단 제거 — 광고 도메인이 아닌 시청 통계/재생 위치 저장용 telemetry라 차단 불필요 (광고 전용 `ads.youtube.com`은 유지, 총 456개)
 - **v3.0**: 해외 파일 공유 사이트(gigafile·gofile·akirabox·buzzheavier) 광고·팝오버/언더·가짜 다운로드 차단 추가 — DNR 광고 도메인 33개 추가, `filehost-blocker.js` 신규 도입 (실제 다운로드 버튼은 보존)
 - **v3.1**: 유튜브 홈 그리드에서 광고 렌더러만 제거되어 빈 칸(325×260px)이 남던 문제 수정 — 광고를 감싼 `ytd-rich-item-renderer` 셀째로 숨기고 제거
-- **v3.2**: 필터를 6개 그룹(보안/광고/한국/개인정보/안티서클/성가신요소)으로 재구성, List-KR 추가, 설정 페이지 탭 UI + 라이트 테마, 모듈화(shared/options/background)
+- **v3.2**: 필터를 6개 그룹(보안/광고/한국/개인정보/광고 감지 대응/성가신요소)으로 재구성, List-KR 추가, 설정 페이지 탭 UI + 라이트 테마, 모듈화(shared/options/background)
 - **v3.3**: 최신 필터 업데이트 기능 구현 (버튼 1개, 2단계 교체, 미변경 감지 '신규 업데이트가 없습니다'), 동적 규칙 한도 초과 오류 수정, 보안 필터 첫 행 배치, 통계 패널 재배치(총 차단 강조·재설정 우측), 설정/팝업 라이트 테마 및 배경 박스 제거, 새 아이콘(방패/AD) 적용
 - **v3.4**: 설치/재로드 시 자동 업데이트 제거 (버튼 누를 때만 실행되도록 변경), 정적 필터 27만 개(272,248개)와 **중복된 도메인은 동적 등록에서 제외**하고 신규 도메인만 업데이트 (`filters/static-index.json` 인덱스(당시 259,853개 → 현재 268,221개), web_accessible_resources 등록). 실제 테스트에서 29,136개 중복 제거 후 474개 신규만 등록. 인위적 상한 제거, validate-rules 오인 수정
 

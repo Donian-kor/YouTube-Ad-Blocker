@@ -105,7 +105,7 @@ export const FILTER_GROUPS = [
 | `intl_ads` | 국제 광고 | easylist, adguard, peterlowe, uassets | 📢 |
 | `korean` | 한국 필터 | korean | 🇰🇷 |
 | `privacy` | 개인정보 | social | 🔒 |
-| `anti_cv` | 안티애드블록 | anti_cv, annoyances | 🚫 |
+| `anti_cv` | 광고 차단 감지 | anti_cv, annoyances | 🚫 |
 | `security` | 보안 | malware, mining | 🛡️ |
 
 ### 3.4 UI 동작
@@ -187,7 +187,7 @@ export const FILTER_GROUPS = [
 | 단일 진실 공급원 | `shared/filter-registry.js` (UMD — Node/importScripts/ESM 모두 지원) |
 | 소스 정의 | 34개 (`FILTER_REGISTRY`) |
 | 소스 그룹 | 10개 (`FILTER_GROUPS`) |
-| UI 카테고리 | 5개 (`FILTER_CATEGORIES`) — 국제 광고 / 한국 필터 / 개인정보 / 안티애드블록 / 보안 |
+| UI 카테고리 | 5개 (`FILTER_CATEGORIES`) — 국제 광고 / 한국 필터 / 개인정보 / 광고 차단 감지 / 보안 |
 | 규칙 수 메타 | `shared/build-meta.js` — 빌드 시 자동 생성, `options/config.js`가 참조 |
 | 정적 규칙셋 | 19개 파일 (그룹별 분할, manifest `rule_resources` 자동 생성) |
 
@@ -243,7 +243,7 @@ export const FILTER_GROUPS = [
 
 - `manifest.json`: 모든 `rule_resources`를 `enabled: false`로 변경 (로드 시 자동 활성화 방지)
 - `background.js`: `getAvailableStaticRuleCount()`로 여유분을 확인한 뒤,
-  우선순위(한국 → 안티서클 → 개인정보 → 성가신 → uAssets → Peter Lowe → 마이닝 → EasyList → AdGuard → 악성)
+  우선순위(한국 → 광고 감지 대응 → 개인정보 → 성가신 → uAssets → Peter Lowe → 마이닝 → EasyList → AdGuard → 악성)
   순으로 예산에 맞는 규칙셋만 활성화. 동시 호출은 큐로 직렬화.
 - `shared/build-meta.js`: 규칙셋별 규칙 수(`rulesets`)를 빌드 시 자동 생성하여 예산 계산에 사용
 - 한도가 부족해 일부 규칙셋이 제외되면 콘솔에 경고를 남김 (동적 규칙·콘텐츠 스크립트 차단은 계속 동작)

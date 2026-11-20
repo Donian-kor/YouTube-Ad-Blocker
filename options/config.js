@@ -58,6 +58,7 @@ export const SOURCE_LIST = REG.FILTER_REGISTRY.map((s) => ({
   id: s.id,
   name: s.name,
   group: s.group,
+  groupName: (REG.FILTER_GROUPS.find((g) => g.id === s.group) || {}).name || s.group,
   category: s.category,
   filterCount: countOfSource(s.id),
   locked: !!(categoryOfSource(s.id) && categoryOfSource(s.id).locked),
