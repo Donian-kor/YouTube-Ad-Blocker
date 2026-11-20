@@ -65,7 +65,6 @@ export const LICENSE_TABLE = [
   { name: "Turtlecute Host List", group: "한국 광고", license: "CC BY-NC-SA 4.0", url: "https://adblock.turtlecute.org/d3host.adblock" },
   { name: "d3Host", group: "한국 광고", license: "CC BY-NC-SA 4.0", url: "https://github.com/d3ward/toolz" },
   { name: "List-KR", group: "한국 광고", license: "GNU GPLv3", url: "https://github.com/List-KR/List-KR" },
-  { name: "자체 extra-hosts", group: "한국 광고", license: "프로젝트 자체 (CC BY-NC-SA 4.0)", url: "https://github.com/Donian-kor/www_AD_Blocker" },
   { name: "Fanboy's Social Blocking", group: "개인정보 보호", license: "CC BY 3.0", url: "https://www.fanboy.co.nz/" },
   { name: "AdGuard URL Tracking", group: "개인정보 보호", license: "GNU GPLv3", url: "https://github.com/AdguardTeam/AdguardFilters" },
   { name: "abp-filters-anti-cv", group: "안티서클", license: "GNU GPLv3", url: "https://github.com/abp-filters/abp-filters-anti-cv" },

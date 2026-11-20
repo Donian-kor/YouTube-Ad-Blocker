@@ -62,7 +62,7 @@ const GROUPS = {
     name: "개인정보 보호",
     sources: [
       ["fanboy-social", "https://www.fanboy.co.nz/fanboy-social.txt"],
-      ["url-tracking", "https://filters.adtidy.org/extension/chromium/filters/10.txt"],
+      ["url-tracking", "https://filters.adtidy.org/extension/chromium/filters/17.txt"],
     ],
   },
 

@@ -207,7 +207,6 @@
 | Turtlecute Host List | 한국 광고 | CC BY-NC-SA 4.0 | adblock.turtlecute.org/d3host.adblock |
 | d3Host | 한국 광고 | CC BY-NC-SA 4.0 | github.com/d3ward/toolz |
 | List-KR | 한국 광고 | GNU GPLv3 | github.com/List-KR/List-KR |
-| 자체 extra-hosts | 한국 광고 | 프로젝트 자체 (CC BY-NC-SA 4.0) | github.com/Donian-kor/www_AD_Blocker |
 | Fanboy's Social Blocking | 개인정보 보호 | CC BY 3.0 | fanboy.co.nz |
 | AdGuard URL Tracking | 개인정보 보호 | GNU GPLv3 | github.com/AdguardTeam/AdguardFilters |
 | abp-filters-anti-cv | 안티서클 | GNU GPLv3 | github.com/abp-filters/abp-filters-anti-cv |
