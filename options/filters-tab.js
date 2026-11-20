@@ -222,13 +222,28 @@ function setUpdateStatus(message, kind) {
   el.className = "update-status" + (kind ? " " + kind : "");
 }
 
+// 정적 규칙 + 버튼으로 등록된 동적 규칙의 합계를 뱃지에 표시
+let dynamicRuleCount = 0;
+
+function updateTotalBadge() {
+  const badge = document.getElementById("totalRuleBadge");
+  if (badge) {
+    const total = STATIC_FILTER_COUNT + dynamicRuleCount;
+    badge.textContent = "규칙 " + total.toLocaleString() + "개";
+  }
+}
+
+function loadDynamicCount() {
+  chrome.storage.local.get(["dynamicRuleCount"], (res) => {
+    dynamicRuleCount = (res && res.dynamicRuleCount) || 0;
+    updateTotalBadge();
+  });
+}
+
 export function initFiltersTab() {
   renderFilterList();
   loadFilterStates();
-
-  // 총 규칙 수를 빌드 메타데이터에서 자동 표시 (빌드 시 규칙이 바뀌면 함께 갱신)
-  const totalBadge = document.getElementById("totalRuleBadge");
-  if (totalBadge) totalBadge.textContent = "규칙 " + STATIC_FILTER_COUNT.toLocaleString() + "개";
+  loadDynamicCount();
 
   document.getElementById("filterAllOnBtn").addEventListener("click", () => {
     SOURCE_LIST.forEach((source) => {
@@ -262,6 +277,7 @@ export function initFiltersTab() {
           setUpdateStatus("✅ " + res.count.toLocaleString() + "개 규칙 업데이트 완료", "ok");
           currentHistory = [res.historyEntry].filter(Boolean).concat(currentHistory);
           renderUpdateHistory(currentHistory);
+          loadDynamicCount(); // 새로 등록된 동적 규칙 수를 뱃지에 반영
         }
       } else {
         const reason = res && res.reason ? res.reason : "알 수 없는 오류";
@@ -273,6 +289,7 @@ export function initFiltersTab() {
   initUpdateHistory();
 
   chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === "local" && changes.dynamicRuleCount) loadDynamicCount();
     if (area === "local" && (changes.adBlockerEnabled || changes.filterStates)) {
       loadFilterStates();
     }
