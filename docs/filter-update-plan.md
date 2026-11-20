@@ -156,7 +156,7 @@
 
 #### 잠금 UI (광고 차단 / 보안)
 
-- 토글이 비활성화되고 "🔒 항상 켜짐" 배지가 표시된다.
+- 토글이 비활성화되고 **녹색 배경의 "🔒 항상 켜짐" 배지**가 표시되어 눈에 잘 띈다.
 
 #### 전체 비활성화 버튼
 
@@ -191,16 +191,27 @@
 
 ### 3.6 [출처 및 라이선스] 탭 상세
 
-#### 필터 그룹별 출처/라이선스 표
+#### 출처 및 라이선스 표 (개별 필터 소스별)
 
-| 그룹 | 출처 | 라이선스 |
-|------|------|----------|
-| 광고 차단 | EasyList, EasyPrivacy, Ultimate Ad Filter | CC BY-SA 3.0 / GNU GPLv3 |
-| 한국 광고 필터 | NoriDev, Turtlecute, d3Host, List-KR | CC BY-NC-SA 4.0 / GNU GPLv3 |
-| 개인정보 보호 | Fanboy's Social, AdGuard URL Tracking | CC BY 3.0 / GNU GPLv3 |
-| 안티서클 | abp-filters-anti-cv | GNU GPLv3 |
-| 성가신 요소 | Fanboy's Annoyance | CC BY 3.0 |
-| 보안 | NoCoin, URLhaus | MIT / CC0 1.0 |
+그룹 단위가 아니라 **개별 필터 소스마다** 항목을 나누어 필터명·그룹·라이선스·출처 주소(클릭 가능한 링크)를 표시한다.
+표 데이터는 `options/config.js`의 `LICENSE_TABLE`에 정의되어 있다.
+
+| 필터 | 그룹 | 라이선스 | 출처 주소 |
+|------|------|----------|-----------|
+| NoCoin | 보안 | MIT | github.com/hoshsadiq/adblock-nocoin-list |
+| URLhaus | 보안 | MIT / CC0 1.0 | gitlab.com/curben/urlhaus-filter |
+| EasyList | 광고 차단 | CC BY-SA 3.0 | easylist.to |
+| EasyPrivacy | 광고 차단 | CC BY-SA 3.0 | easylist.to/easylist/easyprivacy.txt |
+| AdGuard Base (Ultimate Ad Filter) | 광고 차단 | GNU GPLv3 / CC BY 3.0 | github.com/AdguardTeam/AdguardFilters |
+| NoriDev-AdBlock-Filter | 한국 광고 | CC BY-NC-SA 4.0 | github.com/noridev/NoriDev-AdBlock-Filter |
+| Turtlecute Host List | 한국 광고 | CC BY-NC-SA 4.0 | adblock.turtlecute.org/d3host.adblock |
+| d3Host | 한국 광고 | CC BY-NC-SA 4.0 | github.com/d3ward/toolz |
+| List-KR | 한국 광고 | GNU GPLv3 | github.com/List-KR/List-KR |
+| 자체 extra-hosts | 한국 광고 | 프로젝트 자체 (CC BY-NC-SA 4.0) | github.com/Donian-kor/www_AD_Blocker |
+| Fanboy's Social Blocking | 개인정보 보호 | CC BY 3.0 | fanboy.co.nz |
+| AdGuard URL Tracking | 개인정보 보호 | GNU GPLv3 | github.com/AdguardTeam/AdguardFilters |
+| abp-filters-anti-cv | 안티서클 | GNU GPLv3 | github.com/abp-filters/abp-filters-anti-cv |
+| Fanboy's Annoyance | 성가신 요소 | CC BY 3.0 | fanboy.co.nz |
 
 #### 프로젝트 라이선스 안내
 

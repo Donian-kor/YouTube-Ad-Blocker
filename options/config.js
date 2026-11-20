@@ -54,12 +54,20 @@ export const FILTER_LIST = [
 // 대용량 필터 그룹 — 항상 켜짐, 사용자가 끌 수 없음
 export const LOCKED_GROUPS = new Set(["ads", "security"]);
 
-// 출처 및 라이선스 표 데이터
+// 출처 및 라이선스 표 데이터 — 개별 필터 소스별로 분리
 export const LICENSE_TABLE = [
-  { name: "보안", source: "NoCoin, URLhaus", license: "MIT / CC0 1.0", home: "https://gitlab.com/curben/urlhaus-filter" },
-  { name: "광고 차단", source: "EasyList, EasyPrivacy, Ultimate Ad Filter", license: "CC BY-SA 3.0 / GNU GPLv3", home: "https://easylist.to/" },
-  { name: "한국 광고 필터", source: "NoriDev, Turtlecute, d3Host, List-KR", license: "CC BY-NC-SA 4.0 / GNU GPLv3", home: "https://github.com/List-KR/List-KR" },
-  { name: "개인정보 보호", source: "Fanboy's Social, AdGuard URL Tracking", license: "CC BY 3.0 / GNU GPLv3", home: "https://github.com/AdguardTeam/AdguardFilters" },
-  { name: "안티서클", source: "abp-filters-anti-cv", license: "GNU GPLv3", home: "https://github.com/abp-filters/abp-filters-anti-cv" },
-  { name: "성가신 요소", source: "Fanboy's Annoyance", license: "CC BY 3.0", home: "https://easylist.to/" },
+  { name: "NoCoin", group: "보안", license: "MIT", url: "https://github.com/hoshsadiq/adblock-nocoin-list" },
+  { name: "URLhaus", group: "보안", license: "MIT / CC0 1.0", url: "https://gitlab.com/curben/urlhaus-filter" },
+  { name: "EasyList", group: "광고 차단", license: "CC BY-SA 3.0", url: "https://easylist.to/" },
+  { name: "EasyPrivacy", group: "광고 차단", license: "CC BY-SA 3.0", url: "https://easylist.to/easylist/easyprivacy.txt" },
+  { name: "AdGuard Base (Ultimate Ad Filter)", group: "광고 차단", license: "GNU GPLv3 / CC BY 3.0", url: "https://github.com/AdguardTeam/AdguardFilters" },
+  { name: "NoriDev-AdBlock-Filter", group: "한국 광고", license: "CC BY-NC-SA 4.0", url: "https://github.com/noridev/NoriDev-AdBlock-Filter" },
+  { name: "Turtlecute Host List", group: "한국 광고", license: "CC BY-NC-SA 4.0", url: "https://adblock.turtlecute.org/d3host.adblock" },
+  { name: "d3Host", group: "한국 광고", license: "CC BY-NC-SA 4.0", url: "https://github.com/d3ward/toolz" },
+  { name: "List-KR", group: "한국 광고", license: "GNU GPLv3", url: "https://github.com/List-KR/List-KR" },
+  { name: "자체 extra-hosts", group: "한국 광고", license: "프로젝트 자체 (CC BY-NC-SA 4.0)", url: "https://github.com/Donian-kor/www_AD_Blocker" },
+  { name: "Fanboy's Social Blocking", group: "개인정보 보호", license: "CC BY 3.0", url: "https://www.fanboy.co.nz/" },
+  { name: "AdGuard URL Tracking", group: "개인정보 보호", license: "GNU GPLv3", url: "https://github.com/AdguardTeam/AdguardFilters" },
+  { name: "abp-filters-anti-cv", group: "안티서클", license: "GNU GPLv3", url: "https://github.com/abp-filters/abp-filters-anti-cv" },
+  { name: "Fanboy's Annoyance", group: "성가신 요소", license: "CC BY 3.0", url: "https://www.fanboy.co.nz/" },
 ];
