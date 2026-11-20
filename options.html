@@ -169,16 +169,22 @@
     .subgroups { display: none; margin-top: 8px; border-top: 1px dashed #dbe2ee; padding-top: 6px; }
     .subgroups.open { display: block; }
     .subgroup-row {
-      display: flex; align-items: center; gap: 7px;
+      display: grid;
+      grid-template-columns: 14px minmax(0, 1fr) 92px 62px;
+      align-items: center; gap: 7px;
       padding: 4px 2px; font-size: 11px; color: #334155; cursor: pointer;
     }
     .subgroup-row input[type="checkbox"] { accent-color: #e94560; width: 14px; height: 14px; cursor: pointer; }
-    .subgroup-name { flex: 1; min-width: 0; }
+    .subgroup-name { min-width: 0; }
     .subgroup-group {
-      flex: none; font-size: 9px; color: #2563eb; background: #eff6ff;
+      justify-self: center; text-align: center; white-space: nowrap;
+      font-size: 9px; color: #2563eb; background: #eff6ff;
       border: 1px solid #bfdbfe; border-radius: 8px; padding: 1px 5px;
     }
-    .subgroup-count { color: #94a3b8; font-size: 10px; font-variant-numeric: tabular-nums; }
+    .subgroup-count {
+      justify-self: center; text-align: center;
+      color: #94a3b8; font-size: 10px; font-variant-numeric: tabular-nums;
+    }
 
     .toggle { position: relative; width: 38px; height: 21px; cursor: pointer; flex-shrink: 0; margin-left: 8px; }
     .toggle input { opacity: 0; width: 0; height: 0; }
@@ -190,6 +196,10 @@
     }
     input:checked + .slider { background: #e94560; }
     input:checked + .slider:before { transform: translateX(17px); }
+    /* 부분 선택(일부 소스만 켜짐) — 녹색, 전체 적용은 빨강 유지 */
+    .toggle.partial input + .slider { background: #16a34a; }
+    .toggle.partial .slider:before { transform: translateX(9px); }
+    .filter-card:has(.toggle.partial) .filter-name { color: #16a34a; }
     .toggle.locked { opacity: .5; cursor: not-allowed; }
 
     .filter-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }

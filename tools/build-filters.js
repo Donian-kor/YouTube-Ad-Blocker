@@ -34,7 +34,7 @@ const SOURCE_ORDER = [
   "noridev", "turtlecute", "d3host", "list-kr", "filterslists-ko", "extra-hosts",
   // 안티서클
   "anti-cv-en", "anti-cv-zh", "anti-cv-cs", "anti-cv-fr", "anti-cv-de", "anti-cv-pl",
-  "anti-cv-pt", "anti-cv-ru", "anti-cv-es", "anti-cv-tr", "anti-cv-vi",
+  "anti-cv-ru", "anti-cv-es",
   // 개인정보 / 성가신 요소 (Social이 Annoyance와 겹치므로 먼저 소유)
   "fanboy-social", "url-tracking", "uassets-privacy", "fanboy-annoyance",
   // 보안

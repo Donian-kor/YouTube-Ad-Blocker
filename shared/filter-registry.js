@@ -15,7 +15,7 @@
 
   // === UI 카테고리 (5개, 상위 토글 단위) ===
   const FILTER_CATEGORIES = [
-    { id: "intl_ads", name: "국제 광고", icon: "📢", locked: true,
+    { id: "intl_ads", name: "국제 광고", icon: "📢", locked: false,
       description: "EasyList·AdGuard·uAssets 등 해외 광고 필터" },
     { id: "korean", name: "한국 필터", icon: "🇰🇷", locked: false,
       description: "NoriDev·List-KR 등 국내 광고·트래커 필터" },
@@ -23,7 +23,7 @@
       description: "소셜 위젯·URL 추적 파라미터 차단" },
     { id: "anti_cv", name: "안티애드블록", icon: "🚫", locked: false,
       description: "광고 우회 스크립트·성가신 요소 차단" },
-    { id: "security", name: "보안", icon: "🛡️", locked: true,
+    { id: "security", name: "보안", icon: "🛡️", locked: false,
       description: "악성 도메인·cryptomining 차단" },
   ];
 
@@ -117,16 +117,10 @@
       license: "GNU GPLv3", url: "https://gitlab.com/eyeo/anti-cv/abp-filters-anti-cv/-/raw/master/german.txt", limit: 200 },
     { id: "anti-cv-pl", name: "안티서클 (폴란드어)", group: "anti_cv", category: "anti_cv",
       license: "GNU GPLv3", url: "https://gitlab.com/eyeo/anti-cv/abp-filters-anti-cv/-/raw/master/polish.txt", limit: 200 },
-    { id: "anti-cv-pt", name: "안티서클 (포르투갈어)", group: "anti_cv", category: "anti_cv",
-      license: "GNU GPLv3", url: "https://gitlab.com/eyeo/anti-cv/abp-filters-anti-cv/-/raw/master/portuguese.txt", limit: 200 },
     { id: "anti-cv-ru", name: "안티서클 (러시아어)", group: "anti_cv", category: "anti_cv",
       license: "GNU GPLv3", url: "https://gitlab.com/eyeo/anti-cv/abp-filters-anti-cv/-/raw/master/russian.txt", limit: 200 },
     { id: "anti-cv-es", name: "안티서클 (스페인어)", group: "anti_cv", category: "anti_cv",
       license: "GNU GPLv3", url: "https://gitlab.com/eyeo/anti-cv/abp-filters-anti-cv/-/raw/master/spanish.txt", limit: 200 },
-    { id: "anti-cv-tr", name: "안티서클 (터키어)", group: "anti_cv", category: "anti_cv",
-      license: "GNU GPLv3", url: "https://gitlab.com/eyeo/anti-cv/abp-filters-anti-cv/-/raw/master/turkish.txt", limit: 200 },
-    { id: "anti-cv-vi", name: "안티서클 (베트남어)", group: "anti_cv", category: "anti_cv",
-      license: "GNU GPLv3", url: "https://gitlab.com/eyeo/anti-cv/abp-filters-anti-cv/-/raw/master/vietnamese.txt", limit: 200 },
 
     // 안티애드블록 - 성가신 요소
     { id: "fanboy-annoyance", name: "Fanboy's Annoyance", group: "annoyances", category: "anti_cv",

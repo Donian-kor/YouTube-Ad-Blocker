@@ -145,6 +145,8 @@ function loadFilterStates() {
       input.checked = boxes.length > 0 && onCount === boxes.length;
       input.indeterminate = onCount > 0 && onCount < boxes.length;
       input.disabled = category.locked || !masterOn;
+      const toggleEl = input.closest(".toggle");
+      if (toggleEl) toggleEl.classList.toggle("partial", input.indeterminate);
       const card = document.getElementById("filter-card-" + category.id);
       if (card) card.classList.toggle("master-off", !masterOn);
     });

@@ -349,7 +349,7 @@ const LEGACY_GROUP_MAP = {
   // 최초 6개 그룹
   ads: ["easylist", "easyprivacy", "ultimate", "peter-lowe", "uassets-filters", "uassets-general", "uassets-2024", "uassets-2025", "uassets-2026"],
   privacy: ["fanboy-social", "url-tracking", "uassets-privacy"],
-  anti_circumvention: ["anti-cv-en", "anti-cv-zh", "anti-cv-cs", "anti-cv-fr", "anti-cv-de", "anti-cv-pl", "anti-cv-pt", "anti-cv-ru", "anti-cv-es", "anti-cv-tr", "anti-cv-vi"],
+  anti_circumvention: ["anti-cv-en", "anti-cv-zh", "anti-cv-cs", "anti-cv-fr", "anti-cv-de", "anti-cv-pl", "anti-cv-ru", "anti-cv-es"],
   annoyances: ["fanboy-annoyance"],
   security: ["nocoin", "urlhaus", "uassets-badware", "uassets-resource-abuse"],
   // 2단 구조의 10개 소스 그룹
@@ -359,7 +359,7 @@ const LEGACY_GROUP_MAP = {
   uassets: ["uassets-filters", "uassets-general", "uassets-2024", "uassets-2025", "uassets-2026"],
   korean: ["noridev", "turtlecute", "d3host", "list-kr", "filterslists-ko", "extra-hosts"],
   social: ["fanboy-social", "url-tracking", "uassets-privacy"],
-  anti_cv: ["anti-cv-en", "anti-cv-zh", "anti-cv-cs", "anti-cv-fr", "anti-cv-de", "anti-cv-pl", "anti-cv-pt", "anti-cv-ru", "anti-cv-es", "anti-cv-tr", "anti-cv-vi"],
+  anti_cv: ["anti-cv-en", "anti-cv-zh", "anti-cv-cs", "anti-cv-fr", "anti-cv-de", "anti-cv-pl", "anti-cv-ru", "anti-cv-es"],
   malware: ["urlhaus", "uassets-badware", "uassets-resource-abuse"],
   mining: ["nocoin"],
 };
