@@ -233,17 +233,3 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 });
-
-// 확장 설치/재설치 시 최신 필터 자동 적용
-// (동적 규칙은 확장 삭제 시 초기화되므로, 재설치한 사용자가 버튼을 누르지 않아도 최신 규칙을 채워준다)
-chrome.runtime.onInstalled.addListener(() => {
-  setTimeout(() => {
-    updateFilters().then((result) => {
-      if (result.ok) {
-        console.log("[필터 자동 업데이트] " + result.count + "개 규칙 적용" + (result.unchanged ? " (변경 없음)" : ""));
-      } else {
-        console.error("[필터 자동 업데이트] 실패: " + result.reason);
-      }
-    });
-  }, 1000);
-});
