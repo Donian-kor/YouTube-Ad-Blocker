@@ -7,13 +7,17 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      width: min(720px, 100vw - 24px);
-      margin: 0 auto;
+      width: 100%;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: #f4f6fb;
       color: #1e293b;
-      padding: 16px;
+      padding: 12px 0;
       line-height: 1.4;
+    }
+    /* 고정 폭 메인 영역: 통계·사이드바·콘텐츠가 모두 이 안에 들어감 */
+    .main-wrap {
+      width: 900px;
+      margin: 0 auto;
     }
     h2 { font-size: 16px; margin-bottom: 10px; color: #0f172a; }
 
@@ -60,16 +64,22 @@
     button.secondary { background: #e8edf5; color: #1e293b; }
     button.tiny { flex: none; padding: 4px 8px; font-size: 11px; }
 
-    /* 레이아웃: 좌측 사이드바 + 우측 콘텐츠 */
-    .app-body { display: flex; gap: 14px; align-items: flex-start; }
+    /* 본문: 탭 콘텐츠 (사이드바는 고정 폭 밖 좌측에 fixed) */
+    .app-body { display: block; }
 
-    /* 사이드바 (세로 메뉴) — 기능 늘어나도 세로로 쌓임 */
+    /* 사이드바: 고정 폭(main-wrap) 좌측 여백에 고정 배치 */
     .sidebar {
-      flex: 0 0 130px;
+      position: fixed;
+      top: 50%;
+      left: calc(50% - 450px - 140px); /* 900px 고정폭 절반 + 여백 */
+      transform: translateY(-50%);
+      width: 126px;
       background: #fff;
       border: 1px solid #dbe2ee;
       border-radius: 8px;
       padding: 6px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.05);
+      z-index: 10;
     }
     .tab-btn {
       display: flex; align-items: center; gap: 7px;
@@ -82,13 +92,25 @@
     .tab-btn:hover { background: #f1f5f9; color: #334155; }
     .tab-btn.active { background: #ffedf0; color: #e94560; }
     .tab-btn .nav-icon { font-size: 14px; flex-shrink: 0; }
-    .tab-content { display: none; flex: 1; min-width: 0; }
+    .tab-content { display: none; width: 100%; }
     .tab-content.active { display: block; }
 
-    @media (max-width: 540px) {
-      .app-body { flex-direction: column; }
-      .sidebar { flex: none; width: 100%; display: flex; gap: 4px; }
+    @media (max-width: 1180px) {
+      .sidebar {
+        position: static;
+        transform: none;
+        width: 100%;
+        max-width: 900px;
+        margin: 0 auto 12px;
+        display: flex;
+        gap: 4px;
+      }
       .tab-btn { flex: 1; margin-bottom: 0; justify-content: center; }
+    }
+    @media (max-width: 940px) {
+      .main-wrap { width: 100%; padding: 0 12px; }
+    }
+    @media (max-width: 540px) {
       #filterList { grid-template-columns: 1fr; }
     }
 
@@ -191,6 +213,14 @@
   </style>
 </head>
 <body>
+  <!-- 사이드바: 고정 폭 영역 밖, 좌측 여백에 배치 -->
+  <nav class="sidebar">
+    <button class="tab-btn active" data-tab="filters"><span class="nav-icon">🎛️</span>필터 목록</button>
+    <button class="tab-btn" data-tab="blocked"><span class="nav-icon">🚫</span>내 차단 목록</button>
+    <button class="tab-btn" data-tab="licenses"><span class="nav-icon">📄</span>출처 및 라이선스</button>
+  </nav>
+
+  <div class="main-wrap">
   <h2>www_AD_Blocker 설정</h2>
 
   <!-- 통계: 모든 탭에서 항상 표시 -->
@@ -216,15 +246,8 @@
     </div>
   </div>
 
-  <!-- 본문: 좌측 사이드바 + 우측 콘텐츠 -->
+  <!-- 본문: 탭 콘텐츠 -->
   <div class="app-body">
-  <!-- 사이드바 (세로 메뉴) -->
-  <nav class="sidebar">
-    <button class="tab-btn active" data-tab="filters"><span class="nav-icon">🎛️</span>필터 목록</button>
-    <button class="tab-btn" data-tab="blocked"><span class="nav-icon">🚫</span>내 차단 목록</button>
-    <button class="tab-btn" data-tab="licenses"><span class="nav-icon">📄</span>출처 및 라이선스</button>
-  </nav>
-
   <div class="tab-content active" id="tab-filters">
     <div class="section">
       <div class="filter-header">
@@ -277,6 +300,7 @@
     </div>
   </div>
   </div><!-- /app-body -->
+  </div><!-- /main-wrap -->
 
   <script type="module" src="options/main.js"></script>
 </body>
