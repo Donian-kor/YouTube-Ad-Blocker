@@ -61,7 +61,7 @@ const FILTER_SOURCES = {
 const COMMIT_ID_START = 1000;    // 확정된 업데이트 규칙 ID 대역
 const STAGE_ID_START = 100000;   // 스테이징(임시) ID 대역 — 충돌 방지
 const MAX_DYNAMIC_RULES = 30000;
-const MAX_FILTER_BYTES = 1024 * 1024; // 파일 1MB 제한
+const MAX_FILTER_BYTES = 10 * 1024 * 1024; // 파일 10MB 제한 (AdGuard Base 약 7MB 대응)
 const FETCH_TIMEOUT_MS = 10000;
 const UPDATE_DEBOUNCE_MS = 10000;
 let lastUpdateAt = 0;
@@ -77,7 +77,7 @@ async function fetchFilterText(url) {
     });
     if (!res.ok) throw new Error("HTTP " + res.status);
     const text = await res.text();
-    if (text.length > MAX_FILTER_BYTES) throw new Error("파일 크기 초과");
+    if (text.length > MAX_FILTER_BYTES) throw new Error("파일 크기 초과 (" + Math.round(text.length / 1024 / 1024) + "MB)");
     return text;
   } finally {
     clearTimeout(timer);
