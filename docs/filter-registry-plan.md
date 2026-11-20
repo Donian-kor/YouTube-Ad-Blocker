@@ -243,7 +243,7 @@ export const FILTER_GROUPS = [
 
 - `manifest.json`: 모든 `rule_resources`를 `enabled: false`로 변경 (로드 시 자동 활성화 방지)
 - `background.js`: `getAvailableStaticRuleCount()`로 여유분을 확인한 뒤,
-  우선순위(한국 → 광고 감지 대응 → 개인정보 → 성가신 → uAssets → Peter Lowe → 마이닝 → EasyList → AdGuard → 악성)
+  우선순위(한국 → 광고 감지 대응 → 개인정보 → 팝업·쿠키 정리 → uAssets → Peter Lowe → 몰래 채굴 차단 → EasyList → AdGuard → 악성)
   순으로 예산에 맞는 규칙셋만 활성화. 동시 호출은 큐로 직렬화.
 - `shared/build-meta.js`: 규칙셋별 규칙 수(`rulesets`)를 빌드 시 자동 생성하여 예산 계산에 사용
 - 한도가 부족해 일부 규칙셋이 제외되면 콘솔에 경고를 남김 (동적 규칙·콘텐츠 스크립트 차단은 계속 동작)

@@ -18,7 +18,7 @@
     { id: "intl_ads", name: "국제 광고", icon: "📢", locked: false,
       description: "EasyList·AdGuard·uAssets 등 해외 광고 필터" },
     { id: "security", name: "보안", icon: "🛡️", locked: false,
-      description: "악성 도메인·cryptomining 차단" },
+      description: "악성 도메인·몰래 채굴 차단" },
     { id: "korean", name: "한국 필터", icon: "🇰🇷", locked: false,
       description: "NoriDev·List-KR 등 국내 광고·트래커 필터" },
     { id: "privacy", name: "개인정보", icon: "🔒", locked: false,
@@ -47,7 +47,7 @@
       description: "팝업·쿠키 동의창·화면 덮개 제거" },
     { id: "malware", name: "악성 사이트", icon: "🦠", category: "security",
       description: "URLhaus·uAssets badware/resource-abuse" },
-    { id: "mining", name: "코인마이닝", icon: "⛏️", category: "security",
+    { id: "mining", name: "몰래 채굴 차단", icon: "⛏️", category: "security",
       description: "NoCoin" },
   ];
 
@@ -134,7 +134,7 @@
     { id: "uassets-resource-abuse", name: "uAssets resource-abuse", group: "malware", category: "security",
       license: "GPLv3", url: "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/resource-abuse.txt", limit: 500 },
 
-    // 보안 - 코인마이닝
+    // 보안 - 몰래 채굴 차단
     { id: "nocoin", name: "NoCoin", group: "mining", category: "security",
       license: "MIT", url: "https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/nocoin.txt", limit: 500 },
   ];
