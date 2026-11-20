@@ -141,22 +141,27 @@ www_AD_Blocker/
 - **검증**: 설정 페이지에서 통계 표시, 필터 토글, 전체 ON/OFF가 이전과 동일하게 동작
 - **검증**: CSP 위반 없음 (`script-src 'self'` 하에서 module 스크립트 허용)
 
-### 3단계: 백그라운드 모듈화 (선택, 신중)
+### 3단계: 필터 업데이트 기능 구현 (먼저)
 
-- **선택지 A (권장)**: `background.js` 유지 + 업데이트 로직만 `background/filter-updater.js`로 분리, `importScripts()`로 로드
-  - `manifest.json` 변경 최소 (`service_worker` 경로만 유지)
+- `filter-update-plan.md` §3~§10 구현
+- 1단계의 공용 변환기 재사용 → 런타임 변환 로직 중복 없음
+- `background.js`에 `updateFilters` 핸들러를 **기존 파일 안에 임시로** 구현
+- **검증**: `filter-update-plan.md` §11 검증 항목 15개
+
+### 4단계: 백그라운드 모듈화 (기능 구현 후, 선택·신중)
+
+> **순서 변경 이유**: 4단계에서 분리할 `filter-updater.js`는 3단계에서 만들어지는 코드다.
+> 기능 구현 전에 빈 껍데기를 분리하면 검증할 기능이 없어 의미가 없고,
+> 모듈화와 기능 구현을 동시에 하면 문제 발생 시 원인 추적이 어렵다.
+> 따라서 **기능 구현 → 동작 검증 → 모듈화 → 분리 전후 동작 비교** 순서로 진행한다.
+
+- **선택지 A (권장)**: `background.js` 유지 + 검증된 업데이트 로직만 `background/filter-updater.js`로 분리, `importScripts()`로 로드
+  - `manifest.json` 변경 최소 (`service_worker` 경로 유지)
   - 기존 전역 함수 공유 방식 유지
 - **선택지 B**: ES module 전환 (`"type": "module"` 추가)
   - `background/main.js` 진입, `import`로 모듈 로드
   - 모든 전역 참조를 `export`/`import`로 바꿔야 해서 **변경 범위가 큼**
-- **검증**: 확장 재로드 후 규칙 등록, 통계, 뱃지, 토글 정상 동작
-
-### 4단계: 필터 업데이트 기능 구현
-
-- `filter-update-plan.md` §3~§10 구현
-- 1단계의 공용 변환기 재사용 → 런타임 변환 로직 중복 없음
-- 3단계의 `filter-updater.js`에 fetch/스테이징/복구 구현
-- **검증**: `filter-update-plan.md` §11 검증 항목 15개
+- **검증**: 분리 전후 규칙 등록·통계·뱃지·토글·업데이트 동작이 동일한지 비교
 
 ---
 
