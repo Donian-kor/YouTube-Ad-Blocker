@@ -228,3 +228,24 @@ export const FILTER_GROUPS = [
 1. `shared/filter-registry.js`의 `FILTER_REGISTRY`에 한 줄 추가 (`group`, `category`, `url`, `license`, `limit`)
 2. `node tools/build-filters.js --all --offline` (또는온라인) — 규칙셋 + `build-meta.js` + `static-index.json` + manifest 갱신
 3. `options/config.js`, `background.js`, `background/filter-updater.js`, UI는 **수정 불필요**
+
+### 8.6 Chrome 정적 규칙 한도 대응 (오류 수정)
+
+**오류**: `적용 실패: The set of enabled rulesets exceeds the rule count limit.`
+
+**원인**: Chrome은 확장마다 정적 규칙 **30,000개를 보장**하고, 추가분은
+모든 확장이 공유하는 **전역 풀(약 300,000개)**에서 가져온다.
+우리 확장의 정적 규칙 총합은 322,924개였고, 이전 코드는 manifest의 모든 규칙셋을
+한 번에 활성화하여 여유분을 확인하지 않아 한도를 초과했다.
+
+**수정**:
+
+- `manifest.json`: 모든 `rule_resources`를 `enabled: false`로 변경 (로드 시 자동 활성화 방지)
+- `background.js`: `getAvailableStaticRuleCount()`로 여유분을 확인한 뒤,
+  우선순위(한국 → 안티서클 → 개인정보 → 성가신 → uAssets → Peter Lowe → 마이닝 → EasyList → AdGuard → 악성)
+  순으로 예산에 맞는 규칙셋만 활성화. 동시 호출은 큐로 직렬화.
+- `shared/build-meta.js`: 규칙셋별 규칙 수(`rulesets`)를 빌드 시 자동 생성하여 예산 계산에 사용
+- 한도가 부족해 일부 규칙셋이 제외되면 콘솔에 경고를 남김 (동적 규칙·콘텐츠 스크립트 차단은 계속 동작)
+
+**효과**: 여유분이 330,000이면 19개 전체(322,924개), 50,000이면 8개(43,230개)처럼
+브라우저 상황에 맞춰 자동 조절되며 더 이상 한도 초과 오류가 발생하지 않는다.

@@ -1,5 +1,6 @@
 importScripts("shared/filter-converter.js");
 importScripts("shared/filter-registry.js");
+importScripts("shared/build-meta.js");
 importScripts("background/filter-updater.js");
 
 // www_AD_Blocker - Background Service Worker
@@ -356,11 +357,28 @@ function migrateFilterStates(callback) {
   });
 }
 
+// 규칙셋별 규칙 수 (빌드 메타데이터) — 정적 규칙 한도 계산에 사용
+const RULESET_SIZES = (self.BuildMeta && self.BuildMeta.rulesets) || {};
+
+// 한도가 부족할 때 우선 유지할 그룹 순서 (작고 실용적인 필터부터)
+const PRIORITY_GROUPS = [
+  "korean", "anti_cv", "social", "annoyances", "uassets", "peterlowe", "mining",
+  "easylist", "adguard", "malware",
+];
+
+function dnrCall(name, ...args) {
+  return new Promise((resolve, reject) => {
+    chrome.declarativeNetRequest[name](...args, (result) => {
+      if (chrome.runtime.lastError) reject(new Error(chrome.runtime.lastError.message));
+      else resolve(result);
+    });
+  });
+}
+
 // 필터 활성화 상태를 저장소에 저장하고 정적 규칙셋에 즉시 반영
 function saveFilterStates(states, callback) {
   chrome.storage.local.set({ filterStates: states }, () => {
-    applyStaticRulesetsByState(states);
-    if (callback) callback();
+    applyStaticRulesetsByState(states, true, callback);
   });
 }
 
@@ -376,45 +394,79 @@ function expandFilterStates(states) {
   return expanded;
 }
 
-// 필터 활성화 상태에 따라 정적 규칙셋을 개별적으로 켜고 끔
-function applyStaticRulesetsByState(states) {
-  const expanded = expandFilterStates(states);
-  const enable = [];
-  const disable = [];
-  STATIC_RULESET_IDS.forEach((id) => {
-    const isOn = expanded[id] !== undefined ? expanded[id] : true;
-    if (isOn) enable.push(id);
-    else disable.push(id);
-  });
-  const options = {};
-  if (enable.length) options.enableRulesetIds = enable;
-  if (disable.length) options.disableRulesetIds = disable;
-  chrome.declarativeNetRequest.updateEnabledRulesets(options, () => {
-    if (chrome.runtime.lastError) {
-      console.error("정적 규칙 적용 실패:", chrome.runtime.lastError.message);
+// 정적 규칙 적용은 동시에 여러 번 호출될 수 있으므로 직렬화한다
+let staticRulesQueue = Promise.resolve();
+
+// Chrome 정적 규칙 한도(보장 30,000 + 전역 공유) 안에서 규칙셋을 활성화한다.
+// 한도를 넘겨 전체 활성화가 실패하는 것을 막기 위해 여유분을 먼저 확인한다.
+async function doApplyStaticRulesets(states, masterOn) {
+  try {
+    if (!masterOn) {
+      const current = await dnrCall("getEnabledRulesets");
+      if (current.length) await dnrCall("updateEnabledRulesets", { disableRulesetIds: current });
+      return;
     }
-  });
+
+    // 켜진 그룹의 규칙셋을 우선순위 순으로 수집
+    const expanded = expandFilterStates(states);
+    const desired = [];
+    for (const group of PRIORITY_GROUPS) {
+      for (const rid of FILTER_TO_RULESET_IDS[group] || []) {
+        if (expanded[rid]) desired.push(rid);
+      }
+    }
+
+    const current = await dnrCall("getEnabledRulesets");
+    const available = await dnrCall("getAvailableStaticRuleCount");
+    // 현재 우리 확장이 쓰는 규칙 수 + 추가로 쓸 수 있는 수 = 전체 가용 예산
+    const currentTotal = current.reduce((sum, id) => sum + (RULESET_SIZES[id] || 0), 0);
+    let budget = currentTotal + available;
+
+    const toEnable = [];
+    for (const rid of desired) {
+      const size = RULESET_SIZES[rid] || 0;
+      if (size > budget) continue; // 예산에 안 맞으면 건너뜀 (나머지는 계속 시도)
+      toEnable.push(rid);
+      budget -= size;
+    }
+    const enableSet = new Set(toEnable);
+    const toDisable = current.filter((id) => !enableSet.has(id));
+
+    const options = {};
+    if (toDisable.length) options.disableRulesetIds = toDisable;
+    if (toEnable.length) options.enableRulesetIds = toEnable;
+    if (Object.keys(options).length) await dnrCall("updateEnabledRulesets", options);
+
+    const enabledCount = toEnable.reduce((sum, id) => sum + (RULESET_SIZES[id] || 0), 0);
+    console.log("[정적 규칙] " + toEnable.length + "/" + desired.length + " 규칙셋, " +
+      enabledCount.toLocaleString() + "개 규칙 활성화 (여유 " + available + ")");
+    if (toEnable.length < desired.length) {
+      console.warn("[정적 규칙] Chrome 정적 규칙 한도로 일부 규칙셋이 비활성화되었습니다.");
+    }
+  } catch (e) {
+    console.error("정적 규칙 적용 실패:", e.message);
+    throw e;
+  }
+}
+
+// 직렬화된 진입점
+function applyStaticRulesetsByState(states, masterOn, callback) {
+  const run = () => doApplyStaticRulesets(states, masterOn);
+  staticRulesQueue = staticRulesQueue.then(run, run);
+  staticRulesQueue.then(
+    () => { if (callback) callback(); },
+    (e) => { if (callback) callback(e); }
+  );
 }
 
 // 전체 ON/OFF 토글 시 정적 규칙셋 적용
-// - enabled=true: filterStates를 존중하여 켜진 필터만 활성화
-// - enabled=false: 모든 필터 비활성화
 function applyStaticRulesets(enabled) {
   if (enabled) {
-    // 필터 상태를 로드하여 개별 적용
     chrome.storage.local.get(["filterStates"], (result) => {
-      const states = result.filterStates || {};
-      applyStaticRulesetsByState(states);
+      applyStaticRulesetsByState(result.filterStates || {}, true);
     });
   } else {
-    chrome.declarativeNetRequest.updateEnabledRulesets(
-      { disableRulesetIds: STATIC_RULESET_IDS },
-      () => {
-        if (chrome.runtime.lastError) {
-          console.error("정적 규칙 비활성화 실패:", chrome.runtime.lastError.message);
-        }
-      }
-    );
+    applyStaticRulesetsByState({}, false);
   }
 }
 

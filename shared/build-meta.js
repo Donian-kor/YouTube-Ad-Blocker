@@ -16,6 +16,27 @@
     "annoyances": 2445,
     "malware": 137191,
     "mining": 243
+  },
+  "rulesets": {
+    "adguard_1": 30000,
+    "adguard_2": 30000,
+    "adguard_3": 9685,
+    "annoyances_1": 2445,
+    "anti_cv_1": 1041,
+    "easylist_1": 30000,
+    "easylist_2": 30000,
+    "easylist_3": 30000,
+    "easylist_4": 12818,
+    "korean_1": 2286,
+    "malware_1": 30000,
+    "malware_2": 30000,
+    "malware_3": 30000,
+    "malware_4": 30000,
+    "malware_5": 17191,
+    "mining_1": 243,
+    "peterlowe_1": 3568,
+    "social_1": 1459,
+    "uassets_1": 2188
   }
 };
 });

@@ -47,97 +47,97 @@
     "rule_resources": [
       {
         "id": "easylist_1",
-        "enabled": true,
+        "enabled": false,
         "path": "filters/ruleset_easylist.json"
       },
       {
         "id": "easylist_2",
-        "enabled": true,
+        "enabled": false,
         "path": "filters/ruleset_easylist_2.json"
       },
       {
         "id": "easylist_3",
-        "enabled": true,
+        "enabled": false,
         "path": "filters/ruleset_easylist_3.json"
       },
       {
         "id": "easylist_4",
-        "enabled": true,
+        "enabled": false,
         "path": "filters/ruleset_easylist_4.json"
       },
       {
         "id": "adguard_1",
-        "enabled": true,
+        "enabled": false,
         "path": "filters/ruleset_adguard.json"
       },
       {
         "id": "adguard_2",
-        "enabled": true,
+        "enabled": false,
         "path": "filters/ruleset_adguard_2.json"
       },
       {
         "id": "adguard_3",
-        "enabled": true,
+        "enabled": false,
         "path": "filters/ruleset_adguard_3.json"
       },
       {
         "id": "peterlowe_1",
-        "enabled": true,
+        "enabled": false,
         "path": "filters/ruleset_peterlowe.json"
       },
       {
         "id": "uassets_1",
-        "enabled": true,
+        "enabled": false,
         "path": "filters/ruleset_uassets.json"
       },
       {
         "id": "korean_1",
-        "enabled": true,
+        "enabled": false,
         "path": "filters/ruleset_korean.json"
       },
       {
         "id": "social_1",
-        "enabled": true,
+        "enabled": false,
         "path": "filters/ruleset_social.json"
       },
       {
         "id": "anti_cv_1",
-        "enabled": true,
+        "enabled": false,
         "path": "filters/ruleset_anti_cv.json"
       },
       {
         "id": "annoyances_1",
-        "enabled": true,
+        "enabled": false,
         "path": "filters/ruleset_annoyances.json"
       },
       {
         "id": "malware_1",
-        "enabled": true,
+        "enabled": false,
         "path": "filters/ruleset_malware.json"
       },
       {
         "id": "malware_2",
-        "enabled": true,
+        "enabled": false,
         "path": "filters/ruleset_malware_2.json"
       },
       {
         "id": "malware_3",
-        "enabled": true,
+        "enabled": false,
         "path": "filters/ruleset_malware_3.json"
       },
       {
         "id": "malware_4",
-        "enabled": true,
+        "enabled": false,
         "path": "filters/ruleset_malware_4.json"
       },
       {
         "id": "malware_5",
-        "enabled": true,
+        "enabled": false,
         "path": "filters/ruleset_malware_5.json"
       },
       {
         "id": "mining_1",
-        "enabled": true,
+        "enabled": false,
         "path": "filters/ruleset_mining.json"
       }
     ]

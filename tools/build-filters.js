@@ -157,6 +157,17 @@ function writeBuildMeta() {
       }
     } catch (e) { /* 기존 메타 파싱 실패 시 무시 */ }
   }
+  // 규칙셋별 크기 수집 (런타임 정적 규칙 한도 계산에 사용)
+  const rulesetSizes = {};
+  for (const f of fs.readdirSync(OUT_DIR)) {
+    const m = f.match(/^ruleset_(.+?)(?:_(\d+))?\.json$/);
+    if (!m) continue;
+    // manifest rule_resources ID와 동일한 키 사용 (첫 파일은 _1)
+    const id = m[2] ? m[1] + "_" + m[2] : m[1] + "_1";
+    try {
+      rulesetSizes[id] = JSON.parse(fs.readFileSync(path.join(OUT_DIR, f), "utf8")).length;
+    } catch (e) { /* 손상된 파일은 무시 */ }
+  }
   const body = [
     "// shared/build-meta.js - 빌드 시 자동 생성 (직접 수정하지 마세요)",
     "(function (root, factory) {",
@@ -164,7 +175,7 @@ function writeBuildMeta() {
     "  if (typeof module !== 'undefined' && module.exports) module.exports = api;",
     "  else root.BuildMeta = api;",
     "})(typeof self !== 'undefined' ? self : this, function () {",
-    "  return " + JSON.stringify({ groups: builtCounts }, null, 2) + ";",
+    "  return " + JSON.stringify({ groups: builtCounts, rulesets: rulesetSizes }, null, 2) + ";",
     "});",
     "",
   ].join("\n");
