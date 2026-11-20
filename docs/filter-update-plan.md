@@ -194,7 +194,7 @@
 |------|----------|----------|--------|
 | 광고 차단 | EasyList, EasyPrivacy, Ultimate Ad Filter | CC BY-SA 3.0 / GNU GPLv3 | https://easylist.to/ |
 | 한국 광고 필터 | NoriDev, Turtlecute, d3Host, List-KR | CC BY-NC-SA 4.0 / GNU GPLv3 | https://github.com/List-KR/List-KR |
-| 개인정보 보호 | Fanboy's Social, URL Tracking | CC BY 3.0 | https://easylist.to/ |
+| 개인정보 보호 | Fanboy's Social, AdGuard URL Tracking | CC BY 3.0 / GNU GPLv3 | https://easylist.to/, https://github.com/AdguardTeam/AdguardFilters |
 | 안티서클 | abp-filters-anti-cv | GNU GPLv3 | https://github.com/abp-filters/abp-filters-anti-cv |
 | 성가신 요소 | Fanboy's Annoyance | CC BY 3.0 | https://easylist.to/ |
 | 보안 | NoCoin, URLhaus | MIT / CC0 1.0 | https://gitlab.com/curben/urlhaus-filter |
@@ -272,51 +272,68 @@ chrome.storage.local.get(["updateProgress"], (result) => {
 
 각 필터 그룹은 아래 URL에서 최신 필터를 다운로드한다. **모든 URL은 HTTPS만 사용한다.**
 
+> 아래 URL은 2026-11-20 기준으로 모두 **HTTP 200 응답 확인**했습니다.
+> 각 항목의 "실제 제목"은 필터 파일 상단 `! Title:` 헤더 값입니다.
+
 ### 4.1 광고 차단 (상위 30,000개만 동적 업데이트, UI 토글 불가)
 
-| 소스 | URL | 라이선스 |
-|------|-----|----------|
-| EasyList | `https://easylist.to/easylist/easylist.txt` | CC BY-SA 3.0 |
-| EasyPrivacy | `https://easylist.to/easylist/easyprivacy.txt` | CC BY-SA 3.0 |
-| Ultimate Ad Filter | `https://filters.adtidy.org/extension/chromium/filters/2.txt` | GNU GPLv3 / CC BY 3.0 |
+| 소스 | 실제 제목 | 정확한 URL | 검증 | 라이선스 |
+|------|-----------|------------|------|----------|
+| EasyList | EasyList | `https://easylist.to/easylist/easylist.txt` | HTTP 200 (약 2.07MB) | CC BY-SA 3.0 |
+| EasyPrivacy | EasyPrivacy | `https://easylist.to/easylist/easyprivacy.txt` | HTTP 200 (약 1.52MB) | CC BY-SA 3.0 |
+| AdGuard Base (Ultimate Ad Filter) | AdGuard Base filter | `https://filters.adtidy.org/extension/chromium/filters/2.txt` | HTTP 200 (약 7.09MB) | GNU GPLv3 / CC BY 3.0 |
 
 ### 4.2 한국 광고 필터 (전체 동적 업데이트, UI 토글 가능)
 
-| 소스 | URL | 라이선스 |
-|------|-----|----------|
-| NoriDev | `https://raw.githubusercontent.com/noridev/NoriDev-AdBlock-Filter/master/filter/filter.txt` | CC BY-NC-SA 4.0 |
-| Turtlecute | `https://adblock.turtlecute.org/d3host.adblock` | CC BY-NC-SA 4.0 |
-| d3Host | `https://raw.githubusercontent.com/d3ward/toolz/master/src/d3host.txt` | CC BY-NC-SA 4.0 |
-| **List-KR (AdGuard)** | `https://cdn.jsdelivr.net/npm/@list-kr/filterslists@latest/dist/filterslist-AdGuard.txt` | GNU GPLv3 |
-| 자체 extra-hosts | 로컬 파일 (업데이트 시 제외) | - |
+| 소스 | 실제 제목 | 정확한 URL | 검증 | 라이선스 |
+|------|-----------|------------|------|----------|
+| NoriDev | NoriDev AdBlock Filter | `https://raw.githubusercontent.com/noridev/NoriDev-AdBlock-Filter/master/filter/filter.txt` | HTTP 200 (83KB) | CC BY-NC-SA 4.0 |
+| Turtlecute | Turtlecute Host List | `https://adblock.turtlecute.org/d3host.adblock` | HTTP 200 (4.5KB) | CC BY-NC-SA 4.0 |
+| d3Host | (헤더 없음) | `https://raw.githubusercontent.com/d3ward/toolz/master/src/d3host.txt` | HTTP 200 (5KB) | CC BY-NC-SA 4.0 |
+| **List-KR (AdGuard)** | List-KR filters list (AdGuard) | `https://cdn.jsdelivr.net/npm/@list-kr/filterslists@latest/dist/filterslist-AdGuard.txt` | HTTP 200 (253KB) | GNU GPLv3 |
+| 자체 extra-hosts | (로컬 헤더 없음) | `file:tools/tmp/extra-hosts.txt` (로컬 파일, 업데이트 시 제외) | 로컬 | - |
 
 ### 4.3 개인정보 보호 (전체 동적 업데이트, UI 토글 가능)
 
-| 소스 | URL | 라이선스 |
-|------|-----|----------|
-| Fanboy's Social | `https://www.fanboy.co.nz/fanboy-social.txt` | CC BY 3.0 |
-| URL Tracking | `https://filters.adtidy.org/extension/chromium/filters/10.txt` | CC BY 3.0 |
+| 소스 | 실제 제목 | 정확한 URL | 검증 | 라이선스 |
+|------|-----------|------------|------|----------|
+| Fanboy's Social | Fanboy's Social Blocking List | `https://www.fanboy.co.nz/fanboy-social.txt` | HTTP 200 (408KB) | CC BY 3.0 |
+| AdGuard URL Tracking | AdGuard URL Tracking filter | `https://filters.adtidy.org/extension/chromium/filters/17.txt` | HTTP 200 (186KB) | GNU GPLv3 |
+
+> **정정 사항 (2026-11-20)**: 초안에서는 URL Tracking 소스를 `filters/10.txt`로 표기했으나, 실제로 이 파일은 **"Filter unblocking search ads and self-promotion"**(검색 광고 차단 해제) 필터였습니다. 실제 URL Tracking filter는 **`filters/17.txt`** 이며, AdGuard 공식 목록(https://filters.adtidy.org/extension/chromium/filters.json)에서 ID 17로 확인했습니다.
+>
+> **변환 주의**: `17.txt`는 주로 `$removeparam` 규칙(URI 파라미터 제거)으로 구성되어 **DNR로 변환 불가**합니다. 변환 가능한 규칙은 block 48개 + allow 109개 = **157개**뿐이며, 나머지는 빌드 시 제외됩니다. (참고: DNR은 `$removeparam`을 지원하지 않음)
 
 ### 4.4 안티서클 (전체 동적 업데이트, UI 토글 가능)
 
-| 소스 | URL | 라이선스 |
-|------|-----|----------|
-| anti-cv (영문) | `https://raw.githubusercontent.com/abp-filters/abp-filters-anti-cv/master/english.txt` | GNU GPLv3 |
-| anti-cv (중문) | `https://raw.githubusercontent.com/abp-filters/abp-filters-anti-cv/master/chinese.txt` | GNU GPLv3 |
-| anti-cv (기타 언어) | 동일 저장소의 `czech.txt`, `french.txt`, `german.txt`, `polish.txt`, `portuguese.txt`, `russian.txt`, `spanish.txt`, `turkish.txt`, `vietnamese.txt` | GNU GPLv3 |
+| 소스 | 실제 제목 | 정확한 URL | 검증 | 라이선스 |
+|------|-----------|------------|------|----------|
+| anti-cv (영문) | (헤더 없음) | `https://raw.githubusercontent.com/abp-filters/abp-filters-anti-cv/master/english.txt` | HTTP 200 (104KB) | GNU GPLv3 |
+| anti-cv (중문) | (헤더 없음) | `https://raw.githubusercontent.com/abp-filters/abp-filters-anti-cv/master/chinese.txt` | HTTP 200 (1.4KB) | GNU GPLv3 |
+| anti-cv (체코어) | (헤더 없음) | `https://raw.githubusercontent.com/abp-filters/abp-filters-anti-cv/master/czech.txt` | HTTP 200 (35KB) | GNU GPLv3 |
+| anti-cv (프랑스어) | (헤더 없음) | `https://raw.githubusercontent.com/abp-filters/abp-filters-anti-cv/master/french.txt` | HTTP 200 (14KB) | GNU GPLv3 |
+| anti-cv (독일어) | (헤더 없음) | `https://raw.githubusercontent.com/abp-filters/abp-filters-anti-cv/master/german.txt` | HTTP 200 (529B) | GNU GPLv3 |
+| anti-cv (폴란드어) | (헤더 없음) | `https://raw.githubusercontent.com/abp-filters/abp-filters-anti-cv/master/polish.txt` | HTTP 200 (7.5KB) | GNU GPLv3 |
+| anti-cv (포르투갈어) | (헤더 없음) | `https://raw.githubusercontent.com/abp-filters/abp-filters-anti-cv/master/portuguese.txt` | HTTP 200 (1.2KB) | GNU GPLv3 |
+| anti-cv (러시아어) | (헤더 없음) | `https://raw.githubusercontent.com/abp-filters/abp-filters-anti-cv/master/russian.txt` | HTTP 200 (14KB) | GNU GPLv3 |
+| anti-cv (스페인어) | (헤더 없음) | `https://raw.githubusercontent.com/abp-filters/abp-filters-anti-cv/master/spanish.txt` | HTTP 200 (4.7KB) | GNU GPLv3 |
+| anti-cv (터키어) | (헤더 없음) | `https://raw.githubusercontent.com/abp-filters/abp-filters-anti-cv/master/turkish.txt` | HTTP 200 (370B) | GNU GPLv3 |
+| anti-cv (베트남어) | (헤더 없음) | `https://raw.githubusercontent.com/abp-filters/abp-filters-anti-cv/master/vietnamese.txt` | HTTP 200 (3.7KB) | GNU GPLv3 |
+
+> 위 언어 파일들은 **모두 같은 저장소**(abp-filters/abp-filters-anti-cv)에 있으며, 브랜치는 `master`입니다. 파일명만 언어별로 다릅니다.
 
 ### 4.5 성가신 요소 (전체 동적 업데이트, UI 토글 가능)
 
-| 소스 | URL | 라이선스 |
-|------|-----|----------|
-| Fanboy's Annoyance | `https://www.fanboy.co.nz/fanboy-annoyance.txt` | CC BY 3.0 |
+| 소스 | 실제 제목 | 정확한 URL | 검증 | 라이선스 |
+|------|-----------|------------|------|----------|
+| Fanboy's Annoyance | Fanboy's Annoyance List | `https://www.fanboy.co.nz/fanboy-annoyance.txt` | HTTP 200 (2.19MB) | CC BY 3.0 |
 
 ### 4.6 보안 (상위 30,000개만 동적 업데이트, UI 토글 불가)
 
-| 소스 | URL | 라이선스 |
-|------|-----|----------|
-| NoCoin | `https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/nocoin.txt` | MIT |
-| URLhaus | `https://gitlab.com/curben/urlhaus-filter/-/raw/master/urlhaus-filter.txt` | MIT / CC0 1.0 |
+| 소스 | 실제 제목 | 정확한 URL | 검증 | 라이선스 |
+|------|-----------|------------|------|----------|
+| NoCoin | NoCoin Filter List | `https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/nocoin.txt` | HTTP 200 (16KB) | MIT |
+| URLhaus | Malicious URL Blocklist | `https://gitlab.com/curben/urlhaus-filter/-/raw/master/urlhaus-filter.txt` | HTTP 200 (2.33MB) | MIT / CC0 1.0 |
 
 ---
 
