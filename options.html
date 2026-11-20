@@ -20,24 +20,35 @@
     /* 통계 - 항상 상단에 표시 (모든 탭 공통) */
     .stats-panel {
       background: #fff; border: 1px solid #dbe2ee; border-radius: 8px;
-      padding: 10px 12px; margin-bottom: 12px;
+      padding: 12px 14px; margin-bottom: 12px;
     }
     .stats-panel h3 {
       font-size: 12px; color: #e94560; margin-bottom: 8px;
       text-transform: uppercase; letter-spacing: 0.4px;
     }
-    .stats-row { display: flex; gap: 8px; }
+    /* 총 차단: 크게 한 줄 */
+    .stat-total {
+      background: #f8fafc; border: 1px solid #eef2f7; border-radius: 8px;
+      padding: 12px; text-align: center; margin-bottom: 8px;
+    }
+    .stat-total .number { font-size: 34px; font-weight: 800; color: #e94560; line-height: 1.1; }
+    .stat-total .label { font-size: 11px; color: #64748b; margin-top: 4px; }
+    /* 네트워크 / DOM 제거: 2열 한 행 */
+    .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .stat-card {
       background: #f8fafc; border: 1px solid #eef2f7; border-radius: 8px;
-      padding: 8px 10px; flex: 1;
+      padding: 8px 10px;
       display: flex; align-items: center; justify-content: center; gap: 8px;
     }
-    .stat-card.total { flex: 1.4; }
     .stat-card .number { font-size: 20px; font-weight: 700; color: #e94560; }
-    .stat-card.total .number { font-size: 26px; }
     .stat-card .label { font-size: 11px; color: #64748b; }
-    .stats-footer { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
-    .stats-footer .last-reset { font-size: 10px; color: #94a3b8; flex: 1; }
+    /* 통계 재설정 버튼 + 날짜: 우측 정렬, 버튼이 날짜 바로 위 */
+    .stats-footer {
+      display: flex; flex-direction: column; align-items: flex-end;
+      gap: 4px; margin-top: 8px;
+    }
+    .stats-footer button.danger { align-self: flex-end; }
+    .stats-footer .last-reset { font-size: 10px; color: #94a3b8; text-align: right; }
 
     button {
       padding: 8px 10px; border: none; border-radius: 6px;
@@ -146,14 +157,14 @@
   <!-- 통계: 모든 탭에서 항상 표시 -->
   <div class="stats-panel">
     <h3>통계</h3>
+    <div class="stat-total">
+      <div class="number" id="optTotal">0</div>
+      <div class="label">차단된 총 광고</div>
+    </div>
     <div class="stats-row">
-      <div class="stat-card total">
-        <span class="number" id="optTotal">0</span>
-        <span class="label">총 차단</span>
-      </div>
       <div class="stat-card">
         <span class="number" id="optNetwork">0</span>
-        <span class="label">네트워크</span>
+        <span class="label">네트워크 차단</span>
       </div>
       <div class="stat-card">
         <span class="number" id="optDom">0</span>
