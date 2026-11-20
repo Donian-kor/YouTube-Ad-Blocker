@@ -17,8 +17,41 @@
     }
     h2 { font-size: 16px; margin-bottom: 10px; color: #0f172a; }
 
-    /* 탭 바 */
-    .tab-bar { display: flex; gap: 4px; border-bottom: 2px solid #dbe2ee; margin-bottom: 12px; }
+    /* 통계 - 항상 상단에 표시 (모든 탭 공통) */
+    .stats-panel {
+      background: #fff; border: 1px solid #dbe2ee; border-radius: 8px;
+      padding: 10px 12px; margin-bottom: 12px;
+    }
+    .stats-panel h3 {
+      font-size: 12px; color: #e94560; margin-bottom: 8px;
+      text-transform: uppercase; letter-spacing: 0.4px;
+    }
+    .stats-row { display: flex; gap: 8px; }
+    .stat-card {
+      background: #f8fafc; border: 1px solid #eef2f7; border-radius: 8px;
+      padding: 8px 10px; flex: 1;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .stat-card.total { flex: 1.4; }
+    .stat-card .number { font-size: 20px; font-weight: 700; color: #e94560; }
+    .stat-card.total .number { font-size: 26px; }
+    .stat-card .label { font-size: 11px; color: #64748b; }
+    .stats-footer { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+    .stats-footer .last-reset { font-size: 10px; color: #94a3b8; flex: 1; }
+
+    button {
+      padding: 8px 10px; border: none; border-radius: 6px;
+      font-size: 12px; font-weight: 600; cursor: pointer; transition: opacity .2s;
+    }
+    button:hover { opacity: .85; }
+    button:disabled { opacity: .5; cursor: not-allowed; }
+    button.danger { background: #e94560; color: white; }
+    button.primary { background: #2563eb; color: white; }
+    button.secondary { background: #e8edf5; color: #1e293b; }
+    button.tiny { flex: none; padding: 4px 8px; font-size: 11px; }
+
+    /* 탭 바 - 통계 재설정 하단 */
+    .tab-bar { display: flex; gap: 4px; border-bottom: 2px solid #dbe2ee; margin: 4px 0 12px; }
     .tab-btn {
       flex: 1; padding: 9px 6px; border: none; background: transparent;
       color: #64748b; font-size: 12px; font-weight: 600; cursor: pointer;
@@ -35,32 +68,6 @@
       font-size: 12px; color: #e94560; margin-bottom: 8px;
       text-transform: uppercase; letter-spacing: 0.4px;
     }
-
-    /* 통계 - 가로 한 줄 */
-    .stats-row { display: flex; gap: 8px; }
-    .stat-card {
-      background: #fff; border: 1px solid #dbe2ee; border-radius: 8px;
-      padding: 8px 10px; flex: 1;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-    }
-    .stat-card.total { flex: 1.4; }
-    .stat-card .number { font-size: 20px; font-weight: 700; color: #e94560; }
-    .stat-card.total .number { font-size: 26px; }
-    .stat-card .label { font-size: 11px; color: #64748b; }
-
-    button {
-      padding: 8px 10px; border: none; border-radius: 6px;
-      font-size: 12px; font-weight: 600; cursor: pointer; transition: opacity .2s;
-    }
-    button:hover { opacity: .85; }
-    button:disabled { opacity: .5; cursor: not-allowed; }
-    button.danger { background: #e94560; color: white; }
-    button.primary { background: #2563eb; color: white; }
-    button.secondary { background: #e8edf5; color: #1e293b; }
-    button.tiny { flex: none; padding: 4px 8px; font-size: 11px; }
-
-    .btn-row { display: flex; gap: 8px; margin-top: 8px; }
-    .last-reset { font-size: 10px; color: #94a3b8; text-align: right; margin-top: 5px; }
 
     /* 필터 목록 - 2열 그리드 */
     #filterList { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
@@ -136,6 +143,30 @@
 <body>
   <h2>www_AD_Blocker 설정</h2>
 
+  <!-- 통계: 모든 탭에서 항상 표시 -->
+  <div class="stats-panel">
+    <h3>통계</h3>
+    <div class="stats-row">
+      <div class="stat-card total">
+        <span class="number" id="optTotal">0</span>
+        <span class="label">총 차단</span>
+      </div>
+      <div class="stat-card">
+        <span class="number" id="optNetwork">0</span>
+        <span class="label">네트워크</span>
+      </div>
+      <div class="stat-card">
+        <span class="number" id="optDom">0</span>
+        <span class="label">DOM 제거</span>
+      </div>
+    </div>
+    <div class="stats-footer">
+      <button class="danger" id="optResetBtn">통계 재설정</button>
+      <span class="last-reset">마지막 재설정: <span id="optReset">-</span></span>
+    </div>
+  </div>
+
+  <!-- 탭 바: 통계 재설정 하단 -->
   <div class="tab-bar">
     <button class="tab-btn active" data-tab="filters">필터 목록</button>
     <button class="tab-btn" data-tab="blocked">내 차단 목록</button>
@@ -144,28 +175,6 @@
 
   <div class="tab-content active" id="tab-filters">
     <div class="section">
-      <h3>통계</h3>
-      <div class="stats-row">
-        <div class="stat-card total">
-          <span class="number" id="optTotal">0</span>
-          <span class="label">총 차단</span>
-        </div>
-        <div class="stat-card">
-          <span class="number" id="optNetwork">0</span>
-          <span class="label">네트워크</span>
-        </div>
-        <div class="stat-card">
-          <span class="number" id="optDom">0</span>
-          <span class="label">DOM 제거</span>
-        </div>
-      </div>
-      <div class="btn-row">
-        <button class="danger" id="optResetBtn">통계 재설정</button>
-      </div>
-      <p class="last-reset">마지막 재설정: <span id="optReset">-</span></p>
-    </div>
-
-    <div class="section">
       <h3>광고 차단 필터</h3>
       <div class="filter-toolbar">
         <button class="secondary" id="filterAllOnBtn">전체 활성화</button>
@@ -173,11 +182,11 @@
       </div>
       <div id="filterList"></div>
       <div class="btn-row">
-        <button class="primary" id="filterUpdateBtn">필터 전체 업데이트</button>
+        <button class="primary" id="filterUpdateBtn">최신 도메인 업데이트 (동적 27,000개)</button>
       </div>
       <div class="update-status" id="filterUpdateStatus"></div>
       <div class="info">
-        • 광고 차단 / 보안은 대용량 필터로 <b>항상 켜짐</b>입니다. &nbsp;• 업데이트 실패 시 이전 규칙이 유지됩니다.
+        • <b>정적 필터 26만 개</b>는 패키지에 내장되어 재배포 시 갱신됩니다. &nbsp;• 이 버튼은 <b>동적 규칙 27,000개</b>만 최신화합니다. &nbsp;• 실패 시 이전 규칙이 유지됩니다.
       </div>
     </div>
   </div>
