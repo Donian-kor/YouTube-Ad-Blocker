@@ -75,50 +75,20 @@
     });
   }
 
-  // === 차단 주소 목록 ===
+  // === 총 차단 목록 → 설정 페이지의 '차단 기록' 탭으로 바로 이동 ===
   const totalCard = document.getElementById("totalCard");
-  const logPanel = document.getElementById("logPanel");
-  const logList = document.getElementById("logList");
-  const logClose = document.getElementById("logClose");
-
-  function renderLog() {
-    chrome.runtime.sendMessage({ type: "getBlockedLog" }, (response) => {
-      logList.innerHTML = "";
-
-      if (!response || !response.log || response.log.length === 0) {
-        logList.innerHTML = '<li class="log-empty">차단된 주소가 없습니다</li>';
-        return;
-      }
-
-      response.log.slice(0, 100).forEach((entry) => {
-        const li = document.createElement("li");
-
-        const time = document.createElement("div");
-        time.className = "log-time";
-        time.textContent = new Date(entry.time).toLocaleTimeString("ko-KR", { hour12: false });
-
-        const url = document.createElement("div");
-        url.className = "log-url";
-        url.textContent = entry.url;
-
-        li.appendChild(time);
-        li.appendChild(url);
-        li.title = "클릭하면 전체 주소가 펼쳐집니다";
-        li.addEventListener("click", () => li.classList.toggle("open"));
-
-        logList.appendChild(li);
-      });
-    });
-  }
-
   totalCard.addEventListener("click", () => {
-    const opening = !logPanel.classList.contains("open");
-    logPanel.classList.toggle("open");
-    if (opening) renderLog();
-  });
-
-  logClose.addEventListener("click", () => {
-    logPanel.classList.remove("open");
+    const optionsUrl = chrome.runtime.getURL("options.html");
+    const target = optionsUrl + "#log";
+    chrome.tabs.query({}, (tabs) => {
+      const existing = tabs.find((t) => t.url && t.url.startsWith(optionsUrl));
+      if (existing && existing.id !== undefined) {
+        // 이미 열려 있으면 그 탭을 활성화하고 해시만 변경 (새로고침 없이 이동)
+        chrome.tabs.update(existing.id, { url: target, active: true });
+      } else {
+        chrome.tabs.create({ url: target });
+      }
+    });
   });
 
   // === 버튼 ===

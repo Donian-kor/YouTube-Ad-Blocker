@@ -36,22 +36,6 @@ input:checked+.slider:before{transform:translateX(20px)}
 .total-row .total-number{font-size:14px;font-weight:700;color:#e94560}
 .total-row .total-hint{margin-left:auto;font-size:10px;color:#94a3b8}
 
-.log-panel{display:none;background:#fff;border:1px solid #dbe2ee;border-radius:8px;margin-bottom:12px;overflow:hidden}
-.log-panel.open{display:block}
-.log-head{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-bottom:1px solid #dbe2ee}
-.log-title{font-size:11px;font-weight:700;color:#e94560}
-.log-close{flex:0 0 auto;background:none;border:none;color:#64748b;font-size:14px;cursor:pointer;padding:0 4px}
-.log-close:hover{color:#e94560;opacity:1}
-.log-list{list-style:none;max-height:260px;overflow-y:auto}
-.log-list li{padding:6px 10px;border-bottom:1px solid #eef2f7;cursor:pointer}
-.log-list li:last-child{border-bottom:none}
-.log-list li:hover{background:#f8fafc}
-.log-time{font-size:9px;color:#94a3b8;margin-bottom:2px}
-.log-url{font-size:10px;color:#334155;line-height:1.4;word-break:break-all;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.log-list li.open .log-url{display:block;overflow:visible}
-.log-empty{padding:16px !important;text-align:center;color:#94a3b8 !important;cursor:default !important}
-.log-empty:hover{background:transparent !important}
-
 .actions{display:flex;gap:8px;margin-bottom:10px}
 button{flex:1;padding:9px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:opacity .2s}
 button:hover{opacity:.85}
@@ -81,18 +65,10 @@ button.primary{background:#2563eb;color:white}
 <div class="label">현재 사이트 누적 차단</div>
 </div>
 
-<div class="total-row" id="totalCard" title="클릭하면 차단된 주소 목록을 표시합니다">
+<div class="total-row" id="totalCard" title="클릭하면 설정 페이지의 차단 기록을 엽니다">
 <span class="total-label">총 차단</span>
 <span class="total-number" id="totalBlocked">0</span>
-<span class="total-hint">목록 보기</span>
-</div>
-
-<div class="log-panel" id="logPanel">
-<div class="log-head">
-<span class="log-title">차단된 주소</span>
-<button class="log-close" id="logClose">✕</button>
-</div>
-<ul class="log-list" id="logList"></ul>
+<span class="total-hint">기록 보기 →</span>
 </div>
 
 <div class="actions">

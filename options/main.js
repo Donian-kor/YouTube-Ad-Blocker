@@ -35,7 +35,17 @@ function alignSidebarMenu() {
   menu.style.setProperty("--sidebar-row-height", cb.height + "px");
 }
 
+// URL 해시(#log 등)에 해당하는 탭을 연다 (팝업에서 차단 기록으로 바로 이동할 때 사용)
+function activateTabFromHash() {
+  const name = location.hash.replace(/^#/, "");
+  if (!name) return;
+  const btn = document.querySelector('.tab-btn[data-tab="' + name + '"]');
+  if (btn) btn.click();
+}
+
 initTabs();
+activateTabFromHash();
+window.addEventListener("hashchange", activateTabFromHash);
 initStats();
 initFiltersTab();
 initBlockedTab();
