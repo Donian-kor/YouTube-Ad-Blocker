@@ -120,6 +120,46 @@ function renderFilterList() {
     card.appendChild(toggle);
     container.appendChild(card);
   });
+
+  // 6번째 카드: 필터 업데이트
+  const updateCard = document.createElement("div");
+  updateCard.className = "filter-card update-card";
+  updateCard.id = "filter-card-update";
+
+  const updateInfo = document.createElement("div");
+  updateInfo.className = "filter-info";
+  const updateNameRow = document.createElement("div");
+  updateNameRow.className = "filter-name-row";
+  const updateIcon = document.createElement("span");
+  updateIcon.className = "filter-icon";
+  updateIcon.textContent = "🔄";
+  const updateName = document.createElement("span");
+  updateName.className = "filter-name";
+  updateName.textContent = "필터 업데이트";
+  updateNameRow.appendChild(updateIcon);
+  updateNameRow.appendChild(updateName);
+  const updateDesc = document.createElement("div");
+  updateDesc.className = "filter-desc";
+  updateDesc.textContent = "정적 필터에 없는 신규 도메인만 등록합니다";
+  updateInfo.appendChild(updateNameRow);
+  updateInfo.appendChild(updateDesc);
+
+  const actions = document.createElement("div");
+  actions.className = "update-card-actions";
+  const updateBtn = document.createElement("button");
+  updateBtn.className = "primary";
+  updateBtn.id = "filterUpdateBtn";
+  updateBtn.textContent = "최신 필터 업데이트";
+  const historyBtn = document.createElement("button");
+  historyBtn.className = "secondary history-toggle";
+  historyBtn.id = "historyToggleBtn";
+  historyBtn.textContent = "업데이트 내역 보기 ▼";
+  actions.appendChild(updateBtn);
+  actions.appendChild(historyBtn);
+
+  updateCard.appendChild(updateInfo);
+  updateCard.appendChild(actions);
+  container.appendChild(updateCard);
 }
 
 function loadFilterStates() {

@@ -157,6 +157,10 @@
     .filter-badge.count { color: #2563eb; background: #eff6ff; border: 1px solid #bfdbfe; font-weight: 700; }
     .filter-card.master-off { opacity: 0.5; }
     .filter-card.locked-card { background: #fafcff; }
+    /* 6번째 카드: 필터 업데이트 */
+    .filter-card.update-card { background: #f8fafc; }
+    .update-card-actions { display: flex; flex-direction: column; gap: 6px; flex: none; }
+    .update-card-actions button { white-space: nowrap; font-size: 11px; }
     .filter-desc { font-size: 10px; color: #64748b; line-height: 1.35; }
 
     /* 2단 토글: 카테고리 펼치기 버튼 + 소스 그룹 목록 */
@@ -210,7 +214,6 @@
     .section-header .btn-row { margin-top: 0; margin-left: auto; }
     .filter-toolbar { display: flex; gap: 8px; margin-bottom: 0; justify-content: flex-end; }
     .filter-toolbar button { border: 1px solid #cbd5e1; }
-    .update-row { margin-top: 20px; }
     .history-toggle { flex: 0 0 auto; white-space: nowrap; }
     .history-panel { display: none; margin-top: 8px; background: #fff; border: 1px solid #dbe2ee; border-radius: 8px; padding: 4px 10px; }
     .history-panel.open { display: block; }
@@ -310,10 +313,6 @@
         </div>
       </div>
       <div id="filterList"></div>
-      <div class="btn-row update-row">
-        <button class="primary" id="filterUpdateBtn">최신 필터 업데이트</button>
-        <button class="secondary history-toggle" id="historyToggleBtn">업데이트 내역 보기 ▼</button>
-      </div>
       <div class="update-status" id="filterUpdateStatus"></div>
       <div class="history-panel" id="historyPanel"></div>
       <div class="info">
