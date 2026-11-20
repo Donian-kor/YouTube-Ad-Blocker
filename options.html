@@ -117,6 +117,9 @@
 
     .filter-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
     .filter-header h3 { font-size: 18px; margin-bottom: 0; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .section-header h3 { font-size: 18px; margin-bottom: 0; }
+    .section-header .btn-row { margin-top: 0; margin-left: auto; }
     .filter-toolbar { display: flex; gap: 8px; margin-bottom: 0; justify-content: flex-end; }
     .filter-toolbar button { border: 1px solid #cbd5e1; }
     .update-row { margin-top: 20px; }  /* 필터 카드와 업데이트 버튼 사이 여백 */
@@ -216,20 +219,24 @@
 
   <div class="tab-content" id="tab-blocked">
     <div class="section">
-      <h3>내 차단 목록</h3>
+      <div class="section-header">
+        <h3>내 차단 목록</h3>
+        <div class="btn-row">
+          <button class="danger" id="blockedResetBtn">전체 차단 목록 초기화</button>
+        </div>
+      </div>
       <p class="info" style="margin-top:0;padding-top:0;border-top:none">
         웹사이트에서 우클릭으로 차단한 요소입니다. 선택자를 직접 편집·추가·삭제할 수 있습니다.
       </p>
       <div id="blockedList"></div>
-      <div class="btn-row">
-        <button class="danger" id="blockedResetBtn">전체 차단 목록 초기화</button>
-      </div>
     </div>
   </div>
 
   <div class="tab-content" id="tab-licenses">
     <div class="section">
-      <h3>필터 출처 및 라이선스</h3>
+      <div class="section-header">
+        <h3>필터 출처 및 라이선스</h3>
+      </div>
       <table class="lic-table">
         <thead><tr><th>필터</th><th>그룹</th><th>라이선스</th><th>출처</th></tr></thead>
         <tbody id="licenseTable"></tbody>
