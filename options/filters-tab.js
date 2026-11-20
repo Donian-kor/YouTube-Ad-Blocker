@@ -141,8 +141,13 @@ function renderFilterList() {
   const updateDesc = document.createElement("div");
   updateDesc.className = "filter-desc";
   updateDesc.textContent = "정적 필터에 없는 신규 도메인만 등록합니다";
+  const updateStatus = document.createElement("div");
+  updateStatus.className = "update-status";
+  updateStatus.id = "filterUpdateStatus";
+
   updateInfo.appendChild(updateNameRow);
   updateInfo.appendChild(updateDesc);
+  updateInfo.appendChild(updateStatus);
 
   const actions = document.createElement("div");
   actions.className = "update-card-actions";
