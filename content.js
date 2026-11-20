@@ -3,6 +3,8 @@
 
 (function () {
   "use strict";
+  // 통계 보고는 큰 페이지에서만 (중복 방지)
+  const IS_TOP_FRAME = typeof window === "undefined" || window === window.top;
   // 유튜브 스튜디오는 광고 차단 대상이 아니므로 건너뜀
   if (typeof location !== "undefined" && location.hostname === "studio.youtube.com") return;
 
@@ -296,14 +298,16 @@
   setInterval(() => {
     if (!enabled) return;
     if (removedCount > 0) {
+      const reportCount = removedCount;
+      removedCount = 0;
+      if (!IS_TOP_FRAME) return; //iframe에서는 제거만 하고 보고는 하지 않음
       try {
-        chrome.runtime.sendMessage({ type: "adRemoved", count: removedCount }, () => {
+        chrome.runtime.sendMessage({ type: "adRemoved", count: reportCount }, () => {
           // chrome.runtime.lastError 무시 (background가 종료된 경우 등)
           if (chrome.runtime.lastError) {
             // 조용히 실패 처리
           }
         });
-        removedCount = 0;
       } catch (e) {
         // 메시지 전송 실패 시 무시
       }

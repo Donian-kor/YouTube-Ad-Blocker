@@ -6,6 +6,8 @@
 // - 가짜 다운로드 버튼(광고 링크)을 숨기고, 실제 다운로드 버튼은 살려둔다.
 (function () {
   "use strict";
+  // 광고 제거는 모든 프레임에서 하지만, 통계 보고는 큰 페이지에서만 한다 (중복 방지)
+  const IS_TOP_FRAME = typeof window === "undefined" || window === window.top;
   if (typeof location === "undefined") return;
 
   const host = location.hostname.replace(/^www\./, "");
@@ -195,6 +197,7 @@
     } catch (e) {}
     if (removed > 0) {
       removedCount += removed;
+      if (!IS_TOP_FRAME) return; //iframe에서는 제거만 하고 보고는 하지 않음
       try {
         chrome.runtime.sendMessage({ type: "adRemoved", count: removed }, () => {
           void chrome.runtime.lastError;

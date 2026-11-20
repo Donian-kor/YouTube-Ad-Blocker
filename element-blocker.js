@@ -2,6 +2,8 @@
 // 모든 사이트(iframe 포함)에 주입된다.
 (function () {
   "use strict";
+  // 통계 보고는 큰 페이지에서만 (중복 방지)
+  const IS_TOP_FRAME = typeof window === "undefined" || window === window.top;
   // YouTube Studio는 광고 차단 대상이 아니므로 전부 건너뜀
   if (typeof location !== "undefined" && location.hostname === "studio.youtube.com") return;
 
@@ -310,6 +312,10 @@
       saveSelector(selector, (ok) => {
         if (ok) {
           showToast("광고 요소를 차단했습니다.", selector);
+          if (!IS_TOP_FRAME) {
+            sendResponse({ ok: true, selector });
+            return;
+          }
           try {
             chrome.runtime.sendMessage({ type: "adRemoved", count: 1 }, () => {
               void chrome.runtime.lastError;

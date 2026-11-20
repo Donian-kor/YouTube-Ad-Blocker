@@ -3,6 +3,8 @@
 // DNR(네트워크 차단)로 잡히지 않는 페이지 내부 광고를 여기서 처리한다.
 (function () {
   "use strict";
+  // 광고 제거는 모든 프레임에서 하지만, 통계 보고는 큰 페이지에서만 한다 (중복 방지)
+  const IS_TOP_FRAME = typeof window === "undefined" || window === window.top;
   if (typeof location === "undefined") return;
   // 유튜브는 content.js/content-main hook이 전담하므로 중복 처리하지 않는다.
   if (location.hostname === "studio.youtube.com") return;
@@ -131,6 +133,7 @@
     } catch (e) {}
     if (removed > 0) {
       removedCount += removed;
+      if (!IS_TOP_FRAME) return; //iframe에서는 제거만 하고 보고는 하지 않음
       try {
         chrome.runtime.sendMessage({ type: "adRemoved", count: removed }, () => {
           void chrome.runtime.lastError;

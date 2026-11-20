@@ -32,6 +32,28 @@ chrome.storage.onChanged.addListener((changes) => {
   }
 });
 
+// === DOM 제거 기록 합치기 ===
+// 여러 스크립트/프레임이 짧은 시간에 같은 사이트 보고를 보내면 한 줄로 합친다.
+// (지운 개수는 더해서 보존, 일지는 깔끔하게)
+const pendingDomLog = new Map();
+const DOM_MERGE_MS = 400;
+
+function queueDomLog(site, count) {
+  let item = pendingDomLog.get(site);
+  if (!item) {
+    item = { count: 0, timer: null };
+    pendingDomLog.set(site, item);
+  }
+  item.count += count;
+  if (item.timer) clearTimeout(item.timer);
+  item.timer = setTimeout(() => {
+    pendingDomLog.delete(site);
+    AppState.domLog.unshift({ site, count: item.count, time: Date.now() });
+    if (AppState.domLog.length > MAX_DOM_LOG_ENTRIES) AppState.domLog.length = MAX_DOM_LOG_ENTRIES;
+    saveDomLog();
+  }, DOM_MERGE_MS);
+}
+
 // === 메시지 핸들러 ===
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "applyFilterStates" && message.states) {
@@ -52,10 +74,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     const pageUrl = sender && sender.tab ? sender.tab.url : "";
     const site = siteOf(pageUrl);
 
-    // DOM 제거 기록 (사이트 + 개수 + 시간만 저장, 요소 HTML은 저장하지 않음)
-    AppState.domLog.unshift({ site: site || "알 수 없는 사이트", count, time: Date.now() });
-    if (AppState.domLog.length > MAX_DOM_LOG_ENTRIES) AppState.domLog.length = MAX_DOM_LOG_ENTRIES;
-    saveDomLog();
+    // DOM 제거 기록 (짧은 시간 내 같은 사이트 보고는 합쳐서 한 줄로 저장)
+    queueDomLog(site || "알 수 없는 사이트", count);
     if (site) {
       if (tabId >= 0) AppState.tabSites.set(tabId, site);
       getSiteCount(site).dom += count;

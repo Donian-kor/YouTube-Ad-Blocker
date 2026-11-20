@@ -5,6 +5,8 @@
 //   button.btn_skip  (처음엔 .hide, 카운트다운 종료 시 활성화)
 (function () {
   "use strict";
+  // 통계 보고는 큰 페이지에서만 (중복 방지)
+  const IS_TOP_FRAME = typeof window === "undefined" || window === window.top;
   if (typeof location === "undefined") return;
   if (!/chzzk\.naver\.com$/.test(location.hostname)) return;
   if (window.__yabChzzkSkipInstalled) return;
@@ -30,9 +32,11 @@
       try {
         btn.click();
         skippedCount++;
-        chrome.runtime.sendMessage({ type: "adRemoved", count: 1 }, () => {
-          void chrome.runtime.lastError;
-        });
+        if (IS_TOP_FRAME) {
+          chrome.runtime.sendMessage({ type: "adRemoved", count: 1 }, () => {
+            void chrome.runtime.lastError;
+          });
+        }
         console.log("[치지직 광고 스킵] SKIP 클릭 (" + skippedCount + "회)");
       } catch (e) {
         /* 무시 */
