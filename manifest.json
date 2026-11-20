@@ -20,7 +20,14 @@
     "*://*.adsense.googlesyndication.com/*",
     "*://*.googleadservices.com/*",
     "*://*.google-analytics.com/*",
-    "*://*.googletagmanager.com/*"
+    "*://*.googletagmanager.com/*",
+    "https://easylist.to/",
+    "https://filters.adtidy.org/",
+    "https://raw.githubusercontent.com/",
+    "https://adblock.turtlecute.org/",
+    "https://www.fanboy.co.nz/",
+    "https://gitlab.com/",
+    "https://cdn.jsdelivr.net/"
   ],
   "background": {
     "service_worker": "background.js"
