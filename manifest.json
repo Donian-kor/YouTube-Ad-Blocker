@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "www_AD_Blocker",
   "version": "3.4",
-  "description": "PC 크롬에서 유튜브·치지직·일반 사이트 광고를 차단하고 통계를 확인합니다.",
+  "description": "PC 크롬에서 웹사이트 광고와 추적기를 차단하고 통계를 확인합니다.",
   "permissions": [
     "declarativeNetRequest",
     "declarativeNetRequestFeedback",
