@@ -87,14 +87,25 @@
       gap: 3px;
       overflow-y: auto;
     }
-    .tab-btn {
+    /* 사이드바 상단 타이틀 이미지 */
+    .sidebar-title {
+      display: block; width: 100%; height: auto;
+      border-radius: 4px; margin-bottom: 14px;
+    }
+    /* 메뉴: JS가 필터 목록 첫 행 위치에 맞춰 top/행높이를 설정 */
+    .sidebar-menu {
+      position: absolute; left: 6px; right: 6px;
+      top: var(--sidebar-menu-top, 300px);
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .sidebar-menu .tab-btn {
       display: flex; align-items: center; gap: 7px;
-      width: 100%; padding: 10px; margin-bottom: 2px;
+      width: 100%; padding: 10px; margin-bottom: 0;
+      height: var(--sidebar-row-height, 62px);
       border: none; border-radius: 6px; background: transparent;
       color: #64748b; font-size: 12px; font-weight: 600; text-align: left;
       cursor: pointer; transition: background .2s, color .2s;
     }
-    .tab-btn:last-child { margin-bottom: 0; }
     .tab-btn:hover { background: #f1f5f9; color: #334155; }
     .tab-btn.active { background: #ffedf0; color: #e94560; }
     .tab-btn .nav-icon { font-size: 14px; flex-shrink: 0; }
@@ -217,9 +228,12 @@
 <body>
   <!-- 사이드바: 고정 폭 영역 밖, 좌측 여백에 배치 -->
   <nav class="sidebar">
-    <button class="tab-btn active" data-tab="filters"><span class="nav-icon">🎛️</span>필터 목록</button>
-    <button class="tab-btn" data-tab="blocked"><span class="nav-icon">🚫</span>내 차단 목록</button>
-    <button class="tab-btn" data-tab="licenses"><span class="nav-icon">📄</span>출처 및 라이선스</button>
+    <img class="sidebar-title" src="title.png" alt="www_AD_Blocker">
+    <div class="sidebar-menu">
+      <button class="tab-btn active" data-tab="filters"><span class="nav-icon">🎛️</span>필터 목록</button>
+      <button class="tab-btn" data-tab="blocked"><span class="nav-icon">🚫</span>내 차단 목록</button>
+      <button class="tab-btn" data-tab="licenses"><span class="nav-icon">📄</span>출처 및 라이선스</button>
+    </div>
   </nav>
 
   <div class="main-wrap">
