@@ -674,3 +674,15 @@ README "참고 자료"에 나열된 항목 중 **실제 필터 소스로 사용�
 
 **출처**: https://github.com/FilteringDev/crackle (MPL-2.0). 기법만 참고하여 우리 확장 구조(MAIN world content script)에 맞게 재작성.
 **주의**: 크롬에서 확장 **재로드(↻) + 치지직 탭 F5** 후에만 적용됨. 재로드 전에는 `window.__yabChzzkMainInstalled === false`.
+
+---
+
+## 부록: 2단 필터 구조로 마이그레이션 (2026-11-20)
+
+이 문서 본문의 "6개 그룹" 설명은 초기 설계이며, 현재는 **5개 UI 카테고리 + 10개 소스 그룹** 구조로 변경되었습니다.
+최종 구조와 마이그레이션 내역은 `docs/filter-registry-plan.md` §8을 참조하세요.
+
+- 소스 정의: `shared/filter-registry.js` (단일 진실 공급원)
+- 정적 규칙셋: 19개 (그룹별 분할) — `manifest.json`
+- UI: 카테고리 5개 토글 + 펼쳐서 소스 그룹 10개 개별 토글
+- 규칙 수: `shared/build-meta.js`에서 자동 표시

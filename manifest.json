@@ -35,64 +35,175 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["filters/static-index.json"],
-      "matches": ["<all_urls>"]
+      "resources": [
+        "filters/static-index.json"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
     }
   ],
   "declarative_net_request": {
     "rule_resources": [
-      { "id": "ads_1", "enabled": true, "path": "filters/ruleset_ads.json" },
-      { "id": "ads_2", "enabled": true, "path": "filters/ruleset_ads_2.json" },
-      { "id": "ads_3", "enabled": true, "path": "filters/ruleset_ads_3.json" },
-      { "id": "ads_4", "enabled": true, "path": "filters/ruleset_ads_4.json" },
-      { "id": "ads_5", "enabled": true, "path": "filters/ruleset_ads_5.json" },
-      { "id": "korean", "enabled": true, "path": "filters/ruleset_korean.json" },
-      { "id": "privacy", "enabled": true, "path": "filters/ruleset_privacy.json" },
-      { "id": "anti_circumvention", "enabled": true, "path": "filters/ruleset_anti_circumvention.json" },
-      { "id": "annoyances", "enabled": true, "path": "filters/ruleset_annoyances.json" },
-      { "id": "security_1", "enabled": true, "path": "filters/ruleset_security.json" },
-      { "id": "security_2", "enabled": true, "path": "filters/ruleset_security_2.json" },
-      { "id": "security_3", "enabled": true, "path": "filters/ruleset_security_3.json" },
-      { "id": "security_4", "enabled": true, "path": "filters/ruleset_security_4.json" },
-      { "id": "security_5", "enabled": true, "path": "filters/ruleset_security_5.json" }
+      {
+        "id": "easylist_1",
+        "enabled": true,
+        "path": "filters/ruleset_easylist.json"
+      },
+      {
+        "id": "easylist_2",
+        "enabled": true,
+        "path": "filters/ruleset_easylist_2.json"
+      },
+      {
+        "id": "easylist_3",
+        "enabled": true,
+        "path": "filters/ruleset_easylist_3.json"
+      },
+      {
+        "id": "easylist_4",
+        "enabled": true,
+        "path": "filters/ruleset_easylist_4.json"
+      },
+      {
+        "id": "adguard_1",
+        "enabled": true,
+        "path": "filters/ruleset_adguard.json"
+      },
+      {
+        "id": "adguard_2",
+        "enabled": true,
+        "path": "filters/ruleset_adguard_2.json"
+      },
+      {
+        "id": "adguard_3",
+        "enabled": true,
+        "path": "filters/ruleset_adguard_3.json"
+      },
+      {
+        "id": "peterlowe_1",
+        "enabled": true,
+        "path": "filters/ruleset_peterlowe.json"
+      },
+      {
+        "id": "uassets_1",
+        "enabled": true,
+        "path": "filters/ruleset_uassets.json"
+      },
+      {
+        "id": "korean_1",
+        "enabled": true,
+        "path": "filters/ruleset_korean.json"
+      },
+      {
+        "id": "social_1",
+        "enabled": true,
+        "path": "filters/ruleset_social.json"
+      },
+      {
+        "id": "anti_cv_1",
+        "enabled": true,
+        "path": "filters/ruleset_anti_cv.json"
+      },
+      {
+        "id": "annoyances_1",
+        "enabled": true,
+        "path": "filters/ruleset_annoyances.json"
+      },
+      {
+        "id": "malware_1",
+        "enabled": true,
+        "path": "filters/ruleset_malware.json"
+      },
+      {
+        "id": "malware_2",
+        "enabled": true,
+        "path": "filters/ruleset_malware_2.json"
+      },
+      {
+        "id": "malware_3",
+        "enabled": true,
+        "path": "filters/ruleset_malware_3.json"
+      },
+      {
+        "id": "malware_4",
+        "enabled": true,
+        "path": "filters/ruleset_malware_4.json"
+      },
+      {
+        "id": "malware_5",
+        "enabled": true,
+        "path": "filters/ruleset_malware_5.json"
+      },
+      {
+        "id": "mining_1",
+        "enabled": true,
+        "path": "filters/ruleset_mining.json"
+      }
     ]
   },
   "content_scripts": [
     {
-      "matches": ["http://*/*", "https://*/*"],
-      "js": ["anti-bypass.js"],
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "anti-bypass.js"
+      ],
       "run_at": "document_start",
       "all_frames": true,
       "match_about_blank": true
     },
     {
-      "matches": ["http://*/*", "https://*/*"],
-      "js": ["general-blocker.js"],
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "general-blocker.js"
+      ],
       "run_at": "document_start",
       "all_frames": true,
       "match_about_blank": true
     },
     {
-      "matches": ["*://*.youtube.com/*"],
-      "js": ["youtube-main.js"],
+      "matches": [
+        "*://*.youtube.com/*"
+      ],
+      "js": [
+        "youtube-main.js"
+      ],
       "run_at": "document_start",
       "world": "MAIN"
     },
     {
-      "matches": ["*://*.youtube.com/*"],
-      "js": ["content.js"],
+      "matches": [
+        "*://*.youtube.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
       "run_at": "document_idle"
     },
     {
-      "matches": ["*://chzzk.naver.com/*"],
-      "js": ["chzzk-main.js"],
+      "matches": [
+        "*://chzzk.naver.com/*"
+      ],
+      "js": [
+        "chzzk-main.js"
+      ],
       "run_at": "document_start",
       "world": "MAIN",
       "all_frames": true
     },
     {
-      "matches": ["*://chzzk.naver.com/*"],
-      "js": ["chzzk-ad-skip.js"],
+      "matches": [
+        "*://chzzk.naver.com/*"
+      ],
+      "js": [
+        "chzzk-ad-skip.js"
+      ],
       "run_at": "document_start",
       "all_frames": true
     },
@@ -106,19 +217,30 @@
         "*://*.buzzheavier.com/*",
         "*://*.bzzhr.to/*"
       ],
-      "js": ["filehost-blocker.js"],
+      "js": [
+        "filehost-blocker.js"
+      ],
       "run_at": "document_idle",
       "all_frames": true
     },
     {
-      "matches": ["*://*.skidrowreloaded.com/*"],
-      "js": ["popunder-blocker.js"],
+      "matches": [
+        "*://*.skidrowreloaded.com/*"
+      ],
+      "js": [
+        "popunder-blocker.js"
+      ],
       "run_at": "document_start",
       "world": "MAIN"
     },
     {
-      "matches": ["http://*/*", "https://*/*"],
-      "js": ["element-blocker.js"],
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "element-blocker.js"
+      ],
       "run_at": "document_idle",
       "all_frames": true,
       "match_about_blank": true

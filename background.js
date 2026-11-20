@@ -1,4 +1,5 @@
 importScripts("shared/filter-converter.js");
+importScripts("shared/filter-registry.js");
 importScripts("background/filter-updater.js");
 
 // www_AD_Blocker - Background Service Worker
@@ -304,20 +305,56 @@ const ALL_RULE_IDS = [
 
 // === 필터 활성화 상태 관리 ===
 // manifest.json의 declarative_net_request.rule_resources와 1:1 대응
-// 각 그룹은 여러 개의 규칙셋 파일로 분할될 수 있다.
+// 소스 그룹(10개) -> 규칙셋 ID 목록. filterStates는 항상 그룹 키로 저장한다.
 
-// 그룹 -> manifest rule_resources ID 목록 매핑
 const FILTER_TO_RULESET_IDS = {
-  "ads": ["ads_1", "ads_2", "ads_3", "ads_4", "ads_5"],
-  "korean": ["korean"],
-  "privacy": ["privacy"],
-  "anti_circumvention": ["anti_circumvention"],
-  "annoyances": ["annoyances"],
-  "security": ["security_1", "security_2", "security_3", "security_4", "security_5"],
+  easylist: ["easylist_1", "easylist_2", "easylist_3", "easylist_4"],
+  adguard: ["adguard_1", "adguard_2", "adguard_3"],
+  peterlowe: ["peterlowe_1"],
+  uassets: ["uassets_1"],
+  korean: ["korean_1"],
+  social: ["social_1"],
+  anti_cv: ["anti_cv_1"],
+  annoyances: ["annoyances_1"],
+  malware: ["malware_1", "malware_2", "malware_3", "malware_4", "malware_5"],
+  mining: ["mining_1"],
 };
 
 // 모든 rule_resources ID (평탄화된 목록)
 const STATIC_RULESET_IDS = Object.values(FILTER_TO_RULESET_IDS).flat();
+
+// 기존 6개 그룹 키 -> 신규 10개 소스 그룹 키 매핑 (마이그레이션용)
+const LEGACY_GROUP_MAP = {
+  ads: ["easylist", "adguard", "peterlowe", "uassets"],
+  privacy: ["social"],
+  anti_circumvention: ["anti_cv"],
+  security: ["malware", "mining"],
+};
+
+// 이전 버전 filterStates를 새 그룹 키로 변환해 저장
+function migrateFilterStates(callback) {
+  chrome.storage.local.get(["filterStates"], (res) => {
+    const old = res.filterStates || {};
+    const hasLegacy = Object.keys(LEGACY_GROUP_MAP).some((k) => k in old);
+    if (!hasLegacy) { if (callback) callback(); return; }
+    const next = { ...old };
+    for (const [legacyKey, newKeys] of Object.entries(LEGACY_GROUP_MAP)) {
+      if (!(legacyKey in old)) continue;
+      const value = old[legacyKey];
+      for (const key of newKeys) if (!(key in next)) next[key] = value;
+      delete next[legacyKey];
+    }
+    // 규칙셋 ID로 저장된 이전 값도 제거
+    const rulesetIdSet = new Set(STATIC_RULESET_IDS);
+    for (const key of Object.keys(next)) {
+      if (rulesetIdSet.has(key)) delete next[key];
+    }
+    chrome.storage.local.set({ filterStates: next }, () => {
+      console.log("[필터 마이그레이션] 완료:", Object.keys(next).join(", "));
+      if (callback) callback();
+    });
+  });
+}
 
 // 필터 활성화 상태를 저장소에 저장하고 정적 규칙셋에 즉시 반영
 function saveFilterStates(states, callback) {
@@ -327,12 +364,12 @@ function saveFilterStates(states, callback) {
   });
 }
 
-// 개별 필터 토글 상태를 rule_resources ID 배열로 변환
+// 그룹 키 상태를 rule_resources ID 상태로 확장
 function expandFilterStates(states) {
   const expanded = {};
-  Object.keys(FILTER_TO_RULESET_IDS).forEach((filterKey) => {
-    const isOn = states[filterKey] !== undefined ? states[filterKey] : true;
-    FILTER_TO_RULESET_IDS[filterKey].forEach((rid) => {
+  Object.keys(FILTER_TO_RULESET_IDS).forEach((groupKey) => {
+    const isOn = states[groupKey] !== undefined ? states[groupKey] : true;
+    FILTER_TO_RULESET_IDS[groupKey].forEach((rid) => {
       expanded[rid] = isOn;
     });
   });
@@ -413,13 +450,14 @@ function applyRules(enabled) {
 
 // 저장된 활성화 상태 로드 후 규칙 적용
 function initRules() {
-  chrome.storage.local.get(["adBlockerEnabled"], (result) => {
-    const enabled = result.adBlockerEnabled !== undefined ? result.adBlockerEnabled : true;
-    enabledState = enabled;
-    applyRules(enabled);
-    updateBadgeForTab(activeTabId);
+  migrateFilterStates(() => {
+    chrome.storage.local.get(["adBlockerEnabled"], (result) => {
+      const enabled = result.adBlockerEnabled !== undefined ? result.adBlockerEnabled : true;
+      enabledState = enabled;
+      applyRules(enabled);
+      updateBadgeForTab(activeTabId);
+    });
   });
-  
 }
 
 // === 확장 프로그램 설치 시 ===
@@ -448,17 +486,8 @@ chrome.storage.onChanged.addListener((changes) => {
 // === 메시지 핸들러: 필터 활성화 상태 변경 ===
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "applyFilterStates" && message.states) {
-    // 개별 필터 키를 rule_resources ID 배열로 확장하여 저장
-    const expanded = {};
-    Object.keys(message.states).forEach((filterKey) => {
-      const ruleSetIds = FILTER_TO_RULESET_IDS[filterKey];
-      if (ruleSetIds) {
-        ruleSetIds.forEach((rid) => {
-          expanded[rid] = message.states[filterKey];
-        });
-      }
-    });
-    saveFilterStates(expanded, () => {
+    // 그룹 키 상태를 그대로 저장하고, 규칙셋 확장은 applyStaticRulesetsByState에서 수행
+    saveFilterStates(message.states, () => {
       sendResponse({ success: true });
     });
     return true;

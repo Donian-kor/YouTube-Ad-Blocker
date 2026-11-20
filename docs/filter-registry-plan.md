@@ -3,6 +3,8 @@
 > 작성일: 2026-11-20
 > 기준: `tools/build-filters.js`, `background/filter-updater.js`, `options/config.js`, `manifest.json`
 > 목적: 소스 추가·그룹 변경·UI 수정 시 **한 곳만 수정**하면 되도록 구조 개선
+>
+> **구현 완료 (2026-11-20, 커밋 예정)**: 아래 설계가 실제 코드에 반영되었습니다. 최종 상태는 §8 참조.
 
 ---
 
@@ -171,3 +173,58 @@ export const FILTER_GROUPS = [
 - **그룹 ID 호환**: 기존 `filterStates`의 `ads` 키는 마이그레이션에서 `easylist`+`uassets`로 매핑
 - **규칙셋 유지**: 기존 규칙셋 파일명 재사용 없이 새 이름 사용 시 확장 재로드 필요 (atomic)
 - **완전 자동 분류 아님**: 소스 성격별 수동 분류이므로, 새 소스 추가 시 `group` 선택은 사람이 결정 (그게 의도)
+
+---
+
+## 8. 구현 결과 (2026-11-20)
+
+설계가 모두 반영되었으며, 문서 §3~§7의 숫자는 최종 상태와 아래와 같이 다릅니다.
+
+### 8.1 실제 구조
+
+| 항목 | 결과 |
+|------|------|
+| 단일 진실 공급원 | `shared/filter-registry.js` (UMD — Node/importScripts/ESM 모두 지원) |
+| 소스 정의 | 34개 (`FILTER_REGISTRY`) |
+| 소스 그룹 | 10개 (`FILTER_GROUPS`) |
+| UI 카테고리 | 5개 (`FILTER_CATEGORIES`) — 국제 광고 / 한국 필터 / 개인정보 / 안티애드블록 / 보안 |
+| 규칙 수 메타 | `shared/build-meta.js` — 빌드 시 자동 생성, `options/config.js`가 참조 |
+| 정적 규칙셋 | 19개 파일 (그룹별 분할, manifest `rule_resources` 자동 생성) |
+
+### 8.2 그룹별 규칙 수 (빌드 결과)
+
+| 그룹 | 규칙 수 | 규칙셋 |
+|------|---------|--------|
+| easylist | 102,818 | 4 |
+| adguard | 69,685 | 3 |
+| peterlowe | 3,568 | 1 |
+| uassets | 2,188 | 1 |
+| korean | 2,286 | 1 |
+| social | 1,459 | 1 |
+| anti_cv | 1,041 | 1 |
+| annoyances | 2,445 | 1 |
+| malware | 137,191 | 5 |
+| mining | 243 | 1 |
+
+> 그룹 간 중복 제거가 그룹 내부에서만 이루어져 총합(322,924개)은 이전(272,248개)보다 늘었지만,
+> 각 규칙셋은 30,000개 한도를 준수하며 Chrome 규칙셋 수 한도(50개) 내에 있습니다.
+
+### 8.3 마이그레이션
+
+- `background.js`: `migrateFilterStates()`가 기존 6개 키(`ads`, `privacy`, `anti_circumvention`, `security`)를
+  새 10개 그룹 키로 변환. 규칙셋 ID로 저장된 이전 값도 정리.
+- `filterStates`는 이제 **항상 그룹 키로만** 저장하며, 규칙셋 확장은 `applyStaticRulesetsByState()`에서 수행.
+  (이전에는 저장 시 규칙셋 ID로 확장한 뒤 다시 그룹 키로 확장하여 토글이 원복되던 문제가 있었음)
+
+### 8.4 2단 UI 동작
+
+- 상위 5개 카테고리 토글 + `▼` 펼치기 → 하위 소스 그룹 체크박스 노출
+- 카테고리 토글 → 해당 카테고리의 모든 그룹 일괄 ON/OFF
+- 개별 그룹 토글 → 해당 그룹만 ON/OFF (카테고리는 부분 선택 시 indeterminate 표시)
+- 국제 광고·보안 카테고리는 잠금(항상 ON)
+
+### 8.5 향후 소스 추가 방법
+
+1. `shared/filter-registry.js`의 `FILTER_REGISTRY`에 한 줄 추가 (`group`, `category`, `url`, `license`, `limit`)
+2. `node tools/build-filters.js --all --offline` (또는온라인) — 규칙셋 + `build-meta.js` + `static-index.json` + manifest 갱신
+3. `options/config.js`, `background.js`, `background/filter-updater.js`, UI는 **수정 불필요**

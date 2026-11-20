@@ -1,72 +1,16 @@
 // background/filter-updater.js - 필터 전체 업데이트 로직
 
 // === 필터 업데이트 소스 정의 ===
-// 각 그룹의 소스 URL과 동적 규칙 배분 상한 (전체 합계 29,713개 ≤ 30,000)
-const FILTER_SOURCES = {
-  ads: {
-    limit: 19000,
-    urls: [
-      "https://easylist.to/easylist/easylist.txt",
-      "https://easylist.to/easylist/easyprivacy.txt",
-      "https://filters.adtidy.org/extension/chromium/filters/2.txt",
-      "https://pgl.yoyo.org/adservers/serverlist.php?hostformat=adblockplus&showintro=0&mimetype=plaintext",
-      "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/filters.txt",
-      "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/filters-general.txt",
-      "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/filters-2024.txt",
-      "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/filters-2025.txt",
-      "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/filters-2026.txt",
-    ],
-  },
-  korean: {
-    limit: 30000,
-    urls: [
-      "https://raw.githubusercontent.com/noridev/NoriDev-AdBlock-Filter/master/filter/filter.txt",
-      "https://adblock.turtlecute.org/d3host.adblock",
-      "https://raw.githubusercontent.com/d3ward/toolz/master/src/d3host.txt",
-      "https://cdn.jsdelivr.net/npm/@list-kr/filterslists@latest/dist/filterslist-AdGuard.txt",
-      "https://cdn.jsdelivr.net/npm/@filteringdev/filterslists-ko@latest/dist/filterslist-AdGuard-unified.txt",
-    ],
-  },
-  privacy: {
-    limit: 30000,
-    urls: [
-      "https://www.fanboy.co.nz/fanboy-social.txt",
-      "https://filters.adtidy.org/extension/chromium/filters/17.txt",
-      "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/privacy.txt",
-    ],
-  },
-  anti_circumvention: {
-    limit: 30000,
-    urls: [
-      "https://gitlab.com/eyeo/anti-cv/abp-filters-anti-cv/-/raw/master/english.txt",
-      "https://gitlab.com/eyeo/anti-cv/abp-filters-anti-cv/-/raw/master/chinese.txt",
-      "https://gitlab.com/eyeo/anti-cv/abp-filters-anti-cv/-/raw/master/czech.txt",
-      "https://gitlab.com/eyeo/anti-cv/abp-filters-anti-cv/-/raw/master/french.txt",
-      "https://gitlab.com/eyeo/anti-cv/abp-filters-anti-cv/-/raw/master/german.txt",
-      "https://gitlab.com/eyeo/anti-cv/abp-filters-anti-cv/-/raw/master/polish.txt",
-      "https://gitlab.com/eyeo/anti-cv/abp-filters-anti-cv/-/raw/master/portuguese.txt",
-      "https://gitlab.com/eyeo/anti-cv/abp-filters-anti-cv/-/raw/master/russian.txt",
-      "https://gitlab.com/eyeo/anti-cv/abp-filters-anti-cv/-/raw/master/spanish.txt",
-      "https://gitlab.com/eyeo/anti-cv/abp-filters-anti-cv/-/raw/master/turkish.txt",
-      "https://gitlab.com/eyeo/anti-cv/abp-filters-anti-cv/-/raw/master/vietnamese.txt",
-    ],
-  },
-  annoyances: {
-    limit: 30000,
-    urls: [
-      "https://www.fanboy.co.nz/fanboy-annoyance.txt",
-    ],
-  },
-  security: {
-    limit: 6000,
-    urls: [
-      "https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/nocoin.txt",
-      "https://gitlab.com/curben/urlhaus-filter/-/raw/master/urlhaus-filter.txt",
-      "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/badware.txt",
-      "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/resource-abuse.txt",
-    ],
-  },
-};
+// shared/filter-registry.js에서 그룹별 URL·상한을 자동 생성한다.
+// (로컬 file: 소스는 런타임 업데이트에서 제외)
+const FILTER_SOURCES = {};
+for (const group of FilterRegistry.FILTER_GROUPS) {
+  const sources = FilterRegistry.getGroupSources(group.id).filter((s) => !!s.url);
+  FILTER_SOURCES[group.id] = {
+    limit: sources.reduce((sum, s) => sum + (s.limit || 0), 0),
+    urls: sources.map((s) => s.url),
+  };
+}
 
 const COMMIT_ID_START = 1000;    // 업데이트 규칙 ID 대역 (기존 1~68, 100~109와 충돌 없음)
 const MAX_DYNAMIC_RULES = 30000; // Chrome 전체 동적 규칙 한도
