@@ -128,14 +128,77 @@ export function initFiltersTab() {
       updateBtn.disabled = false;
       if (res && res.ok) {
         if (res.unchanged) {
-          setUpdateStatus("신규 업데이트가 없습니다", "ok");
+          setUpdateStatus(res.reason ? "✅ " + res.reason : "신규 업데이트가 없습니다", "ok");
         } else {
           setUpdateStatus("✅ " + res.count.toLocaleString() + "개 규칙 업데이트 완료", "ok");
+          renderUpdateHistory([res.historyEntry].filter(Boolean).concat(currentHistory));
+          currentHistory = [res.historyEntry].filter(Boolean).concat(currentHistory);
         }
       } else {
         const reason = res && res.reason ? res.reason : "알 수 없는 오류";
         setUpdateStatus("❌ 업데이트 실패: " + reason, "err");
       }
     });
+  });
+
+  initUpdateHistory();
+}
+
+// === 업데이트 내역 (접기/펼치기) ===
+let currentHistory = [];
+
+function initUpdateHistory() {
+  const toggleBtn = document.getElementById("historyToggleBtn");
+  const panel = document.getElementById("historyPanel");
+  if (!toggleBtn || !panel) return;
+
+  toggleBtn.addEventListener("click", () => {
+    const opening = !panel.classList.contains("open");
+    panel.classList.toggle("open", opening);
+    toggleBtn.textContent = opening ? "업데이트 내역 숨기기 ▲" : "업데이트 내역 보기 ▼";
+    if (opening) loadUpdateHistory();
+  });
+
+  loadUpdateHistory();
+}
+
+function loadUpdateHistory() {
+  if (typeof chrome === "undefined" || !chrome.runtime) return;
+  chrome.runtime.sendMessage({ type: "getUpdateHistory" }, (res) => {
+    currentHistory = (res && res.history) || [];
+    renderUpdateHistory(currentHistory);
+  });
+}
+
+function renderUpdateHistory(history) {
+  const panel = document.getElementById("historyPanel");
+  if (!panel) return;
+  panel.textContent = "";
+
+  if (!history || history.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "history-empty";
+    empty.textContent = "업데이트 내역이 없습니다. '최신 필터 업데이트'를 눌러주세요.";
+    panel.appendChild(empty);
+    return;
+  }
+
+  history.forEach((entry) => {
+    if (!entry || !entry.at) return;
+    const row = document.createElement("div");
+    row.className = "history-row";
+
+    const date = document.createElement("span");
+    date.className = "history-date";
+    date.textContent = new Date(entry.at).toLocaleString("ko-KR", { hour12: false });
+
+    const detail = document.createElement("span");
+    detail.className = "history-detail";
+    detail.textContent = "신규 " + (entry.added || 0).toLocaleString() + "개" +
+      (entry.duplicates ? " (중복 " + entry.duplicates.toLocaleString() + "개 제외)" : "");
+
+    row.appendChild(date);
+    row.appendChild(detail);
+    panel.appendChild(row);
   });
 }

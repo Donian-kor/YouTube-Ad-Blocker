@@ -122,7 +122,15 @@
     .section-header .btn-row { margin-top: 0; margin-left: auto; }
     .filter-toolbar { display: flex; gap: 8px; margin-bottom: 0; justify-content: flex-end; }
     .filter-toolbar button { border: 1px solid #cbd5e1; }
-    .update-row { margin-top: 20px; }  /* 필터 카드와 업데이트 버튼 사이 여백 */
+    .update-row { margin-top: 20px; }
+    .history-toggle { flex: 0 0 auto; white-space: nowrap; }
+    .history-panel { display: none; margin-top: 8px; background: #fff; border: 1px solid #dbe2ee; border-radius: 8px; padding: 4px 10px; }
+    .history-panel.open { display: block; }
+    .history-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 7px 0; border-bottom: 1px solid #eef2f7; font-size: 11px; }
+    .history-row:last-child { border-bottom: none; }
+    .history-date { color: #475569; font-weight: 600; }
+    .history-detail { color: #16a34a; text-align: right; }
+    .history-empty { padding: 12px 0; font-size: 11px; color: #94a3b8; text-align: center; }
     .update-status { font-size: 10px; color: #64748b; margin-top: 6px; min-height: 13px; }
     .update-status.ok { color: #16a34a; }
     .update-status.err { color: #dc2626; }
@@ -209,8 +217,10 @@
       <div id="filterList"></div>
       <div class="btn-row update-row">
         <button class="primary" id="filterUpdateBtn">최신 필터 업데이트</button>
+        <button class="secondary history-toggle" id="historyToggleBtn">업데이트 내역 보기 ▼</button>
       </div>
       <div class="update-status" id="filterUpdateStatus"></div>
+      <div class="history-panel" id="historyPanel"></div>
       <div class="info">
         • <b>정적 필터 26만 개</b>는 패키지에 내장되어 재배포 시 갱신됩니다. &nbsp;• 이 버튼은 정적 필터에 <b>없는 신규 도메인만</b> 동적으로 등록합니다. &nbsp;• 실패 시 이전 규칙이 유지됩니다.
       </div>

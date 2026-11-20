@@ -214,13 +214,27 @@ async function updateFilters() {
     // 2단계: 새 규칙 추가 (이제 한도 여유가 있음)
     await dnrUpdate({ addRules: committed });
 
-    chrome.storage.local.set({
-      updateStatus: { updatedAt: now, count: committed.length },
-      dynamicRuleCount: committed.length,
-      filterFingerprint: newFingerprint,
+    // 업데이트 이력 기록 (최근 20개)
+    const historyEntry = {
+      at: now,
+      added: committed.length,
+      duplicates: duplicateCount,
+      total: committed.length,
+    };
+
+    chrome.storage.local.get(["updateHistory"], (res) => {
+      const history = Array.isArray(res.updateHistory) ? res.updateHistory : [];
+      history.unshift(historyEntry);
+      if (history.length > 20) history.length = 20;
+      chrome.storage.local.set({
+        updateStatus: { updatedAt: now, count: committed.length },
+        dynamicRuleCount: committed.length,
+        filterFingerprint: newFingerprint,
+        updateHistory: history,
+      });
     });
     updateInProgress = false;
-    return { ok: true, count: committed.length, unchanged: false, duplicates: duplicateCount };
+    return { ok: true, count: committed.length, unchanged: false, duplicates: duplicateCount, historyEntry };
   } catch (e) {
     updateInProgress = false;
     return { ok: false, reason: e.message };
@@ -231,6 +245,12 @@ async function updateFilters() {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "updateFilters") {
     updateFilters().then((result) => sendResponse(result));
+    return true;
+  }
+  if (message.type === "getUpdateHistory") {
+    chrome.storage.local.get(["updateHistory"], (res) => {
+      sendResponse({ history: Array.isArray(res.updateHistory) ? res.updateHistory : [] });
+    });
     return true;
   }
 });
