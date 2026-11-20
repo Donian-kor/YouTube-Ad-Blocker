@@ -260,7 +260,6 @@
     }
     .log-tab-btn:hover { background: #f1f5f9; }
     .log-tab-btn.active { background: #ffedf0; border-color: #fecdd3; color: #e94560; }
-    .log-summary { font-size: 11px; color: #475569; font-weight: 600; margin-bottom: 8px; }
     .log-search { margin-bottom: 10px; }
     .log-search input {
       width: 100%; padding: 7px 9px; font-size: 11px;
@@ -344,6 +343,7 @@
     </div>
     <div class="stats-footer">
       <button class="danger" id="optResetBtn">통계 재설정</button>
+      <span class="last-reset">마지막 차단: <span id="optLastBlock">-</span></span>
       <span class="last-reset">마지막 재설정: <span id="optReset">-</span></span>
     </div>
   </div>
@@ -401,7 +401,6 @@
         <button class="log-tab-btn active" data-log="network">네트워크 차단</button>
         <button class="log-tab-btn" data-log="dom">DOM 제거</button>
       </div>
-      <div class="log-summary" id="logSummary">불러오는 중...</div>
       <div class="log-search">
         <input type="search" id="logSearch" placeholder="사이트 또는 주소 검색">
       </div>

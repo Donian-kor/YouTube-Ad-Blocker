@@ -35,33 +35,16 @@ function fullTime(ts) {
 export function initBlockedLogTab() {
   const container = document.getElementById("siteLogList");
   const searchInput = document.getElementById("logSearch");
-  const summaryEl = document.getElementById("logSummary");
   const modeButtons = document.querySelectorAll(".log-tab-btn");
-  if (!container || !summaryEl) return;
+  if (!container) return;
 
   let networkLog = [];
   let domLog = [];
-  let totalBlocked = 0;   // 네트워크 요청 차단 횟수 (blockedRequests)
-  let domRemoved = 0;     // DOM 제거 횟수 (removedDomAds)
   let mode = "network";   // "network" | "dom"
   let keyword = "";
 
   function currentLog() {
     return mode === "dom" ? domLog : networkLog;
-  }
-
-  function summarize(hosts, count) {
-    const total = totalBlocked + domRemoved;
-    const breakdown = "네트워크 " + totalBlocked.toLocaleString() + " · DOM " + domRemoved.toLocaleString();
-    const prefix = "총 " + total.toLocaleString() + "건 차단 (" + breakdown + ") · ";
-    if (!count) {
-      summaryEl.textContent = prefix + "표시할 기록이 없습니다.";
-      return;
-    }
-    const entries = currentLog();
-    const latest = Math.max(...entries.map((e) => e.time || 0));
-    summaryEl.textContent = prefix + "기록 " + count.toLocaleString() + "건 · " +
-      hosts.size.toLocaleString() + "개 사이트 · 마지막 차단 " + timeAgo(latest);
   }
 
   function render() {
@@ -75,7 +58,6 @@ export function initBlockedLogTab() {
         ? "아직 DOM 제거 기록이 없습니다. 광고 요소가 숨겨지면 여기에 표시됩니다."
         : "아직 차단 기록이 없습니다. 광고가 막히면 여기에 표시됩니다.";
       container.appendChild(empty);
-      summarize(new Map(), 0);
       return;
     }
 
@@ -100,8 +82,6 @@ export function initBlockedLogTab() {
       container.appendChild(empty);
       return;
     }
-
-    summarize(groups, entries.length);
 
     // 건수 많은 사이트부터
     const sorted = [...groups.entries()].sort((a, b) => b[1].length - a[1].length);
@@ -166,11 +146,6 @@ export function initBlockedLogTab() {
   }
 
   function load() {
-    chrome.runtime.sendMessage({ type: "getStats" }, (res) => {
-      totalBlocked = (res && res.blockedRequests) || 0;
-      domRemoved = (res && res.removedDomAds) || 0;
-      render();
-    });
     chrome.runtime.sendMessage({ type: "getBlockedLog" }, (res) => {
       networkLog = (res && res.log) || [];
       render();

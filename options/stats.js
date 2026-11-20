@@ -1,4 +1,13 @@
 // options/stats.js - 통계 표시 및 재설정
+function timeAgo(ts) {
+  if (!ts) return "-";
+  const diff = Date.now() - ts;
+  if (diff < 60 * 1000) return "방금 전";
+  if (diff < 60 * 60 * 1000) return Math.floor(diff / (60 * 1000)) + "분 전";
+  if (diff < 24 * 60 * 60 * 1000) return Math.floor(diff / (60 * 60 * 1000)) + "시간 전";
+  return new Date(ts).toLocaleDateString("ko-KR", { month: "short", day: "numeric" });
+}
+
 export function initStats() {
   function loadStats() {
     chrome.storage.local.get(["adBlockerStats"], (result) => {
@@ -14,6 +23,7 @@ export function initStats() {
       document.getElementById("optTotal").textContent = (network + dom).toLocaleString();
       document.getElementById("optNetwork").textContent = network.toLocaleString();
       document.getElementById("optDom").textContent = dom.toLocaleString();
+      document.getElementById("optLastBlock").textContent = timeAgo(stats.lastBlockAt);
 
       if (stats.lastReset) {
         const date = new Date(stats.lastReset);

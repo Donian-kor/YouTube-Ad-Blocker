@@ -10,6 +10,7 @@ const AppState = {
     blockedRequests: 0,
     removedDomAds: 0,
     blockedLog: [],   // [{ url, time }]
+    lastBlockAt: 0,   // 마지막 차단 시각 (통계 패널에 표시)
     lastReset: Date.now(),
   },
 

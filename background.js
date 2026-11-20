@@ -44,6 +44,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   else if (message.type === "adRemoved") {
     const count = message.count || 1;
     AppState.stats.removedDomAds += count;
+    AppState.stats.lastBlockAt = Date.now();
     saveStats();
 
     // content script가 보낸 페이지 URL 기준으로 사이트에 누적
@@ -75,6 +76,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       blockedAds: AppState.stats.blockedAds,
       blockedRequests: AppState.stats.blockedRequests,
       removedDomAds: AppState.stats.removedDomAds,
+      lastBlockAt: AppState.stats.lastBlockAt || 0,
       lastReset: AppState.stats.lastReset,
     });
   }

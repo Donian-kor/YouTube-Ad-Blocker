@@ -16,7 +16,7 @@ function loadStats() {
     if (result.adBlockerStats) {
       // 이전 버전에 없던 필드도 기본값으로 채움
       AppState.stats = Object.assign(
-        { blockedAds: 0, blockedRequests: 0, removedDomAds: 0, blockedLog: [], lastReset: Date.now() },
+        { blockedAds: 0, blockedRequests: 0, removedDomAds: 0, blockedLog: [], lastBlockAt: 0, lastReset: Date.now() },
         result.adBlockerStats
       );
       if (!Array.isArray(AppState.stats.blockedLog)) AppState.stats.blockedLog = [];
@@ -136,6 +136,7 @@ function resetStats() {
     blockedRequests: 0,
     removedDomAds: 0,
     blockedLog: [],
+    lastBlockAt: 0,
     lastReset: Date.now(),
   };
   saveStats();
@@ -167,6 +168,7 @@ chrome.storage.local.get(["siteCounts"], (result) => {
 // 네트워크 요청 차단 로그
 chrome.declarativeNetRequest.onRuleMatchedDebug.addListener((info) => {
   AppState.stats.blockedRequests++;
+  AppState.stats.lastBlockAt = Date.now();
 
   // 차단 요청이 발생한 탭의 "현재 사이트"에 누적
   const tabId = info ? info.tabId : -1;
