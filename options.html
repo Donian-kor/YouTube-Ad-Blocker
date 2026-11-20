@@ -48,7 +48,7 @@
     }
     .stat-card .number { font-size: 20px; font-weight: 700; color: #e94560; }
     .stat-card .label { font-size: 11px; color: #64748b; }
-    /* 통계 재설정 버튼 + 날짜: 우측 정렬, 버튼이 날짜 바로 위 */
+    /* 통계 초기화 버튼 + 날짜: 우측 정렬, 버튼이 날짜 바로 위 */
     .stats-footer {
       display: flex; flex-direction: column; align-items: flex-end;
       gap: 4px; margin-top: 8px;
@@ -342,7 +342,7 @@
       </div>
     </div>
     <div class="stats-footer">
-      <button class="danger" id="optResetBtn">통계 재설정</button>
+      <button class="danger" id="optResetBtn">통계 초기화</button>
       <span class="last-reset">마지막 차단: <span id="optLastBlock">-</span></span>
       <span class="last-reset">마지막 재설정: <span id="optReset">-</span></span>
     </div>

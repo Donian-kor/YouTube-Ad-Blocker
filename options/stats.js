@@ -36,7 +36,7 @@ export function initStats() {
   }
 
   document.getElementById("optResetBtn").addEventListener("click", () => {
-    if (confirm("통계를 재설정하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) {
+    if (confirm("통계를 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) {
       chrome.runtime.sendMessage({ type: "resetStats" }, () => {
         loadStats();
       });
