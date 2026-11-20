@@ -1,5 +1,5 @@
 // YouTube Ad Blocker - Background Service Worker
-// 네트워크 레벨 괉고 차단 + 통계 관리
+// 네트워크 레벨 광고 차단 + 통계 관리
 
 // === 광고 차단 규칙 ===
 // 광고 전용 도메인만 전체 차단. 영상 재생용 도메인(googlevideo 등)은 차단하지 않음
@@ -298,22 +298,83 @@ const ALL_RULE_IDS = [
   100, 101, 102, 103, 104, 105, 106, 107, 108, 109
 ];
 
-// EasyList/EasyPrivacy 변환 규칙 (manifest의 정적 규칙 세트 ID)
-const STATIC_RULESET_IDS = [
-  "general_1", "general_2", "general_3", "general_4", "general_5", "general_korean"
-];
+// === 필터 활성화 상태 관리 ===
+// manifest.json의 declarative_net_request.rule_resources와 1:1 대응
+// 각 그룹은 여러 개의 규칙셋 파일로 분할될 수 있다.
 
-function applyStaticRulesets(enabled) {
-  chrome.declarativeNetRequest.updateEnabledRulesets(
-    enabled
-      ? { enableRulesetIds: STATIC_RULESET_IDS }
-      : { disableRulesetIds: STATIC_RULESET_IDS },
-    () => {
-      if (chrome.runtime.lastError) {
-        console.error("정적 규칙 적용 실패:", chrome.runtime.lastError.message);
-      }
+// 그룹 -> manifest rule_resources ID 목록 매핑
+const FILTER_TO_RULESET_IDS = {
+  "ads": ["ads_1", "ads_2", "ads_3", "ads_4", "ads_5"],
+  "korean": ["korean"],
+  "privacy": ["privacy"],
+  "anti_circumvention": ["anti_circumvention"],
+  "annoyances": ["annoyances"],
+  "security": ["security_1", "security_2", "security_3", "security_4", "security_5"],
+};
+
+// 모든 rule_resources ID (평탄화된 목록)
+const STATIC_RULESET_IDS = Object.values(FILTER_TO_RULESET_IDS).flat();
+
+// 필터 활성화 상태를 저장소에 저장하고 정적 규칙셋에 즉시 반영
+function saveFilterStates(states, callback) {
+  chrome.storage.local.set({ filterStates: states }, () => {
+    applyStaticRulesetsByState(states);
+    if (callback) callback();
+  });
+}
+
+// 개별 필터 토글 상태를 rule_resources ID 배열로 변환
+function expandFilterStates(states) {
+  const expanded = {};
+  Object.keys(FILTER_TO_RULESET_IDS).forEach((filterKey) => {
+    const isOn = states[filterKey] !== undefined ? states[filterKey] : true;
+    FILTER_TO_RULESET_IDS[filterKey].forEach((rid) => {
+      expanded[rid] = isOn;
+    });
+  });
+  return expanded;
+}
+
+// 필터 활성화 상태에 따라 정적 규칙셋을 개별적으로 켜고 끔
+function applyStaticRulesetsByState(states) {
+  const expanded = expandFilterStates(states);
+  const enable = [];
+  const disable = [];
+  STATIC_RULESET_IDS.forEach((id) => {
+    const isOn = expanded[id] !== undefined ? expanded[id] : true;
+    if (isOn) enable.push(id);
+    else disable.push(id);
+  });
+  const options = {};
+  if (enable.length) options.enableRulesetIds = enable;
+  if (disable.length) options.disableRulesetIds = disable;
+  chrome.declarativeNetRequest.updateEnabledRulesets(options, () => {
+    if (chrome.runtime.lastError) {
+      console.error("정적 규칙 적용 실패:", chrome.runtime.lastError.message);
     }
-  );
+  });
+}
+
+// 전체 ON/OFF 토글 시 정적 규칙셋 적용
+// - enabled=true: filterStates를 존중하여 켜진 필터만 활성화
+// - enabled=false: 모든 필터 비활성화
+function applyStaticRulesets(enabled) {
+  if (enabled) {
+    // 필터 상태를 로드하여 개별 적용
+    chrome.storage.local.get(["filterStates"], (result) => {
+      const states = result.filterStates || {};
+      applyStaticRulesetsByState(states);
+    });
+  } else {
+    chrome.declarativeNetRequest.updateEnabledRulesets(
+      { disableRulesetIds: STATIC_RULESET_IDS },
+      () => {
+        if (chrome.runtime.lastError) {
+          console.error("정적 규칙 비활성화 실패:", chrome.runtime.lastError.message);
+        }
+      }
+    );
+  }
 }
 
 // ON/OFF 상태에 따라 툴바 아이콘을 교체한다 (OFF 시 회색 아이콘)
@@ -379,9 +440,26 @@ chrome.storage.onChanged.addListener((changes) => {
   }
 });
 
-// === content script로 부터 메시지 수신 ===
+// === 메시지 핸들러: 필터 활성화 상태 변경 ===
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === "adRemoved") {
+  if (message.type === "applyFilterStates" && message.states) {
+    // 개별 필터 키를 rule_resources ID 배열로 확장하여 저장
+    const expanded = {};
+    Object.keys(message.states).forEach((filterKey) => {
+      const ruleSetIds = FILTER_TO_RULESET_IDS[filterKey];
+      if (ruleSetIds) {
+        ruleSetIds.forEach((rid) => {
+          expanded[rid] = message.states[filterKey];
+        });
+      }
+    });
+    saveFilterStates(expanded, () => {
+      sendResponse({ success: true });
+    });
+    return true;
+  }
+  // ... 나머지 메시지 핸들러
+  else if (message.type === "adRemoved") {
     const count = message.count || 1;
     stats.removedDomAds += count;
     saveStats();

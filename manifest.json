@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "YouTube Ad Blocker",
-  "version": "3.1",
+  "version": "3.2",
   "description": "PC 크롬에서 유튜브 광고를 차단하고 통계를 확인합니다.",
   "permissions": [
     "declarativeNetRequest",
@@ -27,12 +27,20 @@
   },
   "declarative_net_request": {
     "rule_resources": [
-      { "id": "general_1", "enabled": true, "path": "filters/ruleset_1.json" },
-      { "id": "general_2", "enabled": true, "path": "filters/ruleset_2.json" },
-      { "id": "general_3", "enabled": true, "path": "filters/ruleset_3.json" },
-      { "id": "general_4", "enabled": true, "path": "filters/ruleset_4.json" },
-      { "id": "general_5", "enabled": true, "path": "filters/ruleset_5.json" },
-      { "id": "general_korean", "enabled": true, "path": "filters/ruleset_korean.json" }
+      { "id": "ads_1", "enabled": true, "path": "filters/ruleset_ads.json" },
+      { "id": "ads_2", "enabled": true, "path": "filters/ruleset_ads_2.json" },
+      { "id": "ads_3", "enabled": true, "path": "filters/ruleset_ads_3.json" },
+      { "id": "ads_4", "enabled": true, "path": "filters/ruleset_ads_4.json" },
+      { "id": "ads_5", "enabled": true, "path": "filters/ruleset_ads_5.json" },
+      { "id": "korean", "enabled": true, "path": "filters/ruleset_korean.json" },
+      { "id": "privacy", "enabled": true, "path": "filters/ruleset_privacy.json" },
+      { "id": "anti_circumvention", "enabled": true, "path": "filters/ruleset_anti_circumvention.json" },
+      { "id": "annoyances", "enabled": true, "path": "filters/ruleset_annoyances.json" },
+      { "id": "security_1", "enabled": true, "path": "filters/ruleset_security.json" },
+      { "id": "security_2", "enabled": true, "path": "filters/ruleset_security_2.json" },
+      { "id": "security_3", "enabled": true, "path": "filters/ruleset_security_3.json" },
+      { "id": "security_4", "enabled": true, "path": "filters/ruleset_security_4.json" },
+      { "id": "security_5", "enabled": true, "path": "filters/ruleset_security_5.json" }
     ]
   },
   "content_scripts": [
