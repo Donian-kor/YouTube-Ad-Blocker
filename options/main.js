@@ -2,6 +2,7 @@
 import { initStats } from "./stats.js";
 import { initFiltersTab } from "./filters-tab.js";
 import { initBlockedTab } from "./blocked-tab.js";
+import { initBlockedLogTab } from "./blocked-log-tab.js";
 import { initLicensesTab } from "./licenses-tab.js";
 
 function initTabs() {
@@ -38,6 +39,7 @@ initTabs();
 initStats();
 initFiltersTab();
 initBlockedTab();
+initBlockedLogTab();
 initLicensesTab();
 
 // 필터 카드가 렌더링된 뒤 정렬 (렌더 완료 보장)
