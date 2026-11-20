@@ -1,0 +1,1 @@
+[{"priority":1,"action":{"type":"block"},"condition":{"urlFilter":"||ping0.cc/images/bx/*.gif^","initiatorDomains":["ping0.cc"],"resourceTypes":["image"]},"id":1}]

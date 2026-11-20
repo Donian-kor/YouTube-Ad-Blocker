@@ -1,0 +1,1 @@
+[{"priority":1,"action":{"type":"block"},"condition":{"urlFilter":"||g.cda.pl/player*?ads&vi*^","initiatorDomains":["cda.pl"],"resourceTypes":["xmlhttprequest"]},"id":1}]

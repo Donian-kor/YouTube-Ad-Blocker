@@ -306,49 +306,79 @@ const ALL_RULE_IDS = [
 
 // === 필터 활성화 상태 관리 ===
 // manifest.json의 declarative_net_request.rule_resources와 1:1 대응
-// 소스 그룹(10개) -> 규칙셋 ID 목록. filterStates는 항상 그룹 키로 저장한다.
-
+// 소스 ID -> 규칙셋 ID 목록. filterStates는 항상 소스 키로 저장한다.
 const FILTER_TO_RULESET_IDS = {
-  easylist: ["easylist_1", "easylist_2", "easylist_3", "easylist_4"],
-  adguard: ["adguard_1"],
-  peterlowe: ["peterlowe_1"],
-  uassets: ["uassets_1"],
-  korean: ["korean_1"],
-  social: ["social_1"],
-  anti_cv: ["anti_cv_1"],
-  annoyances: ["annoyances_1"],
-  malware: ["malware_1", "malware_2", "malware_3", "malware_4", "malware_5"],
-  mining: ["mining_1"],
+  "noridev": ["noridev_1"],
+  "turtlecute": ["turtlecute_1"],
+  "d3host": ["d3host_1"],
+  "list-kr": ["list-kr_1"],
+  "filterslists-ko": ["filterslists-ko_1"],
+  "extra-hosts": ["extra-hosts_1"],
+  "anti-cv-en": ["anti-cv-en_1"],
+  "anti-cv-zh": ["anti-cv-zh_1"],
+  "anti-cv-cs": ["anti-cv-cs_1"],
+  "anti-cv-fr": ["anti-cv-fr_1"],
+  "anti-cv-de": ["anti-cv-de_1"],
+  "anti-cv-pl": ["anti-cv-pl_1"],
+  "anti-cv-ru": ["anti-cv-ru_1"],
+  "anti-cv-es": ["anti-cv-es_1"],
+  "fanboy-social": ["fanboy-social_1"],
+  "url-tracking": ["url-tracking_1"],
+  "uassets-privacy": ["uassets-privacy_1"],
+  "fanboy-annoyance": ["fanboy-annoyance_1"],
+  "nocoin": ["nocoin_1"],
+  "urlhaus": ["urlhaus_1", "urlhaus_2", "urlhaus_3", "urlhaus_4", "urlhaus_5"],
+  "uassets-badware": ["uassets-badware_1"],
+  "uassets-resource-abuse": ["uassets-resource-abuse_1"],
+  "uassets-filters": ["uassets-filters_1"],
+  "uassets-general": ["uassets-general_1"],
+  "uassets-2024": ["uassets-2024_1"],
+  "uassets-2025": ["uassets-2025_1"],
+  "uassets-2026": ["uassets-2026_1"],
+  "peter-lowe": ["peter-lowe_1"],
+  "easylist": ["easylist_1", "easylist_2"],
+  "easyprivacy": ["easyprivacy_1", "easyprivacy_2"],
+  "ultimate": ["ultimate_1"],
 };
 
 // 모든 rule_resources ID (평탄화된 목록)
 const STATIC_RULESET_IDS = Object.values(FILTER_TO_RULESET_IDS).flat();
 
-// 기존 6개 그룹 키 -> 신규 10개 소스 그룹 키 매핑 (마이그레이션용)
+// 이전 버전 키(6개 그룹 + 10개 소스 그룹) -> 소스 ID 매핑 (마이그레이션용)
 const LEGACY_GROUP_MAP = {
-  ads: ["easylist", "adguard", "peterlowe", "uassets"],
-  privacy: ["social"],
-  anti_circumvention: ["anti_cv"],
-  security: ["malware", "mining"],
+  // 최초 6개 그룹
+  ads: ["easylist", "easyprivacy", "ultimate", "peter-lowe", "uassets-filters", "uassets-general", "uassets-2024", "uassets-2025", "uassets-2026"],
+  privacy: ["fanboy-social", "url-tracking", "uassets-privacy"],
+  anti_circumvention: ["anti-cv-en", "anti-cv-zh", "anti-cv-cs", "anti-cv-fr", "anti-cv-de", "anti-cv-pl", "anti-cv-pt", "anti-cv-ru", "anti-cv-es", "anti-cv-tr", "anti-cv-vi"],
+  annoyances: ["fanboy-annoyance"],
+  security: ["nocoin", "urlhaus", "uassets-badware", "uassets-resource-abuse"],
+  // 2단 구조의 10개 소스 그룹
+  easylist: ["easylist", "easyprivacy"],
+  adguard: ["ultimate"],
+  peterlowe: ["peter-lowe"],
+  uassets: ["uassets-filters", "uassets-general", "uassets-2024", "uassets-2025", "uassets-2026"],
+  korean: ["noridev", "turtlecute", "d3host", "list-kr", "filterslists-ko", "extra-hosts"],
+  social: ["fanboy-social", "url-tracking", "uassets-privacy"],
+  anti_cv: ["anti-cv-en", "anti-cv-zh", "anti-cv-cs", "anti-cv-fr", "anti-cv-de", "anti-cv-pl", "anti-cv-pt", "anti-cv-ru", "anti-cv-es", "anti-cv-tr", "anti-cv-vi"],
+  malware: ["urlhaus", "uassets-badware", "uassets-resource-abuse"],
+  mining: ["nocoin"],
 };
 
-// 이전 버전 filterStates를 새 그룹 키로 변환해 저장
+// 이전 버전 filterStates를 소스 키로 변환해 저장
 function migrateFilterStates(callback) {
   chrome.storage.local.get(["filterStates"], (res) => {
     const old = res.filterStates || {};
-    const hasLegacy = Object.keys(LEGACY_GROUP_MAP).some((k) => k in old);
+    const sourceKeys = new Set(Object.keys(FILTER_TO_RULESET_IDS));
+    const hasLegacy = Object.keys(LEGACY_GROUP_MAP).some((k) => k in old) ||
+      Object.keys(old).some((k) => !sourceKeys.has(k));
     if (!hasLegacy) { if (callback) callback(); return; }
-    const next = { ...old };
+    const next = {};
+    // 기존 소스 키는 유지
+    for (const key of Object.keys(old)) if (sourceKeys.has(key)) next[key] = old[key];
     for (const [legacyKey, newKeys] of Object.entries(LEGACY_GROUP_MAP)) {
       if (!(legacyKey in old)) continue;
       const value = old[legacyKey];
       for (const key of newKeys) if (!(key in next)) next[key] = value;
-      delete next[legacyKey];
-    }
-    // 규칙셋 ID로 저장된 이전 값도 제거
-    const rulesetIdSet = new Set(STATIC_RULESET_IDS);
-    for (const key of Object.keys(next)) {
-      if (rulesetIdSet.has(key)) delete next[key];
     }
     chrome.storage.local.set({ filterStates: next }, () => {
       console.log("[필터 마이그레이션] 완료:", Object.keys(next).join(", "));
@@ -360,10 +390,14 @@ function migrateFilterStates(callback) {
 // 규칙셋별 규칙 수 (빌드 메타데이터) — 정적 규칙 한도 계산에 사용
 const RULESET_SIZES = (self.BuildMeta && self.BuildMeta.rulesets) || {};
 
-// 한도가 부족할 때 우선 유지할 그룹 순서 (작고 실용적인 필터부터)
-const PRIORITY_GROUPS = [
-  "korean", "anti_cv", "social", "annoyances", "uassets", "peterlowe", "mining",
-  "easylist", "adguard", "malware",
+// 한도가 부족할 때 우선 유지할 소스 순서 (구체적·실용적인 필터부터)
+const PRIORITY_SOURCES = [
+  "noridev", "turtlecute", "d3host", "list-kr", "filterslists-ko", "extra-hosts",
+  "anti-cv-en", "anti-cv-zh", "anti-cv-cs", "anti-cv-fr", "anti-cv-de", "anti-cv-pl",
+  "anti-cv-ru", "anti-cv-es", "fanboy-social", "url-tracking", "uassets-privacy",
+  "fanboy-annoyance", "nocoin", "uassets-filters", "uassets-general", "uassets-2024",
+  "uassets-2025", "uassets-2026", "peter-lowe", "easylist", "easyprivacy", "ultimate",
+  "uassets-badware", "uassets-resource-abuse", "urlhaus",
 ];
 
 function dnrCall(name, ...args) {
@@ -407,11 +441,11 @@ async function doApplyStaticRulesets(states, masterOn) {
       return;
     }
 
-    // 켜진 그룹의 규칙셋을 우선순위 순으로 수집
+    // 켜진 소스의 규칙셋을 우선순위 순으로 수집
     const expanded = expandFilterStates(states);
     const desired = [];
-    for (const group of PRIORITY_GROUPS) {
-      for (const rid of FILTER_TO_RULESET_IDS[group] || []) {
+    for (const source of PRIORITY_SOURCES) {
+      for (const rid of FILTER_TO_RULESET_IDS[source] || []) {
         if (expanded[rid]) desired.push(rid);
       }
     }

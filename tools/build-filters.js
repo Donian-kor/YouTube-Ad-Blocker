@@ -1,13 +1,13 @@
 // 필터 소스 -> Chrome declarativeNetRequest 정적 규칙셋 빌더
 // 소스 정의는 shared/filter-registry.js 단일 진실 공급원을 사용한다.
+// 전체 빌드는 소스별로 규칙셋을 만들어 소스마다 개별 토글할 수 있게 한다.
 //
 // 사용법:
-//   node tools/build-filters.js                     기본(EasyList/EasyPrivacy, 레거시)
-//   node tools/build-filters.js --all               전체 그룹 빌드
-//   node tools/build-filters.js --group=korean      특정 그룹만 빌드
-//   node tools/build-filters.js --all --offline     다운로드 없이 tools/tmp 캐시 사용
-//   node tools/build-filters.js --korean            레거시: 한국 그룹만
-//   node tools/build-filters.js --adblockultimate   레거시: intl_ads+korean+anti_cv
+//   node tools/build-filters.js --all               전체 소스 빌드 (권장)
+//   node tools/build-filters.js --all --offline     캐시 사용
+//   node tools/build-filters.js --source=noridev    특정 소스만
+//   node tools/build-filters.js --group=korean      레거시: 그룹 단위
+//   node tools/build-filters.js                     레거시: EasyList/EasyPrivacy
 const fs = require("fs");
 const path = require("path");
 
@@ -17,7 +17,7 @@ const TMP_DIR = path.join(__dirname, "tmp");
 const { normalizeBadfilter, convertLine } = require("../shared/filter-converter.js");
 const REG = require("../shared/filter-registry.js");
 
-// 레지스트리 -> 그룹 정의 (소스 id, 위치)
+// 레지스트리 -> 그룹 정의 (레거시 그룹 빌드용)
 const GROUPS = {};
 for (const group of REG.FILTER_GROUPS) {
   GROUPS[group.id] = {
@@ -25,47 +25,58 @@ for (const group of REG.FILTER_GROUPS) {
     sources: REG.getGroupSources(group.id).map((s) => [s.id, s.file ? "file:" + s.file : s.url]),
   };
 }
-
 const LISTS = REG.getGroupSources("easylist").map((s) => [s.id, s.url]);
 
-// 그룹 간 중복 제거 시 규칙의 소유 그룹 결정 순서 (구체적인 그룹이 먼저 소유)
-// 예: 한국 규칙이 EasyList에도 있어도 'korean' 그룹에 귀속되어 한국 토글로 제어된다.
-const DEDUPE_ORDER = [
-  "korean", "anti_cv", "annoyances", "social", "mining", "malware",
-  "uassets", "peterlowe", "easylist", "adguard",
+// 소스 간 중복 제거 시 규칙의 소유 소스 결정 순서 (구체적인 소스가 먼저 소유)
+// 예: 한국 소스 규칙이 EasyList에도 있어도 한국 소스에 귀속되어 한국 소스 토글로 제어된다.
+const SOURCE_ORDER = [
+  // 한국
+  "noridev", "turtlecute", "d3host", "list-kr", "filterslists-ko", "extra-hosts",
+  // 안티서클
+  "anti-cv-en", "anti-cv-zh", "anti-cv-cs", "anti-cv-fr", "anti-cv-de", "anti-cv-pl",
+  "anti-cv-pt", "anti-cv-ru", "anti-cv-es", "anti-cv-tr", "anti-cv-vi",
+  // 개인정보 / 성가신 요소 (Social이 Annoyance와 겹치므로 먼저 소유)
+  "fanboy-social", "url-tracking", "uassets-privacy", "fanboy-annoyance",
+  // 보안
+  "nocoin", "urlhaus", "uassets-badware", "uassets-resource-abuse",
+  // 국제 광고
+  "uassets-filters", "uassets-general", "uassets-2024", "uassets-2025", "uassets-2026",
+  "peter-lowe", "easylist", "easyprivacy", "ultimate",
 ];
+// 누락된 소스가 있어도 빠짐없이 빌드되도록 나머지를 뒤에 추가
+for (const s of REG.FILTER_REGISTRY) if (!SOURCE_ORDER.includes(s.id)) SOURCE_ORDER.push(s.id);
 
 // === 명령행 인자 처리 ===
 const args = process.argv.slice(2);
 const ALL_MODE = args.includes("--all");
 const OFFLINE = args.includes("--offline");
+const SOURCE_MODE = args.find((a) => a.startsWith("--source="));
 const GROUP_MODE = args.find((a) => a.startsWith("--group="));
 const KOREAN_ONLY = args.includes("--korean");
 const ADULT_ONLY = args.includes("--adblockultimate");
 
+let selectedSources = null;
 let selectedGroups = null;
+if (SOURCE_MODE) {
+  const id = SOURCE_MODE.replace("--source=", "");
+  if (!REG.FILTER_REGISTRY.some((s) => s.id === id)) {
+    console.error("알 수 없는 소스: " + id);
+    process.exit(1);
+  }
+  selectedSources = [id];
+}
 if (GROUP_MODE) {
   const groupKey = GROUP_MODE.replace("--group=", "");
   if (GROUPS[groupKey]) selectedGroups = [groupKey];
-  else {
-    console.error("알 수 없는 그룹: " + groupKey);
-    console.error("사용 가능한 그룹: " + Object.keys(GROUPS).join(", "));
-    process.exit(1);
-  }
+  else { console.error("알 수 없는 그룹: " + groupKey); process.exit(1); }
 }
 if (KOREAN_ONLY) selectedGroups = ["korean"];
 if (ADULT_ONLY) selectedGroups = ["intl_ads", "korean", "anti_cv"].filter((g) => GROUPS[g]);
-
-// 레거시 그룹명 매핑 (기존 스크립트 호환)
 const LEGACY_ALIAS = {
   ads: ["easylist", "adguard", "peterlowe", "uassets"],
-  privacy: ["social"],
-  anti_circumvention: ["anti_cv"],
-  security: ["malware", "mining"],
+  privacy: ["social"], anti_circumvention: ["anti_cv"], security: ["malware", "mining"],
 };
-if (selectedGroups) {
-  selectedGroups = selectedGroups.flatMap((g) => LEGACY_ALIAS[g] || [g]);
-}
+if (selectedGroups) selectedGroups = selectedGroups.flatMap((g) => LEGACY_ALIAS[g] || [g]);
 
 function sourcePath(name, url) {
   if (url.startsWith("file:")) return path.resolve(ROOT, url.slice(5));
@@ -85,8 +96,7 @@ async function downloadList(name, url) {
   return text;
 }
 
-// 줄 -> DNR 규칙 변환 (공통 로직)
-// seen: 그룹 내부 + 그룹 간 중복을 함께 걸러내는 전역 집합 (전달 시 누적됨)
+// 줄 -> DNR 규칙 변환 (seen: 전역 중복 제거 집합)
 function convertLines(allLines, seen) {
   const dedupeSet = seen || new Set();
   const cancelled = new Set();
@@ -111,70 +121,83 @@ function convertLines(allLines, seen) {
   return { rules, skipped };
 }
 
-const builtCounts = {};
+const builtCounts = {};      // 소스 ID -> 규칙 수
+const CHUNK = 30000;
 
-async function buildGroup(groupKey, globalSeen) {
-  const group = GROUPS[groupKey];
-  if (!group) return 0;
-
-  let allLines = [];
-  for (const [name, url] of group.sources) {
-    try {
-      const text = await downloadList(name, url);
-      const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
-      allLines = allLines.concat(lines);
-      console.log("  " + name + ": " + lines.length + "줄" + (OFFLINE ? " (캐시)" : ""));
-    } catch (e) {
-      console.error("  " + name + " 실패: " + e.message);
-    }
-  }
-  if (allLines.length === 0) {
-    console.error("변환할 라인이 없습니다");
-    return 0;
-  }
-
-  const { rules, skipped } = convertLines(allLines, globalSeen);
-  const allowCount = rules.filter((r) => r.action.type === "allow").length;
-  console.log("  변환 규칙: " + rules.length + "개 (allow " + allowCount + ", block " + (rules.length - allowCount) + ")");
-  console.log("  제외된 줄: " + skipped);
-
-  // DNR 30,000개 한도 준수하여 그룹별로 분할 저장
-  const CHUNK = 30000;
+function saveRules(rules, prefix) {
   let fileIndex = 0;
   for (let i = 0; i < rules.length; i += CHUNK) {
     fileIndex++;
     const chunk = rules.slice(i, i + CHUNK).map((r, j) => Object.assign({}, r, { id: i + j + 1 }));
-    const file = path.join(OUT_DIR, "ruleset_" + groupKey + (fileIndex > 1 ? "_" + fileIndex : "") + ".json");
+    const file = path.join(OUT_DIR, "ruleset_" + prefix + (fileIndex > 1 ? "_" + fileIndex : "") + ".json");
     fs.writeFileSync(file, JSON.stringify(chunk));
     console.log("  filters/" + path.basename(file) + ": " + chunk.length + "개");
   }
-  if (rules.length === 0) console.error("  변환된 규칙이 없습니다");
+}
+
+// 소스 하나를 규칙셋으로 빌드
+async function buildSource(sourceId, globalSeen) {
+  const source = REG.FILTER_REGISTRY.find((s) => s.id === sourceId);
+  if (!source) return 0;
+  let text;
+  try {
+    text = await downloadList(source.id, source.file ? "file:" + source.file : source.url);
+  } catch (e) {
+    console.error("  " + source.name + " 실패: " + e.message);
+    return 0;
+  }
+  const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  console.log("  " + source.name + ": " + lines.length + "줄" + (OFFLINE ? " (캐시)" : ""));
+  const { rules } = convertLines(lines, globalSeen);
+  saveRules(rules, source.id);
+  builtCounts[source.id] = rules.length;
+  return rules.length;
+}
+
+// 레거시: 그룹 단위 빌드
+async function buildGroup(groupKey, globalSeen) {
+  const group = GROUPS[groupKey];
+  if (!group) return 0;
+  let allLines = [];
+  for (const [name, url] of group.sources) {
+    try {
+      const text = await downloadList(name, url);
+      allLines = allLines.concat(text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean));
+      console.log("  " + name + ": 다운로드 완료");
+    } catch (e) { console.error("  " + name + " 실패: " + e.message); }
+  }
+  if (!allLines.length) return 0;
+  const { rules } = convertLines(allLines, globalSeen);
+  saveRules(rules, groupKey);
   builtCounts[groupKey] = rules.length;
   return rules.length;
 }
 
-// 빌드 결과를 옵션 UI가 참조하는 메타데이터로 기록
-function writeBuildMeta() {
+// 빌드 결과 메타데이터 기록
+function writeBuildMeta(options) {
   const metaPath = path.join(ROOT, "shared", "build-meta.js");
-  // 부분 빌드 시 기존 메타데이터를 유지하고 이번 그룹만 덮어씀
-  if (fs.existsSync(metaPath)) {
+  // 전체 빌드는 이전 메타를 병합하지 않는다 (오래된 그룹/소스 키가 섞여 총합이 왜곡됨)
+  if (!(options && options.fresh) && fs.existsSync(metaPath)) {
     try {
       const prev = require(metaPath);
-      for (const [k, v] of Object.entries(prev.groups || {})) {
+      for (const [k, v] of Object.entries(prev.sources || {})) {
         if (!(k in builtCounts)) builtCounts[k] = v;
       }
-    } catch (e) { /* 기존 메타 파싱 실패 시 무시 */ }
+    } catch (e) { /* 무시 */ }
   }
-  // 규칙셋별 크기 수집 (런타임 정적 규칙 한도 계산에 사용)
+  // 그룹별 합계는 소스 소유 관계로 계산
+  const groupCounts = {};
+  for (const src of REG.FILTER_REGISTRY) {
+    groupCounts[src.group] = (groupCounts[src.group] || 0) + (builtCounts[src.id] || 0);
+  }
   const rulesetSizes = {};
   for (const f of fs.readdirSync(OUT_DIR)) {
     const m = f.match(/^ruleset_(.+?)(?:_(\d+))?\.json$/);
     if (!m) continue;
-    // manifest rule_resources ID와 동일한 키 사용 (첫 파일은 _1)
     const id = m[2] ? m[1] + "_" + m[2] : m[1] + "_1";
     try {
       rulesetSizes[id] = JSON.parse(fs.readFileSync(path.join(OUT_DIR, f), "utf8")).length;
-    } catch (e) { /* 손상된 파일은 무시 */ }
+    } catch (e) { /* 무시 */ }
   }
   const body = [
     "// shared/build-meta.js - 빌드 시 자동 생성 (직접 수정하지 마세요)",
@@ -183,15 +206,14 @@ function writeBuildMeta() {
     "  if (typeof module !== 'undefined' && module.exports) module.exports = api;",
     "  else root.BuildMeta = api;",
     "})(typeof self !== 'undefined' ? self : this, function () {",
-    "  return " + JSON.stringify({ groups: builtCounts, rulesets: rulesetSizes }, null, 2) + ";",
+    "  return " + JSON.stringify({ groups: groupCounts, sources: builtCounts, rulesets: rulesetSizes }, null, 2) + ";",
     "});",
     "",
   ].join("\n");
   fs.writeFileSync(metaPath, body);
-  console.log("shared/build-meta.js 갱신:", Object.keys(builtCounts).join(", "));
+  console.log("shared/build-meta.js 갱신 (소스 " + Object.keys(builtCounts).length + "개)");
 }
 
-// 전체 빌드 후 정적 필터 인덱스(동적 업데이트 중복 제거용) 재생성
 function writeStaticIndex() {
   const urlFilters = new Set();
   for (const f of fs.readdirSync(OUT_DIR)) {
@@ -204,15 +226,14 @@ function writeStaticIndex() {
   console.log("static-index.json 갱신:", urlFilters.size, "개");
 }
 
-// 전체 빌드 후 manifest rule_resources 재생성 (한도 초과 방지를 위해 모두 비활성화)
 function writeManifestResources() {
   const resources = [];
-  for (const group of DEDUPE_ORDER) {
+  for (const sourceId of SOURCE_ORDER) {
     let i = 1;
     while (true) {
-      const name = `ruleset_${group}${i > 1 ? "_" + i : ""}.json`;
+      const name = `ruleset_${sourceId}${i > 1 ? "_" + i : ""}.json`;
       if (!fs.existsSync(path.join(OUT_DIR, name))) break;
-      resources.push({ id: `${group}_${i}`, enabled: false, path: `filters/${name}` });
+      resources.push({ id: `${sourceId}_${i}`, enabled: false, path: `filters/${name}` });
       i++;
     }
   }
@@ -227,54 +248,43 @@ async function main() {
   fs.mkdirSync(TMP_DIR, { recursive: true });
   fs.mkdirSync(OUT_DIR, { recursive: true });
 
-  if (selectedGroups) {
-    console.log("=== 그룹별 필터 생성 ===" + (OFFLINE ? " (오프라인 캐시)" : ""));
-    for (const groupKey of selectedGroups) {
-      console.log("\n[" + (GROUPS[groupKey]?.name || groupKey) + "]");
-      await buildGroup(groupKey);
-    }
-    writeBuildMeta();
-  } else if (ALL_MODE) {
-    console.log("=== 전체 필터 생성 (그룹 간 중복 제거) ===" + (OFFLINE ? " (오프라인 캐시)" : ""));
-    // 이전 빌드의 규칙셋 파일 제거 (그룹 소유 변경으로 파일 구성이 달라짐)
+  if (ALL_MODE) {
+    console.log("=== 전체 소스 빌드 (소스별 규칙셋 + 전역 중복 제거) ===" + (OFFLINE ? " (오프라인 캐시)" : ""));
     for (const f of fs.readdirSync(OUT_DIR)) {
       if (/^ruleset_.+\.json$/.test(f)) fs.unlinkSync(path.join(OUT_DIR, f));
     }
     const globalSeen = new Set();
-    for (const groupKey of DEDUPE_ORDER) {
-      console.log("\n[" + (GROUPS[groupKey]?.name || groupKey) + "]");
-      await buildGroup(groupKey, globalSeen);
-    }
+    for (const sourceId of SOURCE_ORDER) await buildSource(sourceId, globalSeen);
     console.log("\n전역 고유 규칙:", globalSeen.size, "개");
-    writeBuildMeta();
+    writeBuildMeta({ fresh: true });
     writeStaticIndex();
     writeManifestResources();
+  } else if (selectedSources) {
+    console.log("=== 소스별 필터 생성 ===");
+    for (const id of selectedSources) await buildSource(id);
+    writeBuildMeta();
+  } else if (selectedGroups) {
+    console.log("=== 그룹별 필터 생성 (레거시) ===");
+    for (const g of selectedGroups) await buildGroup(g);
+    writeBuildMeta();
   } else {
-    // 기본: EasyList/EasyPrivacy (레거시ruleset_1.json)
+    // 레거시 기본: EasyList/EasyPrivacy
     console.log("=== 기본 필터 생성 (EasyList/EasyPrivacy) ===");
     let allLines = [];
     for (const [name, url] of LISTS) {
       const text = await downloadList(name, url);
       allLines = allLines.concat(text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean));
-      console.log(name + ": 완료");
     }
-    const { rules, skipped } = convertLines(allLines);
-    console.log("변환 규칙: " + rules.length + "개 / 제외: " + skipped);
-    const CHUNK = 25000;
+    const { rules } = convertLines(allLines);
+    const CHUNK_LEGACY = 25000;
     let fileIndex = 0;
-    for (let i = 0; i < rules.length; i += CHUNK) {
+    for (let i = 0; i < rules.length; i += CHUNK_LEGACY) {
       fileIndex++;
-      const chunk = rules.slice(i, i + CHUNK).map((r, j) => Object.assign({}, r, { id: i + j + 1 }));
-      const file = path.join(OUT_DIR, "ruleset_" + fileIndex + ".json");
-      fs.writeFileSync(file, JSON.stringify(chunk));
-      const mb = (fs.statSync(file).size / 1024 / 1024).toFixed(2);
-      console.log("filters/" + path.basename(file) + ": " + chunk.length + "개 (" + mb + "MB)");
+      const chunk = rules.slice(i, i + CHUNK_LEGACY).map((r, j) => Object.assign({}, r, { id: i + j + 1 }));
+      fs.writeFileSync(path.join(OUT_DIR, "ruleset_" + fileIndex + ".json"), JSON.stringify(chunk));
     }
-    if (rules.length === 0) throw new Error("변환된 규칙이 없습니다");
+    if (!rules.length) throw new Error("변환된 규칙이 없습니다");
   }
 }
 
-main().catch((e) => {
-  console.error("실패:", e.message);
-  process.exit(1);
-});
+main().catch((e) => { console.error("실패:", e.message); process.exit(1); });

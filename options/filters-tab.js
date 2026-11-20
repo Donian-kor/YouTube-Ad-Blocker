@@ -1,8 +1,8 @@
-// options/filters-tab.js - 2단 필터 토글(카테고리 + 소스 그룹), 업데이트, 이력
-import { FILTER_LIST, GROUP_LIST, LOCKED_SOURCE_GROUPS } from "./config.js";
+// options/filters-tab.js - 2단 필터 토글(카테고리 + 개별 소스), 업데이트, 이력
+import { FILTER_LIST, SOURCE_LIST, LOCKED_SOURCES } from "./config.js";
 
-function groupsOf(categoryId) {
-  return GROUP_LIST.filter((g) => g.category === categoryId);
+function sourcesOf(categoryId) {
+  return SOURCE_LIST.filter((s) => s.category === categoryId);
 }
 
 function makeToggle(id, locked) {
@@ -33,23 +33,19 @@ function renderFilterList() {
 
     const nameRow = document.createElement("div");
     nameRow.className = "filter-name-row";
-
     const icon = document.createElement("span");
     icon.className = "filter-icon";
     icon.textContent = category.icon;
     nameRow.appendChild(icon);
-
     const name = document.createElement("span");
     name.className = "filter-name";
     name.textContent = category.name;
     nameRow.appendChild(name);
-
     const badge = document.createElement("span");
     badge.className = "filter-badge count" + (category.locked ? " lock" : "");
     badge.textContent = "규칙 " + (category.filterCount || 0).toLocaleString() + "개";
     nameRow.appendChild(badge);
 
-    // 펼치기 버튼
     const expand = document.createElement("button");
     expand.className = "expand-btn";
     expand.type = "button";
@@ -57,7 +53,7 @@ function renderFilterList() {
     expand.textContent = "▼";
     expand.title = "소스별 필터 보기";
     expand.addEventListener("click", () => {
-      const panel = document.getElementById("subgroups-" + category.id);
+      const panel = document.getElementById("sources-" + category.id);
       if (!panel) return;
       const opening = !panel.classList.contains("open");
       panel.classList.toggle("open", opening);
@@ -69,33 +65,38 @@ function renderFilterList() {
     desc.className = "filter-desc";
     desc.textContent = category.description;
 
-    // 소스 그룹 하위 목록
+    // 소스별 목록 (그룹 이름을 함께 표시)
     const subPanel = document.createElement("div");
     subPanel.className = "subgroups";
-    subPanel.id = "subgroups-" + category.id;
-    groupsOf(category.id).forEach((group) => {
+    subPanel.id = "sources-" + category.id;
+    sourcesOf(category.id).forEach((source) => {
       const row = document.createElement("label");
       row.className = "subgroup-row";
-      row.htmlFor = "group-" + group.id;
+      row.htmlFor = "source-" + source.id;
 
       const cb = document.createElement("input");
       cb.type = "checkbox";
-      cb.id = "group-" + group.id;
-      cb.dataset.group = group.id;
+      cb.id = "source-" + source.id;
+      cb.dataset.source = source.id;
       cb.dataset.category = category.id;
-      if (group.locked) cb.disabled = true;
+      if (source.locked) cb.disabled = true;
       cb.addEventListener("change", saveFilterStates);
 
       const label = document.createElement("span");
       label.className = "subgroup-name";
-      label.textContent = group.name;
+      label.textContent = source.name;
+
+      const groupTag = document.createElement("span");
+      groupTag.className = "subgroup-group";
+      groupTag.textContent = source.group;
 
       const count = document.createElement("span");
       count.className = "subgroup-count";
-      count.textContent = (group.filterCount || 0).toLocaleString();
+      count.textContent = (source.filterCount || 0).toLocaleString();
 
       row.appendChild(cb);
       row.appendChild(label);
+      row.appendChild(groupTag);
       row.appendChild(count);
       subPanel.appendChild(row);
     });
@@ -108,8 +109,8 @@ function renderFilterList() {
     input.dataset.category = category.id;
     input.addEventListener("change", () => {
       const checked = input.checked;
-      groupsOf(category.id).forEach((g) => {
-        const cb = document.getElementById("group-" + g.id);
+      sourcesOf(category.id).forEach((s) => {
+        const cb = document.getElementById("source-" + s.id);
         if (cb && !cb.disabled) cb.checked = checked;
       });
       saveFilterStates();
@@ -126,23 +127,23 @@ function loadFilterStates() {
     const states = result.filterStates || {};
     const masterOn = result.adBlockerEnabled !== false;
 
-    GROUP_LIST.forEach((group) => {
-      const cb = document.getElementById("group-" + group.id);
+    SOURCE_LIST.forEach((source) => {
+      const cb = document.getElementById("source-" + source.id);
       if (!cb) return;
-      const effective = group.locked ? true : (states[group.id] !== undefined ? states[group.id] : true);
+      const effective = source.locked ? true : (states[source.id] !== undefined ? states[source.id] : true);
       cb.checked = masterOn && effective;
-      cb.disabled = group.locked || !masterOn;
+      cb.disabled = source.locked || !masterOn;
     });
 
     FILTER_LIST.forEach((category) => {
       const input = document.getElementById("filter-" + category.id);
       if (!input) return;
-      const groupBoxes = groupsOf(category.id)
-        .map((g) => document.getElementById("group-" + g.id))
+      const boxes = sourcesOf(category.id)
+        .map((s) => document.getElementById("source-" + s.id))
         .filter(Boolean);
-      const onCount = groupBoxes.filter((cb) => cb.checked).length;
-      input.checked = groupBoxes.length > 0 && onCount === groupBoxes.length;
-      input.indeterminate = onCount > 0 && onCount < groupBoxes.length;
+      const onCount = boxes.filter((cb) => cb.checked).length;
+      input.checked = boxes.length > 0 && onCount === boxes.length;
+      input.indeterminate = onCount > 0 && onCount < boxes.length;
       input.disabled = category.locked || !masterOn;
       const card = document.getElementById("filter-card-" + category.id);
       if (card) card.classList.toggle("master-off", !masterOn);
@@ -152,20 +153,19 @@ function loadFilterStates() {
 
 function saveFilterStates() {
   const states = {};
-  GROUP_LIST.forEach((group) => {
-    if (LOCKED_SOURCE_GROUPS.has(group.id)) {
-      states[group.id] = true;
+  SOURCE_LIST.forEach((source) => {
+    if (LOCKED_SOURCES.has(source.id)) {
+      states[source.id] = true;
       return;
     }
-    const cb = document.getElementById("group-" + group.id);
-    if (cb) states[group.id] = cb.checked;
+    const cb = document.getElementById("source-" + source.id);
+    if (cb) states[source.id] = cb.checked;
   });
   chrome.storage.local.set({ filterStates: states }, () => {
     chrome.runtime.sendMessage({ type: "applyFilterStates", states }, () => {
       void chrome.runtime.lastError;
     });
   });
-  // 카테고리 체크박스 상태도 즉시 갱신
   loadFilterStates();
 }
 
@@ -180,18 +180,18 @@ export function initFiltersTab() {
   loadFilterStates();
 
   document.getElementById("filterAllOnBtn").addEventListener("click", () => {
-    GROUP_LIST.forEach((group) => {
-      const cb = document.getElementById("group-" + group.id);
+    SOURCE_LIST.forEach((source) => {
+      const cb = document.getElementById("source-" + source.id);
       if (cb && !cb.disabled) cb.checked = true;
     });
     saveFilterStates();
   });
 
   document.getElementById("filterAllOffBtn").addEventListener("click", () => {
-    if (confirm("잠금 필터(국제 광고·보안)를 제외한 필터를 비활성화하시겠습니까?")) {
-      GROUP_LIST.forEach((group) => {
-        if (LOCKED_SOURCE_GROUPS.has(group.id)) return;
-        const cb = document.getElementById("group-" + group.id);
+    if (confirm("잠금 필터(국제 광고·보안)를 제외한 소스를 모두 비활성화하시겠습니까?")) {
+      SOURCE_LIST.forEach((source) => {
+        if (LOCKED_SOURCES.has(source.id)) return;
+        const cb = document.getElementById("source-" + source.id);
         if (cb) cb.checked = false;
       });
       saveFilterStates();
@@ -221,7 +221,6 @@ export function initFiltersTab() {
 
   initUpdateHistory();
 
-  // 팝업에서 전체 ON/OFF를 바꾸면 설정 페이지도 즉시 반영
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area === "local" && (changes.adBlockerEnabled || changes.filterStates)) {
       loadFilterStates();
@@ -229,21 +228,19 @@ export function initFiltersTab() {
   });
 }
 
-// === 업데이트 내역 (접기/펼치기) ===
+// === 업데이트 내역 ===
 let currentHistory = [];
 
 function initUpdateHistory() {
   const toggleBtn = document.getElementById("historyToggleBtn");
   const panel = document.getElementById("historyPanel");
   if (!toggleBtn || !panel) return;
-
   toggleBtn.addEventListener("click", () => {
     const opening = !panel.classList.contains("open");
     panel.classList.toggle("open", opening);
     toggleBtn.textContent = opening ? "업데이트 내역 숨기기 ▲" : "업데이트 내역 보기 ▼";
     if (opening) loadUpdateHistory();
   });
-
   loadUpdateHistory();
 }
 
@@ -259,7 +256,6 @@ function renderUpdateHistory(history) {
   const panel = document.getElementById("historyPanel");
   if (!panel) return;
   panel.textContent = "";
-
   if (!history || history.length === 0) {
     const empty = document.createElement("div");
     empty.className = "history-empty";
@@ -267,21 +263,17 @@ function renderUpdateHistory(history) {
     panel.appendChild(empty);
     return;
   }
-
   history.forEach((entry) => {
     if (!entry || !entry.at) return;
     const row = document.createElement("div");
     row.className = "history-row";
-
     const date = document.createElement("span");
     date.className = "history-date";
     date.textContent = new Date(entry.at).toLocaleString("ko-KR", { hour12: false });
-
     const detail = document.createElement("span");
     detail.className = "history-detail";
     detail.textContent = "신규 " + (entry.added || 0).toLocaleString() + "개" +
       (entry.duplicates ? " (중복 " + entry.duplicates.toLocaleString() + "개 제외)" : "");
-
     row.appendChild(date);
     row.appendChild(detail);
     panel.appendChild(row);

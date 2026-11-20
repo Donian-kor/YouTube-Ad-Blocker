@@ -46,64 +46,164 @@
   "declarative_net_request": {
     "rule_resources": [
       {
-        "id": "korean_1",
+        "id": "noridev_1",
         "enabled": false,
-        "path": "filters/ruleset_korean.json"
+        "path": "filters/ruleset_noridev.json"
       },
       {
-        "id": "anti_cv_1",
+        "id": "turtlecute_1",
         "enabled": false,
-        "path": "filters/ruleset_anti_cv.json"
+        "path": "filters/ruleset_turtlecute.json"
       },
       {
-        "id": "annoyances_1",
+        "id": "d3host_1",
         "enabled": false,
-        "path": "filters/ruleset_annoyances.json"
+        "path": "filters/ruleset_d3host.json"
       },
       {
-        "id": "social_1",
+        "id": "list-kr_1",
         "enabled": false,
-        "path": "filters/ruleset_social.json"
+        "path": "filters/ruleset_list-kr.json"
       },
       {
-        "id": "mining_1",
+        "id": "filterslists-ko_1",
         "enabled": false,
-        "path": "filters/ruleset_mining.json"
+        "path": "filters/ruleset_filterslists-ko.json"
       },
       {
-        "id": "malware_1",
+        "id": "extra-hosts_1",
         "enabled": false,
-        "path": "filters/ruleset_malware.json"
+        "path": "filters/ruleset_extra-hosts.json"
       },
       {
-        "id": "malware_2",
+        "id": "anti-cv-en_1",
         "enabled": false,
-        "path": "filters/ruleset_malware_2.json"
+        "path": "filters/ruleset_anti-cv-en.json"
       },
       {
-        "id": "malware_3",
+        "id": "anti-cv-zh_1",
         "enabled": false,
-        "path": "filters/ruleset_malware_3.json"
+        "path": "filters/ruleset_anti-cv-zh.json"
       },
       {
-        "id": "malware_4",
+        "id": "anti-cv-cs_1",
         "enabled": false,
-        "path": "filters/ruleset_malware_4.json"
+        "path": "filters/ruleset_anti-cv-cs.json"
       },
       {
-        "id": "malware_5",
+        "id": "anti-cv-fr_1",
         "enabled": false,
-        "path": "filters/ruleset_malware_5.json"
+        "path": "filters/ruleset_anti-cv-fr.json"
       },
       {
-        "id": "uassets_1",
+        "id": "anti-cv-de_1",
         "enabled": false,
-        "path": "filters/ruleset_uassets.json"
+        "path": "filters/ruleset_anti-cv-de.json"
       },
       {
-        "id": "peterlowe_1",
+        "id": "anti-cv-pl_1",
         "enabled": false,
-        "path": "filters/ruleset_peterlowe.json"
+        "path": "filters/ruleset_anti-cv-pl.json"
+      },
+      {
+        "id": "anti-cv-ru_1",
+        "enabled": false,
+        "path": "filters/ruleset_anti-cv-ru.json"
+      },
+      {
+        "id": "anti-cv-es_1",
+        "enabled": false,
+        "path": "filters/ruleset_anti-cv-es.json"
+      },
+      {
+        "id": "fanboy-social_1",
+        "enabled": false,
+        "path": "filters/ruleset_fanboy-social.json"
+      },
+      {
+        "id": "url-tracking_1",
+        "enabled": false,
+        "path": "filters/ruleset_url-tracking.json"
+      },
+      {
+        "id": "uassets-privacy_1",
+        "enabled": false,
+        "path": "filters/ruleset_uassets-privacy.json"
+      },
+      {
+        "id": "fanboy-annoyance_1",
+        "enabled": false,
+        "path": "filters/ruleset_fanboy-annoyance.json"
+      },
+      {
+        "id": "nocoin_1",
+        "enabled": false,
+        "path": "filters/ruleset_nocoin.json"
+      },
+      {
+        "id": "urlhaus_1",
+        "enabled": false,
+        "path": "filters/ruleset_urlhaus.json"
+      },
+      {
+        "id": "urlhaus_2",
+        "enabled": false,
+        "path": "filters/ruleset_urlhaus_2.json"
+      },
+      {
+        "id": "urlhaus_3",
+        "enabled": false,
+        "path": "filters/ruleset_urlhaus_3.json"
+      },
+      {
+        "id": "urlhaus_4",
+        "enabled": false,
+        "path": "filters/ruleset_urlhaus_4.json"
+      },
+      {
+        "id": "urlhaus_5",
+        "enabled": false,
+        "path": "filters/ruleset_urlhaus_5.json"
+      },
+      {
+        "id": "uassets-badware_1",
+        "enabled": false,
+        "path": "filters/ruleset_uassets-badware.json"
+      },
+      {
+        "id": "uassets-resource-abuse_1",
+        "enabled": false,
+        "path": "filters/ruleset_uassets-resource-abuse.json"
+      },
+      {
+        "id": "uassets-filters_1",
+        "enabled": false,
+        "path": "filters/ruleset_uassets-filters.json"
+      },
+      {
+        "id": "uassets-general_1",
+        "enabled": false,
+        "path": "filters/ruleset_uassets-general.json"
+      },
+      {
+        "id": "uassets-2024_1",
+        "enabled": false,
+        "path": "filters/ruleset_uassets-2024.json"
+      },
+      {
+        "id": "uassets-2025_1",
+        "enabled": false,
+        "path": "filters/ruleset_uassets-2025.json"
+      },
+      {
+        "id": "uassets-2026_1",
+        "enabled": false,
+        "path": "filters/ruleset_uassets-2026.json"
+      },
+      {
+        "id": "peter-lowe_1",
+        "enabled": false,
+        "path": "filters/ruleset_peter-lowe.json"
       },
       {
         "id": "easylist_1",
@@ -116,19 +216,19 @@
         "path": "filters/ruleset_easylist_2.json"
       },
       {
-        "id": "easylist_3",
+        "id": "easyprivacy_1",
         "enabled": false,
-        "path": "filters/ruleset_easylist_3.json"
+        "path": "filters/ruleset_easyprivacy.json"
       },
       {
-        "id": "easylist_4",
+        "id": "easyprivacy_2",
         "enabled": false,
-        "path": "filters/ruleset_easylist_4.json"
+        "path": "filters/ruleset_easyprivacy_2.json"
       },
       {
-        "id": "adguard_1",
+        "id": "ultimate_1",
         "enabled": false,
-        "path": "filters/ruleset_adguard.json"
+        "path": "filters/ruleset_ultimate.json"
       }
     ]
   },

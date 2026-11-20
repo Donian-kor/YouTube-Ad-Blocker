@@ -268,3 +268,29 @@ korean → anti_cv → annoyances → social → mining → malware → uassets 
 
 **결과**: 322,924개 → **271,415개** (17개 규칙셋). `static-index.json`과 `manifest.json`도
 빌드 시 함께 재생성되어 수동 단계가 필요 없습니다. (`node tools/build-filters.js --all --offline`)
+
+### 8.8 소스 단위 토글로 전환 (개별 소스 제어)
+
+**문제**: 소스 그룹(10개) 단위로 규칙셋을 만들어, "한국 필터"나 "개인정보"를 펼쳐도
+하위에 **소스가 1개만** 표시되어 개별 소스(NoriDev, List-KR, Fanboy's Social 등)를 켜고 끌 수 없었습니다.
+
+**수정**:
+
+- `tools/build-filters.js`: `--all` 빌드를 **소스(34개) 단위 규칙셋**으로 변경.
+  전역 중복 제거는 소스 간에도 적용하며, 구체적인 소스가 규칙을 소유한다.
+- `manifest.json`: 37개 규칙셋 (소스별 1개, EasyList·EasyPrivacy·URLhaus는 분할).
+- `background.js`: `FILTER_TO_RULESET_IDS`를 소스 ID 기준으로 재구성.
+  `filterStates`도 소스 키로 저장하며, 이전 6개/10개 그룹 키는 소스 키로 마이그레이션.
+  정적 규칙 한도 계산(`getAvailableStaticRuleCount`)도 소스 단위로 동작.
+- `options/config.js`: `SOURCE_LIST`(34개) 추가, `options/filters-tab.js`: 펼치면 소스별 체크박스 표시.
+- `shared/build-meta.js`: `sources` 맵 추가 (소스별 규칙 수).
+
+**결과 예시**:
+
+| 카테고리 | 펼치면 표시되는 소스 |
+|---|---|
+| 🇰🇷 한국 필터 | NoriDev, Turtlecute, d3Host, List-KR, filterslists-KO, 추가 호스트 (6개) |
+| 🔒 개인정보 | Fanboy's Social, AdGuard URL Tracking, uAssets privacy (3개) |
+
+각 소스 체크박스를 끄면 해당 소스의 정적 규칙셋만 비활성화되고,
+카테고리 토글은 하위 소스 전체를 일괄 제어한다 (부분 선택 시 indeterminate).
