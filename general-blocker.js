@@ -60,11 +60,16 @@
     // - akirabox/buzzheavier: 광고 오버레이/스폰서
     "[class*='advert']", "[class*='sponsored']", ".ad-overlay",
     // chzzk.naver.com 전용 — 치지직 동영상/방송 광고 (플레이어 제외, 광고 마커만)
-    // DNR이 광고 API를 막아도 남는 화면 배너/오버레이를 숨긴다.
+    // 실제 DOM 확인(2026-11-20): webplayer-internal-core-ad-ui = 광고 UI,
+    // pzp-ad-break-indicator = "광고 후 계속됩니다", pzp-pc__midroll-dim = 미드롤 딤
     "[class*='ad-banner']", "[class*='ad-overlay']", "[class*='ad-video']",
     "[class*='advertisement']", "[class*='sponsor-banner']",
     "[data-ad-type]", "[data-ad-slot]", "[data-ad-area]",
-    "[class*='ad_marker']", "[class*='ad-marker']"
+    "[class*='ad_marker']", "[class*='ad-marker']",
+    ".webplayer-internal-core-ad-ui",
+    ".pzp-ad-break-indicator", ".pzp-pc__ad-break-indicator",
+    ".pzp-pc__midroll-dim", ".pzp-midroll-dimmed",
+    "[data-nlog-area='event_popup']"
   ].join(",");
 
   const STYLE_ID = "yab-general-hide-style";

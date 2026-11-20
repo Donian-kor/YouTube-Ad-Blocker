@@ -629,11 +629,14 @@ README "참고 자료"에 나열된 항목 중 **실제 필터 소스로 사용�
 
 **조치**
 - `general-blocker.js`에 치지직 전용 DOM 숨김 선택자 추가:
-  `[data-ad-type]`, `[data-ad-slot]`, `[data-ad-area]`, `[class*='ad-banner']`,
-  `[class*='ad-overlay']`, `[class*='ad-video']`, `[class*='advertisement']`,
-  `[class*='sponsor-banner']`, `[class*='ad_marker']`, `[class*='ad-marker']`
+  - 범용: `[data-ad-type]`, `[data-ad-slot]`, `[data-ad-area]`, `[class*='ad-banner']`, `[class*='ad-overlay']`, `[class*='ad-video']`, `[class*='advertisement']`, `[class*='sponsor-banner']`, `[class*='ad_marker']`, `[class*='ad-marker']`
+  - **실제 페이지 DOM 확인(2026-11-20, 브라우저 도구로 chzzk.naver.com/live 및 /video 페이지 조사) 결과 추가**:
+    - `.webplayer-internal-core-ad-ui` — 치지직 플레이어 광고 UI 전체
+    - `.pzp-ad-break-indicator`, `.pzp-pc__ad-break-indicator` — "광고 후 계속됩니다" 안내
+    - `.pzp-pc__midroll-dim`, `.pzp-midroll-dimmed` — 미드롤 광고 딤 레이어
+    - `[data-nlog-area='event_popup']` — 메인 페이지 이벤트/광고 팝업 ("자세히 보기"/"1일간 보지 않기" 버튼이 있음)
 - 플레이어(`video`, `#movie_player`)는 대상에서 제외 (오차단 방지)
 
 **한계**
-- 실제 치지직 DOM의 광고 클래스명은 사이트를 열어 확인해야 정확히 특정 가능. 현재는 범용 광고 마커 기반이므로, 새 마커가 보이면 선택자 추가 필요.
+- 2026-11-20 실제 페이지를 열어 광고 마커(위 #14.5 참조)를 확인하고 선택자에 반영함. 광고가 새 클래스명으로 바뀌면 추가 확인 필요.
 - 유튜브 같은 응답 후킹(`youtube-main.js`)은 치지직에 없음 → 광고 API가 바뀌면 대응이 어려움.
