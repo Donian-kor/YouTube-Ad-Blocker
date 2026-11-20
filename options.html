@@ -14,9 +14,11 @@
       padding: 12px 0;
       line-height: 1.4;
     }
-    /* 고정 폭 메인 영역: 통계·사이드바·콘텐츠가 모두 이 안에 들어감 */
+    /* 메인 영역: 화면의 60% (최대 900px) — 브라우저 폭 줄면 같이 줄어듦 */
     .main-wrap {
-      width: 900px;
+      width: 60%;
+      max-width: 900px;
+      min-width: 320px;
       margin: 0 auto;
     }
     h2 { font-size: 16px; margin-bottom: 10px; color: #0f172a; }
@@ -67,12 +69,13 @@
     /* 본문: 탭 콘텐츠 (사이드바는 고정 폭 밖 좌측에 fixed) */
     .app-body { display: block; }
 
-    /* 사이드바: 고정 폭(main-wrap) 좌측 여백에 고정 배치 */
+    /* 사이드바: 항상 왼쪽 세로로 길게 (콘텐츠 영역 밖, fixed) */
     .sidebar {
       position: fixed;
-      top: 50%;
-      left: calc(50% - 450px - 140px); /* 900px 고정폭 절반 + 여백 */
-      transform: translateY(-50%);
+      top: 16px;
+      bottom: 16px;
+      left: calc(50% - 30vw - 140px); /* 콘텐츠(60vw) 절반 + 여백 */
+      min-width: 96px;
       width: 126px;
       background: #fff;
       border: 1px solid #dbe2ee;
@@ -80,6 +83,9 @@
       padding: 6px;
       box-shadow: 0 2px 12px rgba(0,0,0,.05);
       z-index: 10;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
     }
     .tab-btn {
       display: flex; align-items: center; gap: 7px;
@@ -95,20 +101,16 @@
     .tab-content { display: none; width: 100%; }
     .tab-content.active { display: block; }
 
+    /* 브라우저가 좁아져도 사이드바는 항상 사이드에 유지 — 여백만 축소 */
     @media (max-width: 1180px) {
-      .sidebar {
-        position: static;
-        transform: none;
-        width: 100%;
-        max-width: 900px;
-        margin: 0 auto 12px;
-        display: flex;
-        gap: 4px;
-      }
-      .tab-btn { flex: 1; margin-bottom: 0; justify-content: center; }
+      .sidebar { left: 12px; width: 110px; }
+      .main-wrap { margin-left: 140px; margin-right: 20px; width: auto; min-width: 0; }
     }
-    @media (max-width: 940px) {
-      .main-wrap { width: 100%; padding: 0 12px; }
+    @media (max-width: 760px) {
+      .sidebar { left: 8px; width: 88px; }
+      .main-wrap { margin-left: 108px; margin-right: 12px; }
+      .tab-btn { padding: 8px 6px; font-size: 11px; }
+      .tab-btn .nav-icon { display: none; }
     }
     @media (max-width: 540px) {
       #filterList { grid-template-columns: 1fr; }
