@@ -39,18 +39,21 @@
 ## 파일 구조
 
 ```
-manifest.json          확장 설정(권한, 스크립트, 규칙 세트)
-background.js          DNR 규칙/통계/뱃지/우클릭 메뉴, 사이트별 allow 규칙
+manifest.json          확장 설정(권한, 스크립트, 규칙 세트 37개)
+background.js          진입점 — 모듈 로드, 메시지 핸들러, 우클릭 메뉴
+background/            state.js(공유 상태) · stats.js(통계·뱃지) · rules.js(DNR 규칙) · filter-updater.js(필터 업데이트)
+shared/                filter-converter.js · filter-registry.js · build-meta.js (빌드/런타임 공용)
+options/               main.js · config.js · stats.js · filters-tab.js · blocked-tab.js · licenses-tab.js
 youtube-main.js        유튜브 MAIN world 응답 후킹
 content.js             유튜브 DOM 정리/광고 스킵
 general-blocker.js     일반 사이트 인라인 광고 숨김 (tryblock, dogdrip, d3ward, uBO 테스트)
 popunder-blocker.js    skidrowreloaded 클릭 리다이렉트(popunder) 차단 (MAIN world)
 filehost-blocker.js    해외 파일 공유 사이트(gigafile/gofile/akirabox/buzzheavier) 광고·팝업·가짜 다운로드 차단
-anti-bypass.js         광고 차단 감지 감지 무력화
+anti-bypass.js         광고 차단 감지 무력화
 element-blocker.js     우클릭 요소 차단
 popup.html / popup.js  팝업 UI
-options.html / options.js  설정 페이지
-filters/               DNR 정적 규칙셋 6개 (ruleset_1~5 + korean)
+options.html           설정 페이지 (options/main.js 모듈 로드)
+filters/               DNR 정적 규칙셋 37개 + static-index.json
 tools/                 필터 생성기·검증기·테스트 (배포 ZIP 미포함)
 _metadata/             DNR 인덱스 캐시 (배포 ZIP 미포함)
 ```
@@ -58,8 +61,9 @@ _metadata/             DNR 인덱스 캐시 (배포 ZIP 미포함)
 ## 개발
 
 ```bash
-node tools/build-filters.js          # EasyList + EasyPrivacy → ruleset_1~5.json
-node tools/build-filters.js --korean # NoriDev + Turtlecute + d3Host + extra-hosts → ruleset_korean.json
+node tools/build-filters.js --all              # 31개 소스 → 37개 규칙셋 전체 재생성
+node tools/build-filters.js --all --offline    # tools/tmp 캐시 사용 (재다운로드 없음)
+node tools/build-filters.js --source=noridev   # 특정 소스만 빌드
 
 node tools/validate-rules.js         # 규칙 검증
 node tools/test-main-hook.js         # 유튜브 후킹 테스트

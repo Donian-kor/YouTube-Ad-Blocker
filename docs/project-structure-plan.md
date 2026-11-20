@@ -77,48 +77,58 @@ www_AD_Blocker/
 ```
 www_AD_Blocker/
 ├── docs/
-│   ├── project-structure-plan.md  ← 이 문서 (신규)
-│   ├── filter-update-plan.md      (기존, 수정 없음)
-│   └── adblockultimate-filter-comparison.md (기존)
-├── filters/                       (변경 없음)
-├── shared/                        ← 신규: 빌드·런타임 공용
-│   └── filter-converter.js        DNR 변환 로직 (UMD)
-├── tools/                         (기존, build-filters.js만 수정)
-│   ├── build-filters.js           공용 변환기를 require하여 사용
-│   └── ...
-├── options/                       ← 신규: 설정 페이지 모듈
-│   ├── main.js                    진입점 (탭 전환, 초기화)
-│   ├── config.js                  FILTER_LIST 상수
-│   ├── filters-tab.js             필터 토글·펼치기·전체 업데이트 UI
-│   ├── blocked-tab.js             내 차단 목록 편집 UI
-│   └── licenses-tab.js            출처·라이선스 UI
-├── background/                    ← 신규: 서비스 워커 모듈 (선택)
-│   ├── main.js                    기존 background.js 진입 역할
-│   ├── rules.js                   정적/동적 규칙 관리
-│   ├── stats.js                   통계·뱃지
-│   └── filter-updater.js          필터 업데이트 (기능 구현 시)
-├── options.html                   <script type="module" src="options/main.js">
-├── options.js                     ← 삭제 (options/ 로 이전)
-├── background.js                  ← 유지 또는 background/main.js로 이전
-├── manifest.json                  service_worker type 조정 (선택)
+│   ├── project-structure-plan.md          이 문서 (현재 구조 반영)
+│   ├── filter-registry-plan.md            필터 레지스트리 2단 구조
+│   ├── filter-update-plan.md              필터 업데이트 기능 계획
+│   └── adblockultimate-filter-comparison.md 필터 소스 비교 자료
+├── filters/                                정적 규칙셋 37개 JSON + static-index.json
+├── shared/                                 빌드·런타임 공용 (UMD)
+│   ├── filter-converter.js                 DNR 변환 로직
+│   ├── filter-registry.js                  소스/그룹/카테고리 단일 진실 공급원
+│   └── build-meta.js                       빌드 결과 메타 (자동 생성)
+├── tools/
+│   ├── build-filters.js                    소스별 규칙셋 빌드
+│   ├── validate-rules.js                   규칙 검증
+│   └── test-*.js                           기능별 테스트
+├── options/                                설정 페이지 모듈 (ESM)
+│   ├── main.js                             진입점 (탭 전환, 초기화, 사이드바 정렬)
+│   ├── config.js                           카테고리·소스 목록, 라이선스 표
+│   ├── stats.js                            통계 패널
+│   ├── filters-tab.js                      필터 토글·업데이트 UI
+│   ├── blocked-tab.js                      내 차단 목록 편집 UI
+│   └── licenses-tab.js                     출처·라이선스 UI
+├── background/                             서비스 워커 모듈 (importScripts)
+│   ├── state.js                            모듈 간 공유 상태 (AppState)
+│   ├── stats.js                            통계·사이트별 카운트·뱃지·탭 추적
+│   ├── rules.js                            DNR 규칙 정의·활성화, 상태 마이그레이션
+│   └── filter-updater.js                   필터 업데이트 로직
+├── background.js                           진입점: 위 모듈 importScripts + 메시지/메뉴 핸들러
+├── options.html                            <script type="module" src="options/main.js">
+├── manifest.json                           service_worker: background.js
 └── (content script 파일들은 위치 유지)
 ```
 
 ### 3.2 모듈별 역할
 
-| 모듈 | 역할 | 예상 줄 수 |
+| 모듈 | 역할 | 현재 줄 수 |
 |------|------|-----------|
-| `shared/filter-converter.js` | `convertLine()`, `sanitizeDomain()`, 타입맵, skip 키 (빌드/런타임 공용) | ~180 |
-| `options/main.js` | 탭 전환, 공통 초기화, stats 폴링 | ~50 |
-| `options/config.js` | `FILTER_LIST`, 그룹→규칙셋 매핑, 라이선스 표 데이터 | ~90 |
-| `options/filters-tab.js` | 필터 카드 렌더, 토글, 펼치기, 업데이트 버튼 | ~150 |
-| `options/blocked-tab.js` | `blockedSelectors` 표시/편집/추가/삭제/초기화 | ~180 |
-| `options/licenses-tab.js` | 출처·라이선스 표 렌더 | ~60 |
-| `background/rules.js` | `FILTER_TO_RULESET_IDS`, `applyRules()`, `applyFilterStates` | ~120 |
-| `background/stats.js` | 통계, 사이트별 카운트, 뱃지 | ~200 |
-| `background/filter-updater.js` | fetch/파싱/스테이징/복구 (기능 구현 시) | ~150 |
+| `shared/filter-converter.js` | `convertLine()`, `normalizeBadfilter()` — 빌드/런타임 공용 | 166 |
+| `shared/filter-registry.js` | 소스 31개·그룹 10개·카테고리 5개 정의 | 154 |
+| `shared/build-meta.js` | 그룹/소스/규칙셋별 규칙 수 (빌드 시 자동 생성) | 93 |
+| `options/main.js` | 진입점, 탭 전환, 사이드바 행 정렬 | 42 |
+| `options/config.js` | 카테고리/소스 목록, 라이선스 표, 정적 규칙 총합 | 70 |
+| `options/stats.js` | 통계 패널 표시 | 33 |
+| `options/filters-tab.js` | 필터 카드·소스별 토글·업데이트·이력 UI | 290 |
+| `options/blocked-tab.js` | `blockedSelectors` 표시/편집/추가/삭제/초기화 | 142 |
+| `options/licenses-tab.js` | 출처·라이선스 표 렌더 | 32 |
+| `background/state.js` | 모듈 간 공유 상태 `AppState` | 18 |
+| `background/stats.js` | 통계, 사이트별 카운트, 뱃지, 탭 추적 | 188 |
+| `background/rules.js` | DNR 규칙 정의·활성화, 필터 상태 마이그레이션 | 322 |
+| `background/filter-updater.js` | fetch/변환/중복 제거/동적 규칙 등록 | 189 |
+| `background.js` | 진입점: importScripts, 메시지 핸들러, 컨텍스트 메뉴 | 123 |
 
-> 줄 수는 **예상치**이며 실제 구현 후 달라질 수 있습니다.
+> `options.js`는 삭제되고 `options/` 모듈로 완전히 이전되었습니다.
+> `background/main.js`는 만들지 않고 `background.js`를 진입점으로 유지합니다.
 
 ---
 
