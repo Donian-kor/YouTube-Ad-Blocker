@@ -39,19 +39,22 @@ export function initBlockedLogTab() {
   if (!container || !summaryEl) return;
 
   let log = [];
-  let totalBlocked = 0;   // 전체 차단 횟수 (로그와 별개로 무제한 누적)
+  let totalBlocked = 0;   // 네트워크 요청 차단 횟수 (blockedRequests)
+  let domRemoved = 0;     // DOM 제거 횟수 (removedDomAds) — 팝업 총합에 포함됨
   let keyword = "";
 
   function summarize(hosts) {
+    const total = totalBlocked + domRemoved;
+    const breakdown = "네트워크 " + totalBlocked.toLocaleString() + " · DOM " + domRemoved.toLocaleString();
     if (!log.length) {
-      summaryEl.textContent = totalBlocked
-        ? "전체 " + totalBlocked.toLocaleString() + "건 차단 · 표시할 기록이 없습니다."
+      summaryEl.textContent = total
+        ? "총 " + total.toLocaleString() + "건 차단 (" + breakdown + ") · 표시할 기록이 없습니다."
         : "아직 기록이 없습니다.";
       return;
     }
     const latest = Math.max(...log.map((e) => e.time || 0));
     summaryEl.textContent =
-      "전체 " + totalBlocked.toLocaleString() + "건 차단 · 기록 " + log.length.toLocaleString() + "건 · " +
+      "총 " + total.toLocaleString() + "건 차단 (" + breakdown + ") · 기록 " + log.length.toLocaleString() + "건 · " +
       hosts.size.toLocaleString() + "개 사이트 · 마지막 차단 " + timeAgo(latest);
   }
 
@@ -146,6 +149,7 @@ export function initBlockedLogTab() {
   function load() {
     chrome.runtime.sendMessage({ type: "getStats" }, (res) => {
       totalBlocked = (res && res.blockedRequests) || 0;
+      domRemoved = (res && res.removedDomAds) || 0;
       render();
     });
     chrome.runtime.sendMessage({ type: "getBlockedLog" }, (res) => {
