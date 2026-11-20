@@ -15,7 +15,7 @@
 | 직접 내장 | **6개** | Ultimate Ad Filter, Anti-circumvention, Fanboy's Korean, Fanboy's Annoyance, Fanboy's Social, NoCoin |
 | 다른 필터로 대체 | **4개** | Ultimate Privacy Filter, URL Tracking, Ultimate Security, Online Malicious URL Blocklist |
 | 코드로 대체 | **1개** | Adblock Warning Removal → `anti-bypass.js` |
-| 미포함 | **35개** | 지역별 언어 필터 30 + 성가신 요소 4 + 보안 1 |
+| 미포함 | **35개** | 지역별 언어 필터 30 + 팝업·쿠키 정리 4 + 보안 1 |
 
 **내장/대체/코드대체 합계: 11개 / 전체 46개 (미포함 35개)**
 
@@ -26,7 +26,7 @@
 | # | 필터 이름 | 라이선스 | 크레딧 URL | 상태 | 내장 위치 / 사유 |
 |---|-----------|----------|------------|------|------------------|
 | 1 | Ultimate Ad Filter | GNU GPLv3 / CC BY 3.0 | easylist.to, filters.adtidy.org | ✅ 직접 내장 | **광고 차단 그룹** (AdGuard Base `2.txt`) |
-| 2 | Anti-circumvention | GNU GPLv3 | github.com/abp-filters/abp-filters-anti-cv | ✅ 직접 내장 | **안티서클 그룹** (동일 저장소 11개 언어 파일) |
+| 2 | Anti-circumvention | GNU GPLv3 | github.com/abp-filters/abp-filters-anti-cv | ✅ 직접 내장 | **광고 감지 대응 그룹** (동일 저장소 11개 언어 파일) |
 | 3 | RuAdList | CC BY 3.0 | easylist.to | ❌ 미포함 | 러시아어 사이트용 — 한국/유튜브 중심이라 실익 적음 |
 | 4 | EasyList Germany | GNU GPLv3 / CC BY 3.0 | easylist.to | ❌ 미포함 | 독일어 사이트용 |
 | 5 | Fanboy's Japanese | CC BY 3.0 | fanboy.co.nz | ❌ 미포함 | 일본어 사이트용 |
@@ -58,12 +58,12 @@
 | 31 | IndianList | See source | github.com/nicepersonality/IndianList | ❌ 미포함 | 힌디어 사이트용 |
 | 32 | Dandelion Serbo-Croatian | See source | github.com/DandelionSprout/adfilt | ❌ 미포함 | 세르비아/크로아티아 사이트용 |
 | 33 | Macedonian filter | See source | github.com/DeepSpaceHarbor/Macedonian-adBlock-Filters | ❌ 미포함 | 마케도니아어 사이트용 |
-| 34 | **Fanboy's Annoyance List** | GNU GPLv3 / CC BY 3.0 | fanboy.co.nz | ✅ 직접 내장 | **성가신 요소 그룹** (`fanboy-annoyance.txt`) |
+| 34 | **Fanboy's Annoyance List** | GNU GPLv3 / CC BY 3.0 | fanboy.co.nz | ✅ 직접 내장 | **팝업·쿠키 정리 그룹** (`fanboy-annoyance.txt`) |
 | 35 | Adblock Warning Removal List | See source | easylist.to | 🔧 코드 대체 | `anti-bypass.js`로 감지 경고/베이트 요소 숨김 구현 |
 | 36 | Popups | See source | github.com/AdguardTeam/AdguardFilters | ❌ 미포함 | 팝업 차단 — `filehost-blocker.js` 등이 일부 담당 |
-| 37 | Other Annoyances | See source | github.com/AdguardTeam/AdguardFilters | ❌ 미포함 | 기타 성가신 요소 |
+| 37 | Other Annoyances | See source | github.com/AdguardTeam/AdguardFilters | ❌ 미포함 | 기타 팝업·쿠키 정리 |
 | 38 | Cookie Notices | See source | github.com/AdguardTeam/AdguardFilters | ❌ 미포함 | 쿠키 동의 배너 |
-| 39 | Dandelion Sprout's Annoyances | See source | github.com/DandelionSprout/adfilt | ❌ 미포함 | 기타 성가신 요소 |
+| 39 | Dandelion Sprout's Annoyances | See source | github.com/DandelionSprout/adfilt | ❌ 미포함 | 기타 팝업·쿠키 정리 |
 
 ---
 
@@ -93,13 +93,13 @@
 | 이유 | 해당 필터 수 | 해당 항목 |
 |------|-------------|------|
 | **지역별 언어 필터** | 30개 | RuAdList ~ Macedonian (표 #3~#19, #21~#33) |
-| **성가신 요소 (미포함)** | 4개 | Popups, Other Annoyances, Cookie Notices, Dandelion Sprout's Annoyances |
+| **팝업·쿠키 정리 (미포함)** | 4개 | Popups, Other Annoyances, Cookie Notices, Dandelion Sprout's Annoyances |
 | **보안 (중복)** | 1개 | Dandelion Sprout's Anti-Malware List |
 
 > 미포함 합계: 30 + 4 + 1 = **35개**
 > (전체 46개 = 직접 내장 6 + 대체 4 + 코드 대체 1 + 미포함 35)
 
-**성가신 요소 미포함 상세**:
+**팝업·쿠키 정리 미포함 상세**:
 
 | 필터 | 사유 |
 |------|------|
