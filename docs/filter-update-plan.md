@@ -657,3 +657,19 @@ README "참고 자료"에 나열된 항목 중 **실제 필터 소스로 사용�
 - `hide` 클래스가 제거되고 버튼이 보이는 순간 **자동 클릭**하여 광고를 스킵하고 `adRemoved` 통계를 전송한다.
 - `manifest.json`에 `*://chzzk.naver.com/*` 매칭, `document_start`, `all_frames`로 등록.
 - 전체 ON/OFF 토글 연동 (OFF 시 폴링 중지).
+
+#### 치지직 광고 응답 후킹 (2026-11-20, FilteringDev/crackle 기법 참고)
+
+**문제**: DOM 스킵(`chzzk-ad-skip.js`)만으로는 5/10/15초 광고가 차단되지 않음.
+광고가 **API 응답 레벨에서 광고 스케줄로 주입**되기 때문.
+
+**해결**: `chzzk-main.js`(MAIN world, document_start)에서 crackle(MPL-2.0) 기법을 포팅:
+1. `Uint8Array` 생성자 프록시 — JSON 디코딩 시 아래 응답을 빈 응답으로 교체
+   - GFP Video Ad Schedule → `adBreaks: [빈]`
+   - Naver SSP Waterfall List → `ads: []`
+   - /seoraksan endpoint → `preRoll: false, midRoll: false`
+2. 안티애드블록 우회 — 광고 클래스 요소의 `getComputedStyle().display`를 `block`으로 속임
+3. XHR OPTIONS 요청 위조 — `nam.veta.naver.com` OPTIONS에 200/OK 반환
+
+**출처**: https://github.com/FilteringDev/crackle (MPL-2.0). 기법만 참고하여 우리 확장 구조(MAIN world content script)에 맞게 재작성.
+**주의**: 크롬에서 확장 **재로드(↻) + 치지직 탭 F5** 후에만 적용됨. 재로드 전에는 `window.__yabChzzkMainInstalled === false`.

@@ -85,6 +85,13 @@
     },
     {
       "matches": ["*://chzzk.naver.com/*"],
+      "js": ["chzzk-main.js"],
+      "run_at": "document_start",
+      "world": "MAIN",
+      "all_frames": true
+    },
+    {
+      "matches": ["*://chzzk.naver.com/*"],
       "js": ["chzzk-ad-skip.js"],
       "run_at": "document_start",
       "all_frames": true
