@@ -4,7 +4,7 @@
 
   // === 토글 기능 ===
   const toggle = document.getElementById("enabledToggle");
-  const toggleStatus = document.getElementById("toggleStatus");
+  const toggleRow = document.querySelector(".toggle-row");
   const toggleStatusText = document.getElementById("toggleStatusText");
 
   chrome.storage.local.get(["adBlockerEnabled"], (result) => {
@@ -44,13 +44,9 @@
   }
 
   function updateToggleUI(enabled) {
-    if (enabled) {
-      toggleStatus.style.color = "#15803d";
-      toggleStatusText.textContent = "광고 차단 중";
-    } else {
-      toggleStatus.style.color = "#94a3b8";
-      toggleStatusText.textContent = "광고 차단 일시 중지";
-    }
+    // ON: 초록 테두리+글씨 / OFF: 빨강 테두리+글씨
+    if (toggleRow) toggleRow.classList.toggle("off", !enabled);
+    toggleStatusText.textContent = enabled ? "광고 차단 중" : "광고 차단 일시 중지";
   }
 
   // === 현재 사이트 누적 차단 수 (가운데 큰 숫자) ===
