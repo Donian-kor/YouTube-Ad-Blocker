@@ -1,7 +1,7 @@
 // background/filter-updater.js - 필터 전체 업데이트 로직
 
 // === 필터 업데이트 소스 정의 ===
-// 각 그룹의 소스 URL과 동적 규칙 배분 상한 (전체 합계 29,742개 ≤ 30,000)
+// 각 그룹의 소스 URL과 동적 규칙 배분 상한 (전체 합계 29,713개 ≤ 30,000)
 const FILTER_SOURCES = {
   ads: {
     limit: 19000,
@@ -58,9 +58,8 @@ const FILTER_SOURCES = {
   },
 };
 
-const COMMIT_ID_START = 1000;    // 확정된 업데이트 규칙 ID 대역
-const STAGE_ID_START = 100000;   // 스테이징(임시) ID 대역 — 충돌 방지
-const MAX_DYNAMIC_RULES = 30000;
+const COMMIT_ID_START = 1000;    // 업데이트 규칙 ID 대역 (기존 1~68, 100~109와 충돌 없음)
+const MAX_DYNAMIC_RULES = 30000; // Chrome 전체 동적 규칙 한도
 const MAX_FILTER_BYTES = 10 * 1024 * 1024; // 파일 10MB 제한 (AdGuard Base 약 7MB 대응)
 const FETCH_TIMEOUT_MS = 10000;
 const UPDATE_DEBOUNCE_MS = 10000;
@@ -125,8 +124,6 @@ async function updateFilters() {
   updateInProgress = true;
   lastUpdateAt = now;
 
-  chrome.storage.local.set({ updateProgress: { incomplete: true, startedAt: now } });
-
   try {
     const allRules = [];
     for (const groupKey of Object.keys(FILTER_SOURCES)) {
@@ -147,61 +144,35 @@ async function updateFilters() {
     if (allRules.length === 0) throw new Error("변환된 규칙이 없습니다");
     if (allRules.length > MAX_DYNAMIC_RULES) allRules.length = MAX_DYNAMIC_RULES;
 
-    // 1) 스테이징: 임시 ID 대역에 먼저 추가
-    const staged = allRules.map((r, i) => Object.assign({}, r, { id: STAGE_ID_START + i }));
-    await dnrUpdate({ addRules: staged });
-
-    // 2) 커밋: 기존 확정 규칙 + 스테이지 규칙 제거 후 확정 ID로 재등록
+    // 이전 업데이트 규칙 ID 수 계산 (저장된 개수만큼만 제거)
     const prev = await new Promise((resolve) => {
       chrome.storage.local.get(["dynamicRuleCount"], (res) => resolve(res.dynamicRuleCount || 0));
     });
     const oldIds = [];
     for (let i = 0; i < prev; i++) oldIds.push(COMMIT_ID_START + i);
-    const stageIds = staged.map((r) => r.id);
+
+    // 새 규칙을 COMMIT ID 대역으로 준비
     const committed = allRules.map((r, i) => Object.assign({}, r, { id: COMMIT_ID_START + i }));
 
-    await dnrUpdate({ removeRuleIds: oldIds.concat(stageIds), addRules: committed });
+    // 원자적 교체: 제거 + 추가를 한 번의 호출로 처리
+    // 주의: 스테이징(임시 추가) 방식은 기존 규칙 + 신규 규칙이 동시에 존재해
+    //       Chrome 전체 동적 규칙 한도(30,000개)를 초과하므로 사용하지 않는다.
+    await dnrUpdate({ removeRuleIds: oldIds, addRules: committed });
 
     chrome.storage.local.set({
-      updateProgress: { incomplete: false, updatedAt: now, count: committed.length },
+      updateStatus: { updatedAt: now, count: committed.length },
       dynamicRuleCount: committed.length,
     });
     updateInProgress = false;
     return { ok: true, count: committed.length };
   } catch (e) {
-    // 롤백: 스테이지 규칙 제거
-    const stageIds = [];
-    for (let i = 0; i < MAX_DYNAMIC_RULES; i++) stageIds.push(STAGE_ID_START + i);
-    try { await dnrUpdate({ removeRuleIds: stageIds }); } catch (ignore) { /* 무시 */ }
-    chrome.storage.local.remove("updateProgress");
+    // 실패 시 새로 추가된 규칙 롤백 (이전 확정 규칙은 보존됨)
+    const rollbackIds = [];
+    for (let i = 0; i < MAX_DYNAMIC_RULES; i++) rollbackIds.push(COMMIT_ID_START + i);
+    try { await dnrUpdate({ removeRuleIds: rollbackIds }); } catch (ignore) { /* 무시 */ }
     updateInProgress = false;
     return { ok: false, reason: e.message };
   }
-}
-
-// 브라우저 종료 등으로 미완료 상태가 남았을 때 복구
-async function recoverInterruptedUpdate() {
-  const prog = await new Promise((resolve) => {
-    chrome.storage.local.get(["updateProgress"], (res) => resolve(res.updateProgress || null));
-  });
-  if (!prog || !prog.incomplete) return;
-
-  const stageIds = Array.from({ length: MAX_DYNAMIC_RULES }, (_, i) => STAGE_ID_START + i);
-  const stageRules = await new Promise((resolve) => {
-    chrome.declarativeNetRequest.getDynamicRules({ filterIds: stageIds }, resolve);
-  });
-  if (stageRules && stageRules.length > 0) {
-    const remapped = stageRules.map((r, i) => Object.assign({}, r, { id: COMMIT_ID_START + i }));
-    const ids = stageRules.map((r) => r.id);
-    try {
-      await dnrUpdate({ removeRuleIds: ids, addRules: remapped });
-      chrome.storage.local.set({ updateProgress: { incomplete: false, recoveredAt: Date.now(), count: remapped.length }, dynamicRuleCount: remapped.length });
-      return;
-    } catch (e) {
-      console.error("[필터 복구] 실패:", e.message);
-    }
-  }
-  chrome.storage.local.remove("updateProgress");
 }
 
 // === 메시지 핸들러: 필터 전체 업데이트 ===
@@ -211,4 +182,3 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 });
-

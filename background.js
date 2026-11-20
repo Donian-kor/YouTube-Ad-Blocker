@@ -413,14 +413,13 @@ function applyRules(enabled) {
 
 // 저장된 활성화 상태 로드 후 규칙 적용
 function initRules() {
-  recoverInterruptedUpdate().then(() => {
   chrome.storage.local.get(["adBlockerEnabled"], (result) => {
     const enabled = result.adBlockerEnabled !== undefined ? result.adBlockerEnabled : true;
     enabledState = enabled;
     applyRules(enabled);
     updateBadgeForTab(activeTabId);
   });
-  });
+  
 }
 
 // === 확장 프로그램 설치 시 ===
