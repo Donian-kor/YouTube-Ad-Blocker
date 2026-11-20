@@ -7,129 +7,130 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      width: min(560px, 100vw - 32px);
+      width: min(720px, 100vw - 24px);
       margin: 0 auto;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #1a1a2e;
-      color: #e0e0e0;
-      padding: 24px;
+      background: #f4f6fb;
+      color: #1e293b;
+      padding: 16px;
+      line-height: 1.4;
     }
-    h2 { font-size: 18px; margin-bottom: 16px; color: #fff; }
+    h2 { font-size: 16px; margin-bottom: 10px; color: #0f172a; }
 
     /* 탭 바 */
-    .tab-bar { display: flex; gap: 4px; border-bottom: 1px solid #2a2a4a; margin-bottom: 20px; }
+    .tab-bar { display: flex; gap: 4px; border-bottom: 2px solid #dbe2ee; margin-bottom: 12px; }
     .tab-btn {
-      flex: 1; padding: 10px 6px; border: none; background: transparent;
-      color: #888; font-size: 12px; font-weight: 600; cursor: pointer;
-      border-bottom: 2px solid transparent; transition: color .2s, border-color .2s;
+      flex: 1; padding: 9px 6px; border: none; background: transparent;
+      color: #64748b; font-size: 12px; font-weight: 600; cursor: pointer;
+      border-bottom: 2px solid transparent; margin-bottom: -2px;
+      transition: color .2s, border-color .2s;
     }
-    .tab-btn:hover { color: #ccc; }
+    .tab-btn:hover { color: #334155; }
     .tab-btn.active { color: #e94560; border-bottom-color: #e94560; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    .section { margin-bottom: 24px; }
+    .section { margin-bottom: 12px; }
     .section h3 {
-      font-size: 13px; color: #e94560; margin-bottom: 12px;
-      text-transform: uppercase; letter-spacing: 0.5px;
+      font-size: 12px; color: #e94560; margin-bottom: 8px;
+      text-transform: uppercase; letter-spacing: 0.4px;
     }
-    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    /* 통계 - 가로 한 줄 */
+    .stats-row { display: flex; gap: 8px; }
     .stat-card {
-      background: #16213e; border-radius: 8px; padding: 8px 10px;
-      text-align: center; border: 1px solid #2a2a4a;
+      background: #fff; border: 1px solid #dbe2ee; border-radius: 8px;
+      padding: 8px 10px; flex: 1;
       display: flex; align-items: center; justify-content: center; gap: 8px;
     }
+    .stat-card.total { flex: 1.4; }
     .stat-card .number { font-size: 20px; font-weight: 700; color: #e94560; }
-    .stat-card .label { font-size: 11px; color: #888; }
-    .total-box {
-      background: #16213e; border-radius: 8px; padding: 16px; text-align: center;
-      margin-bottom: 12px; border: 1px solid #2a2a4a;
-    }
-    .total-box .number { font-size: 32px; font-weight: 700; color: #e94560; }
-    .total-box .label { font-size: 12px; color: #888; margin-top: 4px; }
-    .btn-row { display: flex; gap: 8px; margin-top: 12px; }
-    .last-reset { font-size: 11px; color: #666; text-align: center; margin-top: 8px; }
+    .stat-card.total .number { font-size: 26px; }
+    .stat-card .label { font-size: 11px; color: #64748b; }
 
     button {
-      flex: 1; padding: 10px; border: none; border-radius: 6px;
-      font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity .2s;
+      padding: 8px 10px; border: none; border-radius: 6px;
+      font-size: 12px; font-weight: 600; cursor: pointer; transition: opacity .2s;
     }
     button:hover { opacity: .85; }
     button:disabled { opacity: .5; cursor: not-allowed; }
     button.danger { background: #e94560; color: white; }
-    button.primary { background: #0f3460; color: white; }
-    button.secondary { background: #2a2a4a; color: #e0e0e0; }
+    button.primary { background: #2563eb; color: white; }
+    button.secondary { background: #e8edf5; color: #1e293b; }
     button.tiny { flex: none; padding: 4px 8px; font-size: 11px; }
 
-    .filter-toolbar { display: flex; gap: 8px; margin-bottom: 12px; }
-    .update-status { font-size: 11px; color: #888; margin-top: 8px; min-height: 14px; }
-    .update-status.ok { color: #4ade80; }
-    .update-status.err { color: #ff6b6b; }
+    .btn-row { display: flex; gap: 8px; margin-top: 8px; }
+    .last-reset { font-size: 10px; color: #94a3b8; text-align: right; margin-top: 5px; }
 
+    /* 필터 목록 - 2열 그리드 */
+    #filterList { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
     .filter-card {
       display: flex; align-items: center; justify-content: space-between;
-      background: #16213e; border-radius: 8px; padding: 14px;
-      margin-bottom: 8px; border: 1px solid #2a2a4a; transition: border-color .2s;
+      background: #fff; border: 1px solid #dbe2ee; border-radius: 8px;
+      padding: 10px;
     }
-    .filter-card:hover { border-color: #3a3a5a; }
     .filter-info { flex: 1; min-width: 0; }
-    .filter-name-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap; }
-    .filter-icon { font-size: 16px; flex-shrink: 0; }
-    .filter-name { font-size: 14px; font-weight: 600; color: #fff; }
+    .filter-name-row { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; flex-wrap: wrap; }
+    .filter-icon { font-size: 14px; flex-shrink: 0; }
+    .filter-name { font-size: 12px; font-weight: 700; color: #0f172a; }
     .filter-badge {
-      font-size: 10px; color: #e94560; background: rgba(233,69,96,.15);
-      padding: 2px 6px; border-radius: 10px;
+      font-size: 9px; color: #e94560; background: #ffedf0;
+      padding: 1px 5px; border-radius: 8px;
     }
-    .filter-badge.lock { color: #888; background: rgba(136,136,136,.15); }
-    .filter-desc { font-size: 12px; color: #999; line-height: 1.4; }
-    .filter-source { font-size: 10px; color: #666; }
+    .filter-badge.lock { color: #64748b; background: #eef2f7; }
+    .filter-desc { font-size: 10px; color: #64748b; line-height: 1.35; }
+    .filter-source { font-size: 9px; color: #94a3b8; }
 
-    .toggle { position: relative; width: 44px; height: 24px; cursor: pointer; flex-shrink: 0; margin-left: 12px; }
+    .toggle { position: relative; width: 38px; height: 21px; cursor: pointer; flex-shrink: 0; margin-left: 8px; }
     .toggle input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; inset: 0; background: #3a3a5a; border-radius: 24px; transition: .3s; }
+    .slider { position: absolute; inset: 0; background: #cbd5e1; border-radius: 21px; transition: .3s; }
     .slider:before {
-      content: ""; position: absolute; height: 18px; width: 18px; left: 3px; top: 3px;
-      background: #e0e0e0; border-radius: 50%; transition: .3s;
+      content: ""; position: absolute; height: 15px; width: 15px; left: 3px; top: 3px;
+      background: #fff; border-radius: 50%; transition: .3s;
+      box-shadow: 0 1px 3px rgba(0,0,0,.2);
     }
     input:checked + .slider { background: #e94560; }
-    input:checked + .slider:before { transform: translateX(20px); }
-    .toggle.locked { opacity: .45; cursor: not-allowed; }
+    input:checked + .slider:before { transform: translateX(17px); }
+    .toggle.locked { opacity: .5; cursor: not-allowed; }
+
+    .filter-toolbar { display: flex; gap: 8px; margin-bottom: 8px; }
+    .update-status { font-size: 10px; color: #64748b; margin-top: 6px; min-height: 13px; }
+    .update-status.ok { color: #16a34a; }
+    .update-status.err { color: #dc2626; }
 
     .info {
-      font-size: 11px; color: #666; line-height: 1.7;
-      margin-top: 16px; padding-top: 12px; border-top: 1px solid #2a2a4a;
+      font-size: 10px; color: #64748b; line-height: 1.5;
+      margin-top: 8px; padding-top: 8px; border-top: 1px solid #e2e8f0;
     }
 
     /* 내 차단 목록 탭 */
     .site-card {
-      background: #16213e; border: 1px solid #2a2a4a; border-radius: 8px;
-      padding: 12px; margin-bottom: 10px;
+      background: #fff; border: 1px solid #dbe2ee; border-radius: 8px;
+      padding: 10px; margin-bottom: 8px;
     }
-    .site-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-    .site-name { font-size: 13px; font-weight: 600; color: #fff; word-break: break-all; }
-    .site-count { font-size: 10px; color: #888; }
-    .selector-row {
-      display: flex; align-items: center; gap: 6px;
-      padding: 5px 0; border-top: 1px solid #22223a;
-    }
-    .selector-text {
-      flex: 1; min-width: 0; font-size: 11px; color: #9ab;
-      font-family: monospace; word-break: break-all;
-    }
+    .site-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+    .site-name { font-size: 12px; font-weight: 700; color: #0f172a; word-break: break-all; }
+    .site-count { font-size: 10px; color: #64748b; }
+    .selector-row { display: flex; align-items: center; gap: 6px; padding: 4px 0; border-top: 1px solid #eef2f7; }
+    .selector-text { flex: 1; min-width: 0; font-size: 11px; color: #334155; font-family: monospace; word-break: break-all; }
     .selector-input {
-      flex: 1; min-width: 0; background: #0f1424; color: #e0e0e0;
-      border: 1px solid #2a2a4a; border-radius: 4px; padding: 5px; font-size: 11px;
+      flex: 1; min-width: 0; background: #fff; color: #1e293b;
+      border: 1px solid #cbd5e1; border-radius: 4px; padding: 5px; font-size: 11px;
     }
-    .add-row { display: flex; gap: 6px; margin-top: 8px; }
-    .empty { font-size: 12px; color: #666; text-align: center; padding: 24px 0; }
+    .add-row { display: flex; gap: 6px; margin-top: 6px; }
+    .empty { font-size: 11px; color: #94a3b8; text-align: center; padding: 20px 0; }
 
     /* 출처 및 라이선스 탭 */
-    .lic-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+    .lic-table { width: 100%; border-collapse: collapse; font-size: 11px; background: #fff; }
     .lic-table th, .lic-table td {
-      text-align: left; padding: 7px 6px; border-bottom: 1px solid #2a2a4a; vertical-align: top;
+      text-align: left; padding: 7px 8px; border-bottom: 1px solid #eef2f7; vertical-align: top;
     }
-    .lic-table th { color: #e94560; font-weight: 600; }
-    .lic-table td { color: #aaa; line-height: 1.5; }
+    .lic-table th { color: #e94560; font-weight: 700; background: #f8fafc; }
+    .lic-table td { color: #475569; line-height: 1.4; }
+
+    @media (max-width: 540px) {
+      #filterList { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -144,18 +145,18 @@
   <div class="tab-content active" id="tab-filters">
     <div class="section">
       <h3>통계</h3>
-      <div class="total-box">
-        <div class="number" id="optTotal">0</div>
-        <div class="label">차단된 총 광고</div>
-      </div>
-      <div class="stat-grid">
-        <div class="stat-card">
-          <div class="number" id="optNetwork">0</div>
-          <div class="label">네트워크 차단</div>
+      <div class="stats-row">
+        <div class="stat-card total">
+          <span class="number" id="optTotal">0</span>
+          <span class="label">총 차단</span>
         </div>
         <div class="stat-card">
-          <div class="number" id="optDom">0</div>
-          <div class="label">DOM 제거</div>
+          <span class="number" id="optNetwork">0</span>
+          <span class="label">네트워크</span>
+        </div>
+        <div class="stat-card">
+          <span class="number" id="optDom">0</span>
+          <span class="label">DOM 제거</span>
         </div>
       </div>
       <div class="btn-row">
@@ -167,7 +168,7 @@
     <div class="section">
       <h3>광고 차단 필터</h3>
       <div class="filter-toolbar">
-        <button class="primary" id="filterAllOnBtn">전체 활성화</button>
+        <button class="secondary" id="filterAllOnBtn">전체 활성화</button>
         <button class="secondary" id="filterAllOffBtn">전체 비활성화</button>
       </div>
       <div id="filterList"></div>
@@ -176,18 +177,7 @@
       </div>
       <div class="update-status" id="filterUpdateStatus"></div>
       <div class="info">
-        <p>• <b>광고 차단 / 보안</b>: 대용량 필터로 항상 켜져 있습니다.</p>
-        <p>• <b>나머지 4개 그룹</b>: 필요에 따라 끄고 켤 수 있습니다.</p>
-        <p>• 업데이트 중 브라우저를 종료해도 다음 실행 시 자동 복구됩니다.</p>
-      </div>
-    </div>
-
-    <div class="section">
-      <h3>동작 방식</h3>
-      <div class="info">
-        <p>• <b>네트워크 차단</b>: declarativeNetRequest API로 광고 요청을 블록</p>
-        <p>• <b>DOM 제거</b>: 이미 로드된 광고 요소를 제거</p>
-        <p>• YouTube의 정책 변화로 인해 완전한 차단은 어려울 수 있습니다.</p>
+        • 광고 차단 / 보안은 대용량 필터로 <b>항상 켜짐</b>입니다. &nbsp;• 업데이트 실패 시 이전 규칙이 유지됩니다.
       </div>
     </div>
   </div>
