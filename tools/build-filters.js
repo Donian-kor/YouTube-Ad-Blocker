@@ -26,6 +26,7 @@ const KOREAN_LISTS = [
   ["turtlecute", "https://adblock.turtlecute.org/d3host.adblock"],
   ["d3host", "https://raw.githubusercontent.com/d3ward/toolz/master/src/d3host.txt"],
   ["list-kr", "https://cdn.jsdelivr.net/npm/@list-kr/filterslists@latest/dist/filterslist-AdGuard.txt"],
+  ["filterslists-ko", "https://cdn.jsdelivr.net/npm/@filteringdev/filterslists-ko@latest/dist/filterslist-AdGuard-unified.txt"],
   ["extra-hosts", "file:tools/tmp/extra-hosts.txt"],
 ];
 

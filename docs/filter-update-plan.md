@@ -547,3 +547,38 @@ node tools/build-filters.js --group=korean
 - https://developer.chrome.com/docs/extensions/develop/concepts/network-requests — fetch, host_permissions, XSS 주의
 - https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts — HTTPS 통신, eval 금지
 - https://github.com/List-KR/List-KR — List-KR 필터 저장소 (GNU GPLv3)
+
+---
+
+## 14. README 참고자료 사용 현황 (2026-11-20 점검)
+
+README "참고 자료"에 나열된 항목 중 **실제 필터 소스로 사용하는 것**과 **참고만 한 것**을 정리한다.
+
+### 14.1 실제 사용 중 (출처 표에 포함)
+
+| 참고자료 | 용도 | 출처 표 항목 |
+|----------|------|-------------|
+| uBlock Origin / uBOL-home | 유튜브 응답 후킹 기법 참고 → `youtube-main.js` 구현에 반영 | 코드 기법 참고 (필터 출처 아님) |
+| NoriDev-AdBlock-Filter | 한국 광고 필터 소스 | ✅ NoriDev-AdBlock-Filter |
+| List-KR | 한국 광고 필터 소스 | ✅ List-KR |
+| filterslists-ko | 한국 광고 필터 소스 (2026-11-20 추가, List-KR 포크 분기) | ✅ filterslists-KO (Unified) |
+| Turtlecute Host List | 한국 광고 필터 소스 | ✅ Turtlecute Host List |
+| d3ward d3Host | 한국 광고 필터 소스 | ✅ d3Host |
+| raymondhill.net/ublock 테스트 | 네트워크/코스메틱 차단 검증 (테스트 사이트) | 테스트 검증용 |
+
+### 14.2 참고만 하고 미사용 (출처 표에 없음)
+
+| 참고자료 | 미사용 사유 |
+|----------|------------|
+| **uBlock (gorhill/uBlock)** | 필터 기법 연구용. 실제 필터 데이터는 가져오지 않음 (uBOL-home만 후킹 기법 참고) |
+| **AdAway** | 호스트 기반 차단 참고. 실제 필터 미포함 (DNR 변환 대상이 아님) |
+| **hagezi/dns-blocklists** | 규모가 너무 커 미포함 (README에도 명시) |
+| **tryblock.org / d3ward.com / paileactivist/toolz / canyoublockit.com / obfusgated.com / ipcheck.ing / superadblocktest.com** | 차단 동작 검증용 테스트 사이트. 필터 소스가 아니라 검증 대상 |
+| **raymondhill.net/ublock (테스트 사이트 항목)** | 14.1과 동일 사이트. 네트워크/코스메틱 검증용으로 분류 |
+
+### 14.3 이번 점검에서 조치한 사항
+
+1. **filterslists-ko 추가** — List-KR 포크 분기 저장소, GNU GPLv3, Unified(AdGuard) URL 사용.
+   변환 가능 1,823개 중 정적 중복 제거 후 430개가 한국 필터에 반영됨 (한국 필터 1,856 → 2,286개).
+2. **자체 extra-hosts 출처 항목 제거** — 사용자 저장소에는 필터가 없으므로 출처 표에서 삭제 (정적 빌드 소스로는 유지).
+3. **URL Tracking 소스 불일치 수정** — `build-filters.js`의 `filters/10.txt`(검색광고 차단해제) → `filters/17.txt`(AdGuard URL Tracking)로 변경.

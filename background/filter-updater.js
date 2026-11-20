@@ -18,6 +18,7 @@ const FILTER_SOURCES = {
       "https://adblock.turtlecute.org/d3host.adblock",
       "https://raw.githubusercontent.com/d3ward/toolz/master/src/d3host.txt",
       "https://cdn.jsdelivr.net/npm/@list-kr/filterslists@latest/dist/filterslist-AdGuard.txt",
+      "https://cdn.jsdelivr.net/npm/@filteringdev/filterslists-ko@latest/dist/filterslist-AdGuard-unified.txt",
     ],
   },
   privacy: {
