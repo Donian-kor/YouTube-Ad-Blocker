@@ -17,14 +17,14 @@
   const FILTER_CATEGORIES = [
     { id: "intl_ads", name: "국제 광고", icon: "📢", locked: false,
       description: "EasyList·AdGuard·uAssets 등 해외 광고 필터" },
+    { id: "security", name: "보안", icon: "🛡️", locked: false,
+      description: "악성 도메인·cryptomining 차단" },
     { id: "korean", name: "한국 필터", icon: "🇰🇷", locked: false,
       description: "NoriDev·List-KR 등 국내 광고·트래커 필터" },
     { id: "privacy", name: "개인정보", icon: "🔒", locked: false,
       description: "소셜 위젯·URL 추적 파라미터 차단" },
     { id: "anti_cv", name: "팝업·광고 방해 차단", icon: "🚫", locked: false,
       description: "팝업·쿠키 창을 정리하고, 광고 차단을 감지하는 사이트에 대응합니다" },
-    { id: "security", name: "보안", icon: "🛡️", locked: false,
-      description: "악성 도메인·cryptomining 차단" },
   ];
 
   // === 소스 그룹 (세분화, 정적 규칙셋·개별 토글 단위) ===

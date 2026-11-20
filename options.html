@@ -14,11 +14,11 @@
       padding: 12px 0;
       line-height: 1.4;
     }
-    /* 메인 영역: 화면의 60% (최대 900px), 사이드바(164px) 바로 오른쪽에 붙음 */
+    /* 메인 영역: 화면의 60% - 20px (최대 880px), 사이드바(164px) 바로 오른쪽에 붙음 */
     .main-wrap {
-      width: 60%;
-      max-width: 900px;
-      min-width: 320px;
+      width: calc(60% - 20px);
+      max-width: 880px;
+      min-width: 300px;
       margin-left: 176px; /* 사이드바 164px + 여백 12px */
       margin-right: auto;
     }
@@ -115,11 +115,11 @@
     /* 브라우저가 좁아져도 사이드바는 왼쪽에 고정 — 폭만 축소, 콘텐츠는 항상 붙어 다님 */
     @media (max-width: 1180px) {
       .sidebar { width: 140px; }
-      .main-wrap { margin-left: 152px; margin-right: 20px; width: auto; min-width: 0; }
+      .main-wrap { margin-left: 152px; margin-right: 40px; width: auto; min-width: 0; }
     }
     @media (max-width: 760px) {
       .sidebar { width: 110px; }
-      .main-wrap { margin-left: 122px; margin-right: 12px; }
+      .main-wrap { margin-left: 122px; margin-right: 32px; }
       .tab-btn { padding: 8px 6px; font-size: 11px; }
       .tab-btn .nav-icon { display: none; }
     }
