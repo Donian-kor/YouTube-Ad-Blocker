@@ -14,7 +14,7 @@ const CONDITION_KEYS = new Set([
 ]);
 
 let errors = 0;
-const files = fs.readdirSync(DIR).filter((f) => f.endsWith(".json")).sort();
+const files = fs.readdirSync(DIR).filter((f) => f.endsWith(".json") && f.startsWith("ruleset_")).sort();
 
 for (const file of files) {
   const full = path.join(DIR, file);

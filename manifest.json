@@ -32,6 +32,12 @@
   "background": {
     "service_worker": "background.js"
   },
+  "web_accessible_resources": [
+    {
+      "resources": ["filters/static-index.json"],
+      "matches": ["<all_urls>"]
+    }
+  ],
   "declarative_net_request": {
     "rule_resources": [
       { "id": "ads_1", "enabled": true, "path": "filters/ruleset_ads.json" },

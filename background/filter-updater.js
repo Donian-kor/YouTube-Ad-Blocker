@@ -65,6 +65,22 @@ const FETCH_TIMEOUT_MS = 10000;
 const UPDATE_DEBOUNCE_MS = 10000;
 let lastUpdateAt = 0;
 let updateInProgress = false;
+let staticUrlFilters = null; // 정적 규칙에 이미 있는 urlFilter 집합 (중복 제거용)
+
+// 정적 필터 인덱스 로드 (패키지 내장 JSON)
+async function loadStaticIndex() {
+  if (staticUrlFilters) return staticUrlFilters;
+  try {
+    const res = await fetch(chrome.runtime.getURL("filters/static-index.json"));
+    const data = await res.json();
+    staticUrlFilters = new Set(data.urlFilters || []);
+    console.log("[정적 필터 인덱스] " + staticUrlFilters.size + "개 로드");
+  } catch (e) {
+    console.error("[정적 필터 인덱스] 로드 실패:", e.message);
+    staticUrlFilters = new Set();
+  }
+  return staticUrlFilters;
+}
 
 async function fetchFilterText(url) {
   const controller = new AbortController();
@@ -138,6 +154,10 @@ async function updateFilters() {
   lastUpdateAt = now;
 
   try {
+    // 정적 필터에 이미 있는 도메인 집합 로드 (중복 제거용)
+    const staticSet = await loadStaticIndex();
+    let duplicateCount = 0;
+
     const allRules = [];
     for (const groupKey of Object.keys(FILTER_SOURCES)) {
       const src = FILTER_SOURCES[groupKey];
@@ -151,13 +171,22 @@ async function updateFilters() {
           console.error("[필터 업데이트] " + url + " 실패: " + e.message);
         }
       }
-      allRules.push(...groupRules.slice(0, src.limit));
+      // 정적 필터에 이미 있는 규칙은 제외 (신규 도메인만 동적으로 등록)
+      const fresh = groupRules.filter((r) => {
+        if (r.condition && r.condition.urlFilter && staticSet.has(r.condition.urlFilter)) {
+          duplicateCount++;
+          return false;
+        }
+        return true;
+      });
+      allRules.push(...fresh.slice(0, src.limit));
     }
 
-    if (allRules.length === 0) throw new Error("변환된 규칙이 없습니다");
-    // 한도보다 여유 있게 상한 설정 (기존 규칙과 동시 존재 시에도 안전)
-    const SAFE_LIMIT = Math.floor(MAX_DYNAMIC_RULES * 0.9); // 27,000개
-    if (allRules.length > SAFE_LIMIT) allRules.length = SAFE_LIMIT;
+    if (allRules.length === 0) {
+      updateInProgress = false;
+      return { ok: true, count: 0, unchanged: true, reason: "정적 필터에 모두 포함됨" };
+    }
+    if (allRules.length > MAX_DYNAMIC_RULES) allRules.length = MAX_DYNAMIC_RULES;
 
     const committed = allRules.map((r, i) => Object.assign({}, r, { id: COMMIT_ID_START + i }));
     const newFingerprint = rulesFingerprint(committed);
@@ -190,7 +219,7 @@ async function updateFilters() {
       filterFingerprint: newFingerprint,
     });
     updateInProgress = false;
-    return { ok: true, count: committed.length, unchanged: false };
+    return { ok: true, count: committed.length, unchanged: false, duplicates: duplicateCount };
   } catch (e) {
     updateInProgress = false;
     return { ok: false, reason: e.message };
