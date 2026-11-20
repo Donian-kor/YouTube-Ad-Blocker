@@ -60,18 +60,37 @@
     button.secondary { background: #e8edf5; color: #1e293b; }
     button.tiny { flex: none; padding: 4px 8px; font-size: 11px; }
 
-    /* 탭 바 - 통계 재설정 하단 */
-    .tab-bar { display: flex; gap: 4px; border-bottom: 2px solid #dbe2ee; margin: 4px 0 12px; }
-    .tab-btn {
-      flex: 1; padding: 9px 6px; border: none; background: transparent;
-      color: #64748b; font-size: 12px; font-weight: 600; cursor: pointer;
-      border-bottom: 2px solid transparent; margin-bottom: -2px;
-      transition: color .2s, border-color .2s;
+    /* 레이아웃: 좌측 사이드바 + 우측 콘텐츠 */
+    .app-body { display: flex; gap: 14px; align-items: flex-start; }
+
+    /* 사이드바 (세로 메뉴) — 기능 늘어나도 세로로 쌓임 */
+    .sidebar {
+      flex: 0 0 130px;
+      background: #fff;
+      border: 1px solid #dbe2ee;
+      border-radius: 8px;
+      padding: 6px;
     }
-    .tab-btn:hover { color: #334155; }
-    .tab-btn.active { color: #e94560; border-bottom-color: #e94560; }
-    .tab-content { display: none; }
+    .tab-btn {
+      display: flex; align-items: center; gap: 7px;
+      width: 100%; padding: 9px 10px; margin-bottom: 3px;
+      border: none; border-radius: 6px; background: transparent;
+      color: #64748b; font-size: 12px; font-weight: 600; text-align: left;
+      cursor: pointer; transition: background .2s, color .2s;
+    }
+    .tab-btn:last-child { margin-bottom: 0; }
+    .tab-btn:hover { background: #f1f5f9; color: #334155; }
+    .tab-btn.active { background: #ffedf0; color: #e94560; }
+    .tab-btn .nav-icon { font-size: 14px; flex-shrink: 0; }
+    .tab-content { display: none; flex: 1; min-width: 0; }
     .tab-content.active { display: block; }
+
+    @media (max-width: 540px) {
+      .app-body { flex-direction: column; }
+      .sidebar { flex: none; width: 100%; display: flex; gap: 4px; }
+      .tab-btn { flex: 1; margin-bottom: 0; justify-content: center; }
+      #filterList { grid-template-columns: 1fr; }
+    }
 
     .section { margin-bottom: 12px; }
     .section h3 {
@@ -168,9 +187,7 @@
     .lic-table a { color: #2563eb; text-decoration: none; word-break: break-all; }
     .lic-table a:hover { text-decoration: underline; }
 
-    @media (max-width: 540px) {
-      #filterList { grid-template-columns: 1fr; }
-    }
+
   </style>
 </head>
 <body>
@@ -199,12 +216,14 @@
     </div>
   </div>
 
-  <!-- 탭 바: 통계 재설정 하단 -->
-  <div class="tab-bar">
-    <button class="tab-btn active" data-tab="filters">필터 목록</button>
-    <button class="tab-btn" data-tab="blocked">내 차단 목록</button>
-    <button class="tab-btn" data-tab="licenses">출처 및 라이선스</button>
-  </div>
+  <!-- 본문: 좌측 사이드바 + 우측 콘텐츠 -->
+  <div class="app-body">
+  <!-- 사이드바 (세로 메뉴) -->
+  <nav class="sidebar">
+    <button class="tab-btn active" data-tab="filters"><span class="nav-icon">🎛️</span>필터 목록</button>
+    <button class="tab-btn" data-tab="blocked"><span class="nav-icon">🚫</span>내 차단 목록</button>
+    <button class="tab-btn" data-tab="licenses"><span class="nav-icon">📄</span>출처 및 라이선스</button>
+  </nav>
 
   <div class="tab-content active" id="tab-filters">
     <div class="section">
@@ -257,6 +276,7 @@
       </div>
     </div>
   </div>
+  </div><!-- /app-body -->
 
   <script type="module" src="options/main.js"></script>
 </body>
