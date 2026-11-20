@@ -5,7 +5,7 @@ export const FILTER_LIST = [
     id: "security",
     name: "보안",
     description: "악성 도메인, 피싱, cryptomining 차단",
-    filterCount: 4,
+    filterCount: 137434,
     source: "NoCoin, URLhaus, uAssets badware 등",
     icon: "🚨"
   },
@@ -13,7 +13,7 @@ export const FILTER_LIST = [
     id: "ads",
     name: "광고 차단",
     description: "전 세계 광고를 차단하는 기본 필터 (EasyList + EasyPrivacy + Ultimate Ad Filter)",
-    filterCount: 9,
+    filterCount: 127583,
     source: "EasyList, EasyPrivacy, AdBlocker Ultimate, Peter Lowe's, uAssets 등",
     icon: "📢"
   },
@@ -21,7 +21,7 @@ export const FILTER_LIST = [
     id: "korean",
     name: "한국 광고 필터",
     description: "국내 광고·트래커 차단 (NoriDev, Turtlecute, d3Host, List-KR)",
-    filterCount: 6,
+    filterCount: 2286,
     source: "NoriDev, Turtlecute, d3Host, List-KR, filterslists-KO",
     icon: "🇰🇷"
   },
@@ -29,7 +29,7 @@ export const FILTER_LIST = [
     id: "privacy",
     name: "개인정보 보호",
     description: "소셜 미디어 통합 제거 + URL 추적 파라미터 제거",
-    filterCount: 3,
+    filterCount: 1459,
     source: "Fanboy's Social, AdGuard URL Tracking, uAssets privacy",
     icon: "🔒"
   },
@@ -37,7 +37,7 @@ export const FILTER_LIST = [
     id: "anti_circumvention",
     name: "안티서클",
     description: "광고 우회 스크립트 차단 (영문/중문/유럽어권)",
-    filterCount: 11,
+    filterCount: 1041,
     source: "abp-filters-anti-cv (eyeo) 11개 언어",
     icon: "🛡️"
   },
@@ -45,7 +45,7 @@ export const FILTER_LIST = [
     id: "annoyances",
     name: "성가신 요소",
     description: "팝업, 쿠키 동의, 배너 등 성가신 요소 차단",
-    filterCount: 1,
+    filterCount: 2445,
     source: "Fanboy's Annoyance List",
     icon: "🧹"
   }

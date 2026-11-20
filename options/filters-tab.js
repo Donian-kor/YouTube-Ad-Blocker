@@ -63,7 +63,7 @@ function renderFilterList() {
 
     const badge = document.createElement("span");
     badge.className = "filter-badge count" + (LOCKED_GROUPS.has(filter.id) ? " lock" : "");
-    badge.textContent = "필터 " + (filter.filterCount || 0) + "개";
+    badge.textContent = "규칙 " + (filter.filterCount || 0).toLocaleString() + "개";
     nameRow.appendChild(badge);
 
     const desc = document.createElement("div");
