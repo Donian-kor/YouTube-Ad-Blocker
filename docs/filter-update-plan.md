@@ -640,3 +640,20 @@ README "참고 자료"에 나열된 항목 중 **실제 필터 소스로 사용�
 **한계**
 - 2026-11-20 실제 페이지를 열어 광고 마커(위 #14.5 참조)를 확인하고 선택자에 반영함. 광고가 새 클래스명으로 바뀌면 추가 확인 필요.
 - 유튜브 같은 응답 후킹(`youtube-main.js`)은 치지직에 없음 → 광고 API가 바뀌면 대응이 어려움.
+
+#### 치지직 동영상 광고 자동 스킵 (2026-11-20 추가)
+
+실제 크롬에서 확인한 광고 DOM 구조:
+```html
+<div class="ad_info_area">
+  <div class="skip_area" data-role="countDownEl">
+    <p class="skip_info"><strong data-role="countDownTxt">8</strong>초 후 <span class="txt_skip">SKIP</span></p>
+  </div>
+  <button class="btn_skip hide">SKIP</button>  <!-- 카운트다운 끝나면 hide 제거됨 -->
+</div>
+```
+
+- 네트워크 차단으로 막지 못한 광고가 재생되면, `chzzk-ad-skip.js`가 250ms 간격으로 `.ad_info_area button.btn_skip`을 감시한다.
+- `hide` 클래스가 제거되고 버튼이 보이는 순간 **자동 클릭**하여 광고를 스킵하고 `adRemoved` 통계를 전송한다.
+- `manifest.json`에 `*://chzzk.naver.com/*` 매칭, `document_start`, `all_frames`로 등록.
+- 전체 ON/OFF 토글 연동 (OFF 시 폴링 중지).

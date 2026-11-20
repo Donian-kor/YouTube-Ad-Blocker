@@ -84,6 +84,12 @@
       "run_at": "document_idle"
     },
     {
+      "matches": ["*://chzzk.naver.com/*"],
+      "js": ["chzzk-ad-skip.js"],
+      "run_at": "document_start",
+      "all_frames": true
+    },
+    {
       "matches": [
         "*://*.gigafile.nu/*",
         "*://*.gofile.io/*",
