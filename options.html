@@ -204,6 +204,7 @@
 
     .filter-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
     .filter-header h3 { font-size: 18px; margin-bottom: 0; }
+    .filter-title-row { display: flex; align-items: center; gap: 8px; }
     .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
     .section-header h3 { font-size: 18px; margin-bottom: 0; }
     .section-header .btn-row { margin-top: 0; margin-left: auto; }
@@ -299,7 +300,10 @@
   <div class="tab-content active" id="tab-filters">
     <div class="section">
       <div class="filter-header">
-        <h3>광고 차단 필터</h3>
+        <div class="filter-title-row">
+          <h3>광고 차단 필터</h3>
+          <span class="filter-badge count" id="totalRuleBadge">규칙 -</span>
+        </div>
         <div class="filter-toolbar">
           <button class="secondary" id="filterAllOnBtn">전체 활성화</button>
           <button class="secondary" id="filterAllOffBtn">전체 비활성화</button>

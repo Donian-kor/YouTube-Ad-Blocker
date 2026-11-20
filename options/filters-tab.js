@@ -181,9 +181,11 @@ export function initFiltersTab() {
   renderFilterList();
   loadFilterStates();
 
-  // 정적 필터 개수를 빌드 메타데이터에서 자동 표시
+  // 정적 필터 개수를 빌드 메타데이터에서 자동 표시 (빌드 시 규칙이 바뀌면 함께 갱신)
   const staticCountEl = document.getElementById("staticFilterCount");
   if (staticCountEl) staticCountEl.textContent = STATIC_FILTER_COUNT.toLocaleString();
+  const totalBadge = document.getElementById("totalRuleBadge");
+  if (totalBadge) totalBadge.textContent = "규칙 " + STATIC_FILTER_COUNT.toLocaleString() + "개";
 
   document.getElementById("filterAllOnBtn").addEventListener("click", () => {
     SOURCE_LIST.forEach((source) => {
