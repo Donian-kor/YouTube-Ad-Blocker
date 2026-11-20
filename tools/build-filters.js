@@ -28,6 +28,13 @@ for (const group of REG.FILTER_GROUPS) {
 
 const LISTS = REG.getGroupSources("easylist").map((s) => [s.id, s.url]);
 
+// 그룹 간 중복 제거 시 규칙의 소유 그룹 결정 순서 (구체적인 그룹이 먼저 소유)
+// 예: 한국 규칙이 EasyList에도 있어도 'korean' 그룹에 귀속되어 한국 토글로 제어된다.
+const DEDUPE_ORDER = [
+  "korean", "anti_cv", "annoyances", "social", "mining", "malware",
+  "uassets", "peterlowe", "easylist", "adguard",
+];
+
 // === 명령행 인자 처리 ===
 const args = process.argv.slice(2);
 const ALL_MODE = args.includes("--all");
@@ -79,7 +86,9 @@ async function downloadList(name, url) {
 }
 
 // 줄 -> DNR 규칙 변환 (공통 로직)
-function convertLines(allLines) {
+// seen: 그룹 내부 + 그룹 간 중복을 함께 걸러내는 전역 집합 (전달 시 누적됨)
+function convertLines(allLines, seen) {
+  const dedupeSet = seen || new Set();
   const cancelled = new Set();
   for (const line of allLines) {
     if (!line.startsWith("!") && !line.startsWith("[") && line.includes("badfilter")) {
@@ -87,7 +96,6 @@ function convertLines(allLines) {
     }
   }
   const rules = [];
-  const seen = new Set();
   let skipped = 0;
   for (const line of allLines) {
     if (!line || line.startsWith("!") || line.startsWith("[") || line.includes("#")) continue;
@@ -96,8 +104,8 @@ function convertLines(allLines) {
     const rule = convertLine(line);
     if (!rule) { skipped++; continue; }
     const key = JSON.stringify([rule.action.type, rule.condition]);
-    if (seen.has(key)) continue;
-    seen.add(key);
+    if (dedupeSet.has(key)) continue;
+    dedupeSet.add(key);
     rules.push(rule);
   }
   return { rules, skipped };
@@ -105,7 +113,7 @@ function convertLines(allLines) {
 
 const builtCounts = {};
 
-async function buildGroup(groupKey) {
+async function buildGroup(groupKey, globalSeen) {
   const group = GROUPS[groupKey];
   if (!group) return 0;
 
@@ -125,7 +133,7 @@ async function buildGroup(groupKey) {
     return 0;
   }
 
-  const { rules, skipped } = convertLines(allLines);
+  const { rules, skipped } = convertLines(allLines, globalSeen);
   const allowCount = rules.filter((r) => r.action.type === "allow").length;
   console.log("  변환 규칙: " + rules.length + "개 (allow " + allowCount + ", block " + (rules.length - allowCount) + ")");
   console.log("  제외된 줄: " + skipped);
@@ -183,6 +191,38 @@ function writeBuildMeta() {
   console.log("shared/build-meta.js 갱신:", Object.keys(builtCounts).join(", "));
 }
 
+// 전체 빌드 후 정적 필터 인덱스(동적 업데이트 중복 제거용) 재생성
+function writeStaticIndex() {
+  const urlFilters = new Set();
+  for (const f of fs.readdirSync(OUT_DIR)) {
+    if (!/^ruleset_.+\.json$/.test(f)) continue;
+    for (const r of JSON.parse(fs.readFileSync(path.join(OUT_DIR, f), "utf8"))) {
+      if (r.condition && r.condition.urlFilter) urlFilters.add(r.condition.urlFilter);
+    }
+  }
+  fs.writeFileSync(path.join(OUT_DIR, "static-index.json"), JSON.stringify({ urlFilters: [...urlFilters] }));
+  console.log("static-index.json 갱신:", urlFilters.size, "개");
+}
+
+// 전체 빌드 후 manifest rule_resources 재생성 (한도 초과 방지를 위해 모두 비활성화)
+function writeManifestResources() {
+  const resources = [];
+  for (const group of DEDUPE_ORDER) {
+    let i = 1;
+    while (true) {
+      const name = `ruleset_${group}${i > 1 ? "_" + i : ""}.json`;
+      if (!fs.existsSync(path.join(OUT_DIR, name))) break;
+      resources.push({ id: `${group}_${i}`, enabled: false, path: `filters/${name}` });
+      i++;
+    }
+  }
+  const manifestPath = path.join(ROOT, "manifest.json");
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+  manifest.declarative_net_request.rule_resources = resources;
+  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + "\n");
+  console.log("manifest rule_resources 갱신:", resources.length, "개");
+}
+
 async function main() {
   fs.mkdirSync(TMP_DIR, { recursive: true });
   fs.mkdirSync(OUT_DIR, { recursive: true });
@@ -195,12 +235,20 @@ async function main() {
     }
     writeBuildMeta();
   } else if (ALL_MODE) {
-    console.log("=== 전체 필터 생성 ===" + (OFFLINE ? " (오프라인 캐시)" : ""));
-    for (const groupKey of Object.keys(GROUPS)) {
-      console.log("\n[" + GROUPS[groupKey].name + "]");
-      await buildGroup(groupKey);
+    console.log("=== 전체 필터 생성 (그룹 간 중복 제거) ===" + (OFFLINE ? " (오프라인 캐시)" : ""));
+    // 이전 빌드의 규칙셋 파일 제거 (그룹 소유 변경으로 파일 구성이 달라짐)
+    for (const f of fs.readdirSync(OUT_DIR)) {
+      if (/^ruleset_.+\.json$/.test(f)) fs.unlinkSync(path.join(OUT_DIR, f));
     }
+    const globalSeen = new Set();
+    for (const groupKey of DEDUPE_ORDER) {
+      console.log("\n[" + (GROUPS[groupKey]?.name || groupKey) + "]");
+      await buildGroup(groupKey, globalSeen);
+    }
+    console.log("\n전역 고유 규칙:", globalSeen.size, "개");
     writeBuildMeta();
+    writeStaticIndex();
+    writeManifestResources();
   } else {
     // 기본: EasyList/EasyPrivacy (레거시ruleset_1.json)
     console.log("=== 기본 필터 생성 (EasyList/EasyPrivacy) ===");

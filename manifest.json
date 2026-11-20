@@ -46,59 +46,9 @@
   "declarative_net_request": {
     "rule_resources": [
       {
-        "id": "easylist_1",
-        "enabled": false,
-        "path": "filters/ruleset_easylist.json"
-      },
-      {
-        "id": "easylist_2",
-        "enabled": false,
-        "path": "filters/ruleset_easylist_2.json"
-      },
-      {
-        "id": "easylist_3",
-        "enabled": false,
-        "path": "filters/ruleset_easylist_3.json"
-      },
-      {
-        "id": "easylist_4",
-        "enabled": false,
-        "path": "filters/ruleset_easylist_4.json"
-      },
-      {
-        "id": "adguard_1",
-        "enabled": false,
-        "path": "filters/ruleset_adguard.json"
-      },
-      {
-        "id": "adguard_2",
-        "enabled": false,
-        "path": "filters/ruleset_adguard_2.json"
-      },
-      {
-        "id": "adguard_3",
-        "enabled": false,
-        "path": "filters/ruleset_adguard_3.json"
-      },
-      {
-        "id": "peterlowe_1",
-        "enabled": false,
-        "path": "filters/ruleset_peterlowe.json"
-      },
-      {
-        "id": "uassets_1",
-        "enabled": false,
-        "path": "filters/ruleset_uassets.json"
-      },
-      {
         "id": "korean_1",
         "enabled": false,
         "path": "filters/ruleset_korean.json"
-      },
-      {
-        "id": "social_1",
-        "enabled": false,
-        "path": "filters/ruleset_social.json"
       },
       {
         "id": "anti_cv_1",
@@ -109,6 +59,16 @@
         "id": "annoyances_1",
         "enabled": false,
         "path": "filters/ruleset_annoyances.json"
+      },
+      {
+        "id": "social_1",
+        "enabled": false,
+        "path": "filters/ruleset_social.json"
+      },
+      {
+        "id": "mining_1",
+        "enabled": false,
+        "path": "filters/ruleset_mining.json"
       },
       {
         "id": "malware_1",
@@ -136,9 +96,39 @@
         "path": "filters/ruleset_malware_5.json"
       },
       {
-        "id": "mining_1",
+        "id": "uassets_1",
         "enabled": false,
-        "path": "filters/ruleset_mining.json"
+        "path": "filters/ruleset_uassets.json"
+      },
+      {
+        "id": "peterlowe_1",
+        "enabled": false,
+        "path": "filters/ruleset_peterlowe.json"
+      },
+      {
+        "id": "easylist_1",
+        "enabled": false,
+        "path": "filters/ruleset_easylist.json"
+      },
+      {
+        "id": "easylist_2",
+        "enabled": false,
+        "path": "filters/ruleset_easylist_2.json"
+      },
+      {
+        "id": "easylist_3",
+        "enabled": false,
+        "path": "filters/ruleset_easylist_3.json"
+      },
+      {
+        "id": "easylist_4",
+        "enabled": false,
+        "path": "filters/ruleset_easylist_4.json"
+      },
+      {
+        "id": "adguard_1",
+        "enabled": false,
+        "path": "filters/ruleset_adguard.json"
       }
     ]
   },

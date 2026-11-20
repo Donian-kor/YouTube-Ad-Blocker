@@ -310,7 +310,7 @@ const ALL_RULE_IDS = [
 
 const FILTER_TO_RULESET_IDS = {
   easylist: ["easylist_1", "easylist_2", "easylist_3", "easylist_4"],
-  adguard: ["adguard_1", "adguard_2", "adguard_3"],
+  adguard: ["adguard_1"],
   peterlowe: ["peterlowe_1"],
   uassets: ["uassets_1"],
   korean: ["korean_1"],
