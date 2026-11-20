@@ -1,4 +1,4 @@
-// YouTube Ad Blocker - MAIN world 스크립틀릿
+// www_AD_Blocker - MAIN world 스크립틀릿
 // 유튜브 페이지의 "메인 세계"에서 실행되어 플레이어 응답의 광고 데이터를 제거한다.
 // (content script는 격리된 세계라 페이지의 Promise/JSON.parse에 접근할 수 없음)
 // 참고: uBlock Origin uAssets 의 ytInitialPlayerResponse set-constant / json-prune 기법

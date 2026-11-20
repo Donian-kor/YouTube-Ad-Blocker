@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "YouTube Ad Blocker",
+  "name": "www_AD_Blocker",
   "version": "3.2",
   "description": "PC 크롬에서 유튜브 광고를 차단하고 통계를 확인합니다.",
   "permissions": [
@@ -99,7 +99,7 @@
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "YouTube Ad Blocker",
+    "default_title": "www_AD_Blocker",
     "default_icon": {
       "48": "icon48.png"
     }

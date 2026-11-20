@@ -1,4 +1,4 @@
-# YouTube Ad Blocker
+# www_AD_Blocker
 
 크롬(Chrome)에서 유튜브 영상 광고와 일반 사이트 광고를 차단하는 Manifest V3 확장 프로그램입니다.
 개발자 모드에서 폴더 또는 ZIP을 불러와 사용합니다.
@@ -21,7 +21,7 @@
 
 ### ZIP 배포판 (권장)
 
-1. GitHub Release에서 `youtube-ad-blocker-v3.1.zip` 다운로드
+1. GitHub Release에서 `www_AD_Blocker-v3.1.zip` 다운로드
 2. 압축 해제 (`manifest.json`이 들어있는 폴더 확인)
 3. `chrome://extensions/` 접속 → **개발자 모드** ON
 4. **압축해제된 확장 프로그램을 로드합니다** → 2번 폴더 선택

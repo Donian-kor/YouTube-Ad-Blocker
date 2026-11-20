@@ -1,4 +1,4 @@
-// YouTube Ad Blocker - Content Script
+// www_AD_Blocker - Content Script
 // YouTube 페이지에 주입되어 광고 DOM을 제거하고 통계를 보고
 
 (function () {
@@ -297,5 +297,5 @@
 
   // 초기 상태 로드
   loadEnabled();
-  console.log("YouTube Ad Blocker: 활성화됨");
+  console.log("www_AD_Blocker: 활성화됨");
 })();

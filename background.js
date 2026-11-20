@@ -1,4 +1,4 @@
-// YouTube Ad Blocker - Background Service Worker
+// www_AD_Blocker - Background Service Worker
 // 네트워크 레벨 광고 차단 + 통계 관리
 
 // === 광고 차단 규칙 ===
@@ -421,7 +421,7 @@ function initRules() {
 chrome.runtime.onInstalled.addListener(() => {
   initRules();
   loadStats();
-  console.log("YouTube Ad Blocker: 규칙 등록 완료");
+  console.log("www_AD_Blocker: 규칙 등록 완료");
 });
 
 // === 확장 프로그램 시작 시 ===

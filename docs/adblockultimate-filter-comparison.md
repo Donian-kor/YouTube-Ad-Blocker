@@ -2,7 +2,7 @@
 
 > 작성일: 2026-11-20
 > 기준 페이지: https://adblockultimate.net/ko/filters
-> 이 문서는 **AdBlocker Ultimate 공식 필터 페이지에 나열된 전체 필터**와 **현재 프로젝트(youtube-ad-blocker v3.2) 내장 여부**를 대조한 기록입니다.
+> 이 문서는 **AdBlocker Ultimate 공식 필터 페이지에 나열된 전체 필터**와 **현재 프로젝트(www_AD_Blocker v3.2) 내장 여부**를 대조한 기록입니다.
 > "크레딧 URL"은 해당 페이지에 표기된 링크(주로 홈페이지/저장소)이며, 실제 다운로드 URL은 별도로 확인해야 합니다.
 
 ---
