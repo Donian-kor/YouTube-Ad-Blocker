@@ -616,3 +616,24 @@ README "참고 자료"에 나열된 항목 중 **실제 필터 소스로 사용�
 **빌드 결과**: 전체 정적 규칙 262,246 → **272,248개** (14개 ruleset JSON), 정적 인덱스 259,853 → **268,213개 urlFilter**.
 
 **eyeo 전용 추가 언어(arabic/bulgarian/dutch/hebrew/hungarian/indian/indonesian/italian/latvian/lithuanian/romanian/tamil/nordic/fb_non-graph/mobile-anti-cv)**는 대부분 cosmetic 필터라 DNR 변환 대상이 거의 없어(신규 2개) 미포함.
+
+### 14.5 치지직(chzzk.naver.com) 광고 대응 (2026-11-20)
+
+**현재 상태**
+- 네트워크 차단: `ruleset_korean.json`에 치지직 전용 규칙 **14개** 존재
+  - `api.chzzk.naver.com/service/v1/lives/*/ads/current` (현재 광고 API)
+  - `api.chzzk.naver.com/ad-polling/v1/lives/*/ad` (광고 폴링)
+  - `nam.veta.naver.com/*` allow 3개 (안티애드블록 감지 우회용)
+- **동영상 광고 자체**: API 차단에만 의존하며, 이미 로드된 광고 영상/배너는 DNR로 잡히지 않음
+- `$replace` 옵션 규칙 3개(id 823~825)는 DNR 미지원 옵션이 urlFilter에 그대로 들어가 **무효**
+
+**조치**
+- `general-blocker.js`에 치지직 전용 DOM 숨김 선택자 추가:
+  `[data-ad-type]`, `[data-ad-slot]`, `[data-ad-area]`, `[class*='ad-banner']`,
+  `[class*='ad-overlay']`, `[class*='ad-video']`, `[class*='advertisement']`,
+  `[class*='sponsor-banner']`, `[class*='ad_marker']`, `[class*='ad-marker']`
+- 플레이어(`video`, `#movie_player`)는 대상에서 제외 (오차단 방지)
+
+**한계**
+- 실제 치지직 DOM의 광고 클래스명은 사이트를 열어 확인해야 정확히 특정 가능. 현재는 범용 광고 마커 기반이므로, 새 마커가 보이면 선택자 추가 필요.
+- 유튜브 같은 응답 후킹(`youtube-main.js`)은 치지직에 없음 → 광고 API가 바뀌면 대응이 어려움.

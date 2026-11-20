@@ -58,7 +58,13 @@
     // - gofile: 광고 슬롯
     "#ad-slot", "[id='ad-slot']",
     // - akirabox/buzzheavier: 광고 오버레이/스폰서
-    "[class*='advert']", "[class*='sponsored']", ".ad-overlay"
+    "[class*='advert']", "[class*='sponsored']", ".ad-overlay",
+    // chzzk.naver.com 전용 — 치지직 동영상/방송 광고 (플레이어 제외, 광고 마커만)
+    // DNR이 광고 API를 막아도 남는 화면 배너/오버레이를 숨긴다.
+    "[class*='ad-banner']", "[class*='ad-overlay']", "[class*='ad-video']",
+    "[class*='advertisement']", "[class*='sponsor-banner']",
+    "[data-ad-type]", "[data-ad-slot]", "[data-ad-area]",
+    "[class*='ad_marker']", "[class*='ad-marker']"
   ].join(",");
 
   const STYLE_ID = "yab-general-hide-style";
