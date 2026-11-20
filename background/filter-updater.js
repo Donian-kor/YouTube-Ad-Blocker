@@ -117,6 +117,19 @@ function dnrUpdate(options) {
   });
 }
 
+// 규칙 배열의 지문 계산 (내용이 같은지 비교용)
+function rulesFingerprint(rules) {
+  let h = 5381;
+  for (const r of rules) {
+    const s = r.action.type + "|" + JSON.stringify(r.condition);
+    for (let i = 0; i < s.length; i++) {
+      h = ((h << 5) + h) ^ s.charCodeAt(i);
+      h = h | 0;
+    }
+  }
+  return (h >>> 0).toString(36);
+}
+
 async function updateFilters() {
   const now = Date.now();
   if (updateInProgress) return { ok: false, reason: "진행 중" };
@@ -147,11 +160,20 @@ async function updateFilters() {
     if (allRules.length > SAFE_LIMIT) allRules.length = SAFE_LIMIT;
 
     const committed = allRules.map((r, i) => Object.assign({}, r, { id: COMMIT_ID_START + i }));
+    const newFingerprint = rulesFingerprint(committed);
+
+    // 이전 규칙 지문과 비교 — 내용이 같으면 새로 등록할 필요 없음
+    const prevState = await new Promise((resolve) => {
+      chrome.storage.local.get(["dynamicRuleCount", "filterFingerprint"], (res) => resolve(res));
+    });
+
+    if (prevState.filterFingerprint === newFingerprint) {
+      updateInProgress = false;
+      return { ok: true, count: committed.length, unchanged: true };
+    }
 
     // 1단계: 이전 업데이트 규칙 모두 제거 (한도 여유 확보)
-    const prev = await new Promise((resolve) => {
-      chrome.storage.local.get(["dynamicRuleCount"], (res) => resolve(res.dynamicRuleCount || 0));
-    });
+    const prev = prevState.dynamicRuleCount || 0;
     const oldIds = [];
     for (let i = 0; i < prev; i++) oldIds.push(COMMIT_ID_START + i);
 
@@ -165,9 +187,10 @@ async function updateFilters() {
     chrome.storage.local.set({
       updateStatus: { updatedAt: now, count: committed.length },
       dynamicRuleCount: committed.length,
+      filterFingerprint: newFingerprint,
     });
     updateInProgress = false;
-    return { ok: true, count: committed.length };
+    return { ok: true, count: committed.length, unchanged: false };
   } catch (e) {
     updateInProgress = false;
     return { ok: false, reason: e.message };

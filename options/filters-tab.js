@@ -127,7 +127,11 @@ export function initFiltersTab() {
     chrome.runtime.sendMessage({ type: "updateFilters" }, (res) => {
       updateBtn.disabled = false;
       if (res && res.ok) {
-        setUpdateStatus("✅ " + res.count.toLocaleString() + "개 규칙 업데이트 완료", "ok");
+        if (res.unchanged) {
+          setUpdateStatus("신규 업데이트가 없습니다", "ok");
+        } else {
+          setUpdateStatus("✅ " + res.count.toLocaleString() + "개 규칙 업데이트 완료", "ok");
+        }
       } else {
         const reason = res && res.reason ? res.reason : "알 수 없는 오류";
         setUpdateStatus("❌ 업데이트 실패: " + reason, "err");

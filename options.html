@@ -112,6 +112,7 @@
     .toggle.locked { opacity: .5; cursor: not-allowed; }
 
     .filter-toolbar { display: flex; gap: 8px; margin-bottom: 8px; }
+    .update-row { margin-top: 20px; }  /* 필터 카드와 업데이트 버튼 사이 여백 */
     .update-status { font-size: 10px; color: #64748b; margin-top: 6px; min-height: 13px; }
     .update-status.ok { color: #16a34a; }
     .update-status.err { color: #dc2626; }
@@ -192,8 +193,8 @@
         <button class="secondary" id="filterAllOffBtn">전체 비활성화</button>
       </div>
       <div id="filterList"></div>
-      <div class="btn-row">
-        <button class="primary" id="filterUpdateBtn">최신 도메인 업데이트 (동적 27,000개)</button>
+      <div class="btn-row update-row">
+        <button class="primary" id="filterUpdateBtn">최신 필터 업데이트</button>
       </div>
       <div class="update-status" id="filterUpdateStatus"></div>
       <div class="info">
