@@ -559,7 +559,7 @@ README "참고 자료"에 나열된 항목 중 **실제 필터 소스로 사용�
 
 | 참고자료 | 용도 | 출처 표 항목 |
 |----------|------|-------------|
-| uBlock Origin / uBOL-home | 유튜브 응답 후킹 기법 참고 → `youtube-main.js` 구현에 반영 | 코드 기법 참고 (필터 출처 아님) |
+| uBlock Origin / uBOL-home | 유튜브 응답 후킹 기법 참고 → `youtube-main.js` 구현에 반영. **단, uBO가 쓰는 필터 데이터(EasyList/EasyPrivacy/URLhaus)는 이미 포함됨** | 코드 기법 참고 + 필터 일부 포함 |
 | NoriDev-AdBlock-Filter | 한국 광고 필터 소스 | ✅ NoriDev-AdBlock-Filter |
 | List-KR | 한국 광고 필터 소스 | ✅ List-KR |
 | filterslists-ko | 한국 광고 필터 소스 (2026-11-20 추가, List-KR 포크 분기) | ✅ filterslists-KO (Unified) |
@@ -571,7 +571,7 @@ README "참고 자료"에 나열된 항목 중 **실제 필터 소스로 사용�
 
 | 참고자료 | 미사용 사유 |
 |----------|------------|
-| **uBlock (gorhill/uBlock)** | 필터 기법 연구용. 실제 필터 데이터는 가져오지 않음 (uBOL-home만 후킹 기법 참고) |
+| **uBlock (gorhill/uBlock)** | **정정**: '기법 연구용'이라는 표현은 부정확. 실제로는 uBO가 기본 사용하는 5개 필터 중 3개(EasyList/EasyPrivacy/URLhaus)는 이미 포함했고, 나머지 **Peter Lowe's / uAssets는 검토 과정에서 누락**됨 (의도적 제외 아님). 2026-11-20 데이터 검증 완료 |
 | **AdAway** | 호스트 기반 차단 참고. 실제 필터 미포함 (DNR 변환 대상이 아님) |
 | **hagezi/dns-blocklists** | 규모가 너무 커 미포함 (README에도 명시) |
 | **tryblock.org / d3ward.com / paileactivist/toolz / canyoublockit.com / obfusgated.com / ipcheck.ing / superadblocktest.com** | 차단 동작 검증용 테스트 사이트. 필터 소스가 아니라 검증 대상 |
@@ -583,3 +583,10 @@ README "참고 자료"에 나열된 항목 중 **실제 필터 소스로 사용�
    변환 가능 1,823개 중 정적 중복 제거 후 430개가 한국 필터에 반영됨 (한국 필터 1,856 → 2,286개).
 2. **자체 extra-hosts 출처 항목 제거** — 사용자 저장소에는 필터가 없으므로 출처 표에서 삭제 (정적 빌드 소스로는 유지).
 3. **URL Tracking 소스 불일치 수정** — `build-filters.js`의 `filters/10.txt`(검색광고 차단해제) → `filters/17.txt`(AdGuard URL Tracking)로 변경.
+4. **uBO 필터 누락 재검증 (2026-11-20)** — 이전 문서의 "uBO는 기법 참고용" 설명은 부정확하여 정정. 실제 uBO 기본 필터 5개 중 3개(EasyList/EasyPrivacy/URLhaus)는 이미 포함, 나머지 Peter Lowe's와 uAssets는 ** 검토 누락**이었음. 데이터 검증 결과 아래와 같이 상당수가 **중복이 아닌 신규 도메인**임을 확인:
+   - Peter Lowe's: 변환 3,568개 중 정적 중복 1,656개 / **신규 1,912개**
+   - uAssets `badware.txt`: 변환 2,967개 중 중복 15개 / **신규 2,945개**
+   - uAssets `privacy.txt`: 변환 841개 중 중복 37개 / **신규 804개**
+   - uAssets `filters.txt`: 변환 872개 중 중복 229개 / **신규 634개**
+   - uAssets는 단일 필터가 아니라 **22개 파일** (filters.txt, filters-2020~2026, privacy.txt, badware.txt, annoyances계열, resource-abuse, ubo-link-shorteners, unbreak 등). 이전에 "필터 2개"라고 표현한 것도 부정확.
+   - **결론**: 중복이 아닌 신규 도메인이 수천 개 있으므로, 추가 여부는 별도 결정 필요 (현재는 미추가 상태).
