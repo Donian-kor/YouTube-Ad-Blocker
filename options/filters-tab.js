@@ -1,5 +1,5 @@
 // options/filters-tab.js - 2단 필터 토글(카테고리 + 개별 소스), 업데이트, 이력
-import { FILTER_LIST, SOURCE_LIST, LOCKED_SOURCES } from "./config.js";
+import { FILTER_LIST, SOURCE_LIST, LOCKED_SOURCES, STATIC_FILTER_COUNT } from "./config.js";
 
 function sourcesOf(categoryId) {
   return SOURCE_LIST.filter((s) => s.category === categoryId);
@@ -178,6 +178,10 @@ function setUpdateStatus(message, kind) {
 export function initFiltersTab() {
   renderFilterList();
   loadFilterStates();
+
+  // 정적 필터 개수를 빌드 메타데이터에서 자동 표시
+  const staticCountEl = document.getElementById("staticFilterCount");
+  if (staticCountEl) staticCountEl.textContent = STATIC_FILTER_COUNT.toLocaleString();
 
   document.getElementById("filterAllOnBtn").addEventListener("click", () => {
     SOURCE_LIST.forEach((source) => {

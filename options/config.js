@@ -66,6 +66,10 @@ export const SOURCE_LIST = REG.FILTER_REGISTRY.map((s) => ({
 // 잠금 소스 (국제 광고·보안 카테고리 소속)
 export const LOCKED_SOURCES = new Set(SOURCE_LIST.filter((s) => s.locked).map((s) => s.id));
 
+// 빌드 결과 기준 정적 규칙 총합 (빌드 메타에서 자동 계산)
+export const STATIC_FILTER_COUNT = Object.values(META.rulesets || {})
+  .reduce((sum, n) => sum + n, 0);
+
 // 출처 및 라이선스 표 (레지스트리에서 자동 생성)
 export const LICENSE_TABLE = REG.FILTER_REGISTRY.map((s) => ({
   name: s.name,
