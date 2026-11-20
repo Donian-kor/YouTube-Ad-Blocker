@@ -1,8 +1,8 @@
 // background/stats.js - 통계 수집/저장, 사이트별 카운트, 툴바 뱃지, 탭 추적
 // AppState(background/state.js)를 통해 다른 모듈과 상태를 공유한다.
 
-// 차단 주소 로그는 최대 300개까지만 보관
-const MAX_LOG_ENTRIES = 300;
+// 차단 주소 로그는 최대 5,000개까지만 보관 (전체 차단 횟수는 blockedRequests에 별도 누적)
+const MAX_LOG_ENTRIES = 5000;
 let saveTimer = null;
 let siteSaveTimer = null;
 

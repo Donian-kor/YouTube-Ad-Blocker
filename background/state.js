@@ -4,7 +4,7 @@ const AppState = {
   enabledState: true,   // 전체 광고 차단 ON/OFF
   activeTabId: -1,
 
-  // 통계 (blockedLog는 최대 300개)
+  // 통계 (blockedLog는 최대 5,000개, 전체 차단 수는 blockedRequests에 무제한 누적)
   stats: {
     blockedAds: 0,
     blockedRequests: 0,

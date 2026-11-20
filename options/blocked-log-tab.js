@@ -1,5 +1,5 @@
 // options/blocked-log-tab.js - 자동으로 차단된 요청 기록 (사이트별 그룹)
-// 데이터: background의 stats.blockedLog(최대 300건) + siteCounts(사이트별 누적)
+// 데이터: background의 stats.blockedLog(최대 5,000건) + 전체 차단 횟수(blockedRequests)
 
 function hostOf(url) {
   try {
@@ -39,16 +39,19 @@ export function initBlockedLogTab() {
   if (!container || !summaryEl) return;
 
   let log = [];
+  let totalBlocked = 0;   // 전체 차단 횟수 (로그와 별개로 무제한 누적)
   let keyword = "";
 
   function summarize(hosts) {
     if (!log.length) {
-      summaryEl.textContent = "아직 기록이 없습니다.";
+      summaryEl.textContent = totalBlocked
+        ? "전체 " + totalBlocked.toLocaleString() + "건 차단 · 표시할 기록이 없습니다."
+        : "아직 기록이 없습니다.";
       return;
     }
     const latest = Math.max(...log.map((e) => e.time || 0));
     summaryEl.textContent =
-      "최근 " + log.length.toLocaleString() + "건 · " +
+      "전체 " + totalBlocked.toLocaleString() + "건 차단 · 기록 " + log.length.toLocaleString() + "건 · " +
       hosts.size.toLocaleString() + "개 사이트 · 마지막 차단 " + timeAgo(latest);
   }
 
@@ -141,6 +144,10 @@ export function initBlockedLogTab() {
   }
 
   function load() {
+    chrome.runtime.sendMessage({ type: "getStats" }, (res) => {
+      totalBlocked = (res && res.blockedRequests) || 0;
+      render();
+    });
     chrome.runtime.sendMessage({ type: "getBlockedLog" }, (res) => {
       log = (res && res.log) || [];
       render();
