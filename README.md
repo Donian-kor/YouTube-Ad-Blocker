@@ -7,7 +7,7 @@
 
 ## 주요 기능
 
-- **유튜브 광고 차단** — 광고 소재 도메인을 유튜브에서만 허용하고 요청 body를 광고 없는 클라이언트로 위조해 애초에 광고가 오지 않게 처리, 플레이어 응답의 `adSlots` / `playerAds` / `adPlacements` / `adBreakHeartbeatParams` 제거, Shorts `isAd` 플래그 무력화, 자동 음소거 해제
+- **동영상 사이트 광고 차단** — 광고 소재 도메인을 동영상 사이트에서만 허용하고 요청 body를 광고 없는 클라이언트로 위조해 애초에 광고가 오지 않게 처리, 플레이어 응답의 `adSlots` / `playerAds` / `adPlacements` / `adBreakHeartbeatParams` 제거, Shorts `isAd` 플래그 무력화, 자동 음소거 해제
 - **네트워크 광고 차단** — 5개 카테고리·34개 소스(소스별 개별 토글), 정적 271,415개 + 동적 신규 규칙(최대 30,000개 한도)를 DNR로 차단
 - **인라인 광고 차단** — 네트워크 차단으로 잡히지 않는 배너·사이드바·스폰서·팝업·오버레이 광고를 CSS 숨김 + DOM 제거 (`general-blocker.js`)
 - **광고 감지 우회** — 감지 경고창·베이트 요소를 숨기고, dogdrip.net 서버 감지도 우회
@@ -51,8 +51,8 @@ background.js          진입점 — 모듈 로드, 메시지 핸들러, 우클�
 background/            state.js(공유 상태) · stats.js(통계·뱃지) · rules.js(DNR 규칙) · filter-updater.js(필터 업데이트)
 shared/                filter-converter.js · filter-registry.js · build-meta.js · badge-format.js (빌드/런타임 공용)
 options/               main.js · config.js · stats.js · filters-tab.js · blocked-tab.js · licenses-tab.js
-youtube-main.js        유튜브 MAIN world 응답 후킹
-content.js             유튜브 DOM 정리/광고 스킵
+youtube-main.js        동영상 사이트 MAIN world 응답 후킹
+content.js             동영상 사이트 DOM 정리/광고 스킵
 general-blocker.js     일반 사이트 인라인 광고 숨김 (tryblock, dogdrip, d3ward, uBO 테스트)
 popunder-blocker.js    skidrowreloaded 클릭 리다이렉트(popunder) 차단 (MAIN world)
 filehost-blocker.js    해외 파일 공유 사이트(gigafile/gofile/akirabox/buzzheavier) 광고·팝업·가짜 다운로드 차단
@@ -73,7 +73,7 @@ node tools/build-filters.js --all --offline    # tools/tmp 캐시 사용 (재다
 node tools/build-filters.js --source=noridev   # 특정 소스만 빌드
 
 node tools/validate-rules.js         # 규칙 검증
-node tools/test-main-hook.js         # 유튜브 후킹 테스트
+node tools/test-main-hook.js         # 동영상 사이트 후킹 테스트
 node tools/test-site-badge.js        # 사이트별 뱃지 테스트
 node tools/test-element-blocker.js   # 우클릭 요소 차단 테스트
 node tools/test-filehost-blocker.js  # 해외 파일 공유 사이트 차단 테스트
@@ -101,7 +101,7 @@ node tools/test-filehost-blocker.js  # 해외 파일 공유 사이트 차단 테
 | [gofile.io](https://gofile.io/) | 다운로드 페이지 광고 슬롯 | `#ad-slot` 광고 영역 제거, 실제 다운로드 버튼 유지 |
 | [akirabox.com](https://akirabox.com/) | 다운로드 클릭 시 가짜 팝업/리다이렉트 | 팝오버·팝언더·외부 광고 링크 차단 |
 | [buzzheavier.com](https://buzzheavier.com/) | 팝오버/언더 + 가짜 다운로드 | 팝업/리다이렉트 차단, 실제 다운로드(hx-get /download) 버튼 보존 |
-| 유튜브 | 영상 전/중·Shorts·피드·배너 | 광고 필드·DOM 0개, 영상 정상 재생 확인 |
+| 동영상 사이트 | 영상 전/중·Shorts·피드·배너 | 광고 필드·DOM 0개, 영상 정상 재생 확인 |
 
 ## 보안 관련 사항
 
@@ -109,7 +109,7 @@ node tools/test-filehost-blocker.js  # 해외 파일 공유 사이트 차단 테
 - **XSS 방지** — 차단 로그·출처 표는 `textContent` + DOM API로 렌더링합니다. `innerHTML`은 고정 문자열(빈 로그 안내, 1px GIF)에만 사용합니다.
 - **안전한 통신** — 필터 소스 30개 전부 HTTPS이며, 10초 타임아웃·10MB 용량 제한을 적용합니다.
 - **최소 노출** — `web_accessible_resources`는 `filters/static-index.json` 하나뿐입니다. 저장소에 API 키·비밀번호·서명 키가 없고, `.gitignore`에 `*.pem`·`*.zip`·`tools/tmp/`를 등록했습니다.
-- **MAIN world 제한** — 페이지 영역에 코드를 넣는 스크립트는 유튜브·치지직·skidrowreloaded 3개 사이트에만 주입합니다.
+- **MAIN world 제한** — 페이지 영역에 코드를 넣는 스크립트는 동영상 사이트·치지직·skidrowreloaded 3개 사이트에만 주입합니다.
 - **토글 메시지 위조 방지** — 격리 세계(content script)가 페이지 로드마다 **랜덤 토큰**을 생성해 DOM에 심고, MAIN world(`youtube-main.js`, `popunder-blocker.js`)는 이 토큰이 일치하는 메시지만 수용합니다. 웹사이트가 고정 문자열(`yab-extension`)만으로 "광고 차단 꺼짐"을 위조할 수 없습니다. (`tools/test-main-hook.js`에 위조 토큰 거부 테스트 포함)
 
 > 참고: 토큰은 같은 페이지의 DOM에 저장되므로, 페이지 스크립트가 의도적으로 읽으면 흉내낼 수 있습니다. 다만 무작위 값이라 사전에 알고 있는 문자열로는 속일 수 없어 위조 난이도가 크게 올라갑니다.
@@ -126,11 +126,11 @@ node tools/test-filehost-blocker.js  # 해외 파일 공유 사이트 차단 테
 
 ## 개선 내역 (버전별)
 
-- **v0.36**: 유튜브 광고 차단 감지 경고·재생 차단 해결 — 광고 소재 도메인을 유튜브 요청에 한해 허용하고 요청 body를 광고 없는 클라이언트로 위조, 텔레메트리 12개 경로 허용, 감지 콜백(`onAbnormalityDetected`)·`[native code]` 검사 타이머 무력화, 자동 음소거 해제. 유튜브에서는 광고 DOM 제거·영상 탐색을 하지 않고 CSS 은닉만 사용. 툴바 뱃지 9999 상한 해소(최대 999B), DOM 차단 수 중복 집계 수정, 뱃지 글자색 흰색 적용.
+- **v0.36**: 동영상 사이트 광고 차단 감지 경고·재생 차단 해결 — 광고 소재 도메인을 동영상 사이트 요청에 한해 허용하고 요청 body를 광고 없는 클라이언트로 위조, 텔레메트리 12개 경로 허용, 감지 콜백(`onAbnormalityDetected`)·`[native code]` 검사 타이머 무력화, 자동 음소거 해제. 동영상 사이트에서는 광고 DOM 제거·영상 탐색을 하지 않고 CSS 은닉만 사용. 툴바 뱃지 9999 상한 해소(최대 999B), DOM 차단 수 중복 집계 수정, 뱃지 글자색 흰색 적용.
 
 - **v0.35**: 우클릭이 막힌 사이트용 **요소 차단 모드** 추가 — 팝업 버튼 → 마우스 위 요소가 파란 테두리로 실시간 하이라이트 → 클릭 시 차단, ESC 취소, iframe 포함 모든 프레임 지원. 필터 개수 뱃지에 동적 규칙 수 자동 합산.
 
-- **초기**: `Promise.then` 후킹 무한 재귀 수정, 유튜브 광고 키/Shorts 처리 확대, DOM 전체 제거, Observer 등록 수정, DNR 로드 오류(`||*`·중복 ID) 수정
+- **초기**: `Promise.then` 후킹 무한 재귀 수정, 동영상 사이트 광고 키/Shorts 처리 확대, DOM 전체 제거, Observer 등록 수정, DNR 로드 오류(`||*`·중복 ID) 수정
 - **v1.2**: 한국 도메인 + Turtlecute 규칙셋 추가
 - **v1.3~v1.5**: 일반 사이트 인라인 광고 차단(`general-blocker.js`), tryblock 3단계/우회 챌린지 대응
 - **v1.6~v1.7**: dogdrip 광고 iframe 차단 및 서버 측 감지 우회
@@ -143,17 +143,17 @@ node tools/test-filehost-blocker.js  # 해외 파일 공유 사이트 차단 테
 - **v2.5**: obfusgated(55)+ipcheck(26) 테스트 미차단 도메인 72개를 `extra-hosts` 규칙셋에 추가 (정적 allow를 덮도록 priority 11 적용)
 - **v2.6**: superadblocktest 미차단 105개 중 신규 48개 도메인 추가 (보조 규칙셋 총 454개)
 - **v2.7**: 잔여 4개 도메인(`redirector.googlevideo.com`, `analytics.x.com`, `ads.x.com`, `mon.tiktokv.com`) 추가 (총 458개)
-- **v2.8**: `redirector.googlevideo.com` 차단 제거 — 유튜브 영상 로딩이 약 5초 지연되는 문제가 확인되어 예외 처리 (나머지 3개는 유지, 총 457개)
+- **v2.8**: `redirector.googlevideo.com` 차단 제거 — 동영상 사이트 영상 로딩이 약 5초 지연되는 문제가 확인되어 예외 처리 (나머지 3개는 유지, 총 457개)
 - **v2.9**: `s.youtube.com` 차단 제거 — 광고 도메인이 아닌 시청 통계/재생 위치 저장용 telemetry라 차단 불필요 (광고 전용 `ads.youtube.com`은 유지, 총 456개)
 - **v3.0**: 해외 파일 공유 사이트(gigafile·gofile·akirabox·buzzheavier) 광고·팝오버/언더·가짜 다운로드 차단 추가 — DNR 광고 도메인 33개 추가, `filehost-blocker.js` 신규 도입 (실제 다운로드 버튼은 보존)
-- **v3.1**: 유튜브 홈 그리드에서 광고 렌더러만 제거되어 빈 칸(325×260px)이 남던 문제 수정 — 광고를 감싼 `ytd-rich-item-renderer` 셀째로 숨기고 제거
+- **v3.1**: 동영상 사이트 홈 그리드에서 광고 렌더러만 제거되어 빈 칸(325×260px)이 남던 문제 수정 — 광고를 감싼 `ytd-rich-item-renderer` 셀째로 숨기고 제거
 - **v3.2**: 필터를 6개 그룹(보안/광고/한국/개인정보/광고 감지 대응/성가신요소)으로 재구성, List-KR 추가, 설정 페이지 탭 UI + 라이트 테마, 모듈화(shared/options/background)
 - **v3.3**: 최신 필터 업데이트 기능 구현 (버튼 1개, 2단계 교체, 미변경 감지 '신규 업데이트가 없습니다'), 동적 규칙 한도 초과 오류 수정, 보안 필터 첫 행 배치, 통계 패널 재배치(총 차단 강조·재설정 우측), 설정/팝업 라이트 테마 및 배경 박스 제거, 새 아이콘(방패/AD) 적용
 - **v0.34**: 설치/재로드 시 자동 업데이트 제거 (버튼 누를 때만 실행되도록 변경), 정적 필터 27만 개(272,248개)와 **중복된 도메인은 동적 등록에서 제외**하고 신규 도메인만 업데이트 (`filters/static-index.json` 인덱스(당시 259,853개 → 현재 268,221개), web_accessible_resources 등록). 실제 테스트에서 29,136개 중복 제거 후 474개 신규만 등록. 인위적 상한 제거, validate-rules 오인 수정. 이후 소스 단위 필터 토글(31소스·37규칙셋), 그룹 간 중복 51,509개 제거(271,415개), Chrome 정적 규칙 한도 대응, background 모듈화, **MAIN world 토글 메시지에 랜덤 토큰 검증 추가**, DOM 제거 기록 추가 및 중복 보고 방지, 차단 기록 탭·팝업 바로가기, 상단 통계 패널에 마지막 차단 시점 표시, 필터 개수 뱃지에 동적 규칙 자동 합산, 사이드바 UI 및 토글 색상 정리
 
 ## 참고 자료
 
-- [uBlock Origin / uBOL-home](https://github.com/uBlockOrigin/uBOL-home), [uBlock](https://github.com/gorhill/uBlock) — 유튜브 응답 후킹·필터 기법
+- [uBlock Origin / uBOL-home](https://github.com/uBlockOrigin/uBOL-home), [uBlock](https://github.com/gorhill/uBlock) — 동영상 사이트 응답 후킹·필터 기법
 - [raymondhill.net/ublock 테스트](https://raymondhill.net/ublock/tests.html) — 네트워크/코스메틱 차단 검증
 - [NoriDev-AdBlock-Filter](https://github.com/noridev/NoriDev-AdBlock-Filter), [List-KR](https://github.com/List-KR/List-KR), [filterslists-ko](https://github.com/FilteringDev/filterslists-ko) — 한국 광고 도메인/필터
 - [AdAway](https://github.com/AdAway/AdAway), [hagezi/dns-blocklists](https://github.com/hagezi/dns-blocklists) — 호스트 기반 차단 참고 (hagezi는 규모가 커 미포함)
@@ -178,4 +178,4 @@ node tools/test-filehost-blocker.js  # 해외 파일 공유 사이트 차단 테
 - 정적 규칙 파일 수정 후에는 확장을 **재로드(↻)** 해야 반영됩니다.
 - **최신 필터 업데이트**는 정적 필터 271,415개에 없는 **신규 도메인만** 동적으로 등록합니다. 정적 필터 자체는 재배포 시에만 바뀌고, 신규 도메인이 없으면 "신규 업데이트가 없습니다"로 안내합니다.
 - 동적 규칙은 확장 삭제 시 초기화됩니다. **재설치 후에는 "최신 필터 업데이트" 버튼을 눌러야** 동적 규칙이 채워집니다 (자동 업데이트 없음).
-- `redirector.googlevideo.com`은 유튜브 스트리밍 리다이렉터로, 차단 시 영상 로딩이 지연되어 의도적으로 예외 처리했습니다 (테스트 점수보다 실제 이용 우선).
+- `redirector.googlevideo.com`은 동영상 사이트 스트리밍 리다이렉터로, 차단 시 영상 로딩이 지연되어 의도적으로 예외 처리했습니다 (테스트 점수보다 실제 이용 우선).

@@ -1,28 +1,28 @@
-# 유튜브 광고 차단 감지 대응 작업 내역
+# 동영상 사이트 광고 차단 감지 대응 작업 내역
 
-2026-11-21 작업. 유튜브가 "광고 차단 프로그램이 감지되었습니다" 경고를 띄우고
-영상 재생을 막던 문제를 해결한 기록이다. 나중에 유튜브가 감지를 다시 강화했을 때
+2026-11-21 작업. 동영상 사이트가 "광고 차단 프로그램이 감지되었습니다" 경고를 띄우고
+영상 재생을 막던 문제를 해결한 기록이다. 나중에 동영상 사이트가 감지를 다시 강화했을 때
 참고할 수 있도록 원인 분석 과정과 최종 구현을 모두 남긴다.
 
-커밋: `fdfa085 fix: 유튜브 광고 차단 감지 대응 (요청 스푸핑 + 광고 도메인 허용)`
+커밋: `fdfa085 fix: 동영상 사이트 광고 차단 감지 대응 (요청 스푸핑 + 광고 도메인 허용)`
 
 ---
 
 ## 1. 증상
 
-- 유튜브 시청 시 "광고 차단 프로그램 사용이 감지되었습니다" 경고 표시
+- 동영상 사이트 시청 시 "광고 차단 프로그램 사용이 감지되었습니다" 경고 표시
 - 경고와 함께 영상 재생이 막힘
 - 팝업에서 광고 차단을 끄면 경고가 사라지고 광고와 함께 정상 재생됨
-- 같은 브라우저에서 AdGuard계열 확장은 유튜브 광고 차단이 정상 동작
+- 같은 브라우저에서 AdGuard계열 확장은 동영상 사이트 광고 차단이 정상 동작
 
 ## 2. 검증 과정 (다시 같은 실수를 하지 않기 위한 기록)
 
-원인을 하나씩 분리해 확인했다. 각 단계는 "확장 새로고침 → 유튜브 F5"로 검증했다.
+원인을 하나씩 분리해 확인했다. 각 단계는 "확장 새로고침 → 동영상 사이트 F5"로 검증했다.
 
 | # | 조건 | 결과 |
 |---|---|---|
 | 1 | 초기 상태 (광고 도메인 차단, 모든 스크립트 ON) | 경고 |
-| 2 | 유튜브 텔레메트리 12개 경로 허용 | 경고 |
+| 2 | 동영상 사이트 텔레메트리 12개 경로 허용 | 경고 |
 | 3 | 감지 콜백 무력화 추가 | 경고 |
 | 4 | `content.js` 끄고 `youtube-main.js`만 | 경고 |
 | 5 | `youtube-main.js` 끄고 `content.js`만 | 경고 |
@@ -52,9 +52,9 @@
 
 ### 3-1. 광고 소재 도메인을 DNR로 차단 (네트워크 계층)
 
-유튜브 광고는 다음 순서로 동작한다.
+동영상 사이트 광고는 다음 순서로 동작한다.
 
-1. 유튜브 서버가 "광고 config"를 정상 응답
+1. 동영상 사이트 서버가 "광고 config"를 정상 응답
 2. 플레이어가 광고 소재를 다운로드 (`googlesyndication.com`, `doubleclick.net` ...)
 3. **DNR이 차단 → 다운로드 실패**
 4. 플레이어가 광고 로드 실패를 "광고 차단"으로 판정 → 경고
@@ -69,7 +69,7 @@
 
 ## 4. 해결 전략
 
-AdGuard AdBlock Ultimate이 유튜브를 통과시키는 방식과 동일하다.
+AdGuard AdBlock Ultimate이 동영상 사이트를 통과시키는 방식과 동일하다.
 
 | 단계 | 방식 |
 |---|---|
@@ -86,7 +86,7 @@ AdGuard AdBlock Ultimate이 유튜브를 통과시키는 방식과 동일하다.
 
 ### 5-1. `background/rules.js` — DNR 허용 규칙
 
-**A. 유튜브 텔레메트리 12개 경로 허용** (`YOUTUBE_ALLOW_PATHS`, id 110~121, priority 100)
+**A. 동영상 사이트 텔레메트리 12개 경로 허용** (`YOUTUBE_ALLOW_PATHS`, id 110~121, priority 100)
 
 ```text
 ||youtube.com/api/stats/            # ads · qoe (정상 재생에도 나가는 품질 통계)
@@ -104,7 +104,7 @@ AdGuard AdBlock Ultimate이 유튜브를 통과시키는 방식과 동일하다.
 ```
 
 `gen_204`·`csi_204`·`player_204`·`api/stats/qoe`는 **광고와 무관한 정상 재생에도
-매 시청마다 나가는** 텔레메트리다. 이게 막히면 유튜브가 비정상 클라이언트로 판단한다.
+매 시청마다 나가는** 텔레메트리다. 이게 막히면 동영상 사이트가 비정상 클라이언트로 판단한다.
 주로 `ruleset_filterslists-ko.json`(40건), `ruleset_easyprivacy.json`(18건)에서 차단되고 있었다.
 
 **B. 광고 소재 도메인 9개 허용** (`YOUTUBE_AD_DOMAINS`, id 130~138, priority 100,
@@ -122,7 +122,7 @@ AdGuard AdBlock Ultimate이 유튜브를 통과시키는 방식과 동일하다.
 ||googletagmanager.com^
 ```
 
-`initiatorDomains`가 있으므로 **유튜브가 요청할 때만** 허용된다.
+`initiatorDomains`가 있으므로 **동영상 사이트가 요청할 때만** 허용된다.
 다른 사이트의 광고는 계속 차단된다. `www.youtube.com`은 하위 도메인으로 자동 포함.
 
 **C. 기타**
@@ -134,12 +134,12 @@ AdGuard AdBlock Ultimate이 유튜브를 통과시키는 방식과 동일하다.
 
 아래 7개 섹션 구조다.
 
-**1) 감지 자체를 무력화** (AdGuard filter_1의 신규 유튜브 규칙 이식)
+**1) 감지 자체를 무력화** (AdGuard filter_1의 신규 동영상 사이트 규칙 이식)
 - `Promise.then` 콜백 소스에 `onAbnormalityDetected`가 있으면 빈 함수로 교체
-  → 유튜브의 이상 징후 보고를 차단
+  → 동영상 사이트의 이상 징후 보고를 차단
 - 콜백 소스에 `[native code]`가 있고 지연이 `17000ms`인 `setTimeout`만 17ms로 단축
   (AdGuard `adjust-setTimeout('[native code]', '17000', '0.001')` 대응)
-- `Node.prototype.appendChild`를 Proxy로 감싸 유튜브가 붙이는 `about:blank` iframe의
+- `Node.prototype.appendChild`를 Proxy로 감싸 동영상 사이트가 붙이는 `about:blank` iframe의
   `contentWindow`에 페이지의 `fetch`·`Request`를 복사 (iframe 단독 후킹 검사 무력화)
 
 **2) `Promise.prototype.then` Proxy**
@@ -198,7 +198,7 @@ if (audio && audio.muteOnStart === true) {
 
 ### 5-3. `content.js` — CSS 은닉만
 
-**제거한 것** (모두 유튜브 광고 차단 감지의 신호가 되는 동작)
+**제거한 것** (모두 동영상 사이트 광고 차단 감지의 신호가 되는 동작)
 
 | 제거 | 이유 |
 |---|---|
@@ -222,7 +222,7 @@ style 요소는 id 없이 만들고 참조는 클로저 변수로만 유지한�
 
 **남은 동작**: CSS 주입, 광고 개수 세기(`countAds`), 통계 보고
 
-### 5-4. `anti-bypass.js`, `general-blocker.js` — 유튜브에서 제외
+### 5-4. `anti-bypass.js`, `general-blocker.js` — 동영상 사이트에서 제외
 
 기존에는 `studio.youtube.com`만 제외했으나 `/(^|\.)youtube\.com$/` 전체로 확대했다.
 
@@ -236,7 +236,7 @@ style 요소는 id 없이 만들고 참조는 클로저 변수로만 유지한�
 
 ### 5-5. `manifest.json`
 
-`content_scripts`의 유튜브 항목 2개. `content.js`(격리 world)가 먼저,
+`content_scripts`의 동영상 사이트 항목 2개. `content.js`(격리 world)가 먼저,
 `youtube-main.js`(`world: "MAIN"`)가 나중에 실행되도록 한다.
 `content.js`는 `chrome.storage`를 쓰므로 격리 world가 필수다.
 
@@ -279,20 +279,20 @@ chrome.declarativeNetRequest.getDynamicRules()
 | 3 | 재생 | 5초 로딩 후 정상 재생 |
 | 4 | 소리 | 음소거로 시작하지 않음 |
 
-## 7. 나중에 유튜브가 감지를 강화했을 때
+## 7. 나중에 동영상 사이트가 감지를 강화했을 때
 
 ### 7-1. 참고할 원본 위치
 
-AdGuard 계열 필터 원문에 유튜브 대응이 들어 있다.
+AdGuard 계열 필터 원문에 동영상 사이트 대응이 들어 있다.
 
 | 위치 | 내용 |
 |---|---|
-| `src/resources/filters/chromium-mv3/filter_1.txt` | 유튜브 스크립틀릿 원문 (`youtube.com#%#...`) |
-| `src/resources/filters/chromium-mv3/filter_2.txt` | 유튜브 코스메틱 규칙 (`youtube.com##...`) |
+| `src/resources/filters/chromium-mv3/filter_1.txt` | 동영상 사이트 스크립틀릿 원문 (`youtube.com#%#...`) |
+| `src/resources/filters/chromium-mv3/filter_2.txt` | 동영상 사이트 코스메틱 규칙 (`youtube.com##...`) |
 | 빌드 결과물 `filters/local_script_rules.js` | 스크립틀릿 실제 구현체 |
 
 저장소: `https://github.com/AdAvoid-Ltd/AdBlocker-Ultimate-for-Browsers`
-(이 저장소에 유튜브 전용 코드는 없고, 전부 필터 목록 텍스트로 처리된다.)
+(이 저장소에 동영상 사이트 전용 코드는 없고, 전부 필터 목록 텍스트로 처리된다.)
 
 `filter_1.txt`에서 찾을 규칙 키워드:
 
@@ -321,19 +321,19 @@ ssap                           # 서버측 광고 구간 스킵 (Array.prototype
 
 | 증상 | 원인 | 대응 |
 |---|---|---|
-| 유튜브만 광고가 보임 | 스푸핑 실패 | `SPOOF_PARAMS` 값 확인, 콘솔에서 요청 body의 `params` 확인 |
+| 동영상 사이트만 광고가 보임 | 스푸핑 실패 | `SPOOF_PARAMS` 값 확인, 콘솔에서 요청 body의 `params` 확인 |
 | 숏츠에서 이상 동작 | 스푸핑 대상에서 의도적으로 제외 | `isSpoofSkipped()` 조건 확인 |
 | 영상이 음소거로 시작 | `muteOnStart` 미처리 | `deleteAdKeys`의 자동 음소거 해제 확인 |
 | 다른 사이트 광고 차단이 약해짐 | `initiatorDomains` 없는 allow 규칙 추가 | allow 규칙에 `initiatorDomains: ["youtube.com"]` 부여 |
-| 유튜브에서만 재생 오류 | DNR이 유튜브 리소스 차단 | Network 탭에서 차단 요청 확인 후 `YOUTUBE_ALLOW_PATHS` 추가 |
+| 동영상 사이트에서만 재생 오류 | DNR이 동영상 사이트 리소스 차단 | Network 탭에서 차단 요청 확인 후 `YOUTUBE_ALLOW_PATHS` 추가 |
 
 ## 8. 주의 사항
 
-- **유튜브에서만 허용하는 규칙**이다. `initiatorDomains`가 없는 allow 규칙을 추가하면
+- **동영상 사이트에서만 허용하는 규칙**이다. `initiatorDomains`가 없는 allow 규칙을 추가하면
   다른 사이트의 광고까지 허용되므로 반드시 확인한다.
 - `params` 위조 값(`eAFgAQ`, `8AUB`)은 AdGuard 필터에서 가져온 값이다.
   임의로 추측한 값을 넣지 않는다.
-- 광고 소재 도메인을 허용하므로 **유튜브 광고 소재는 실제로 다운로드된다.**
+- 광고 소재 도메인을 허용하므로 **동영상 사이트 광고 소재는 실제로 다운로드된다.**
   화면에 보이지 않는 이유는 요청 위조로 광고 config 자체가 오지 않기 때문이다.
 - `content.js`에 DOM 조작을 다시 넣지 않는다. 넣는 순간 감지된다.
-- `anti-bypass.js`·`general-blocker.js`를 유튜브에 다시 포함하지 않는다.
+- `anti-bypass.js`·`general-blocker.js`를 동영상 사이트에 다시 포함하지 않는다.

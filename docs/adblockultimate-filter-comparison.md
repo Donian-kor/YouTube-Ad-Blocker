@@ -27,7 +27,7 @@
 |---|-----------|----------|------------|------|------------------|
 | 1 | Ultimate Ad Filter | GNU GPLv3 / CC BY 3.0 | easylist.to, filters.adtidy.org | ✅ 직접 내장 | **광고 차단 그룹** (AdGuard Base `2.txt`) |
 | 2 | Anti-circumvention | GNU GPLv3 | github.com/abp-filters/abp-filters-anti-cv | ✅ 직접 내장 | **광고 감지 대응 그룹** (동일 저장소 11개 언어 파일) |
-| 3 | RuAdList | CC BY 3.0 | easylist.to | ❌ 미포함 | 러시아어 사이트용 — 한국/유튜브 중심이라 실익 적음 |
+| 3 | RuAdList | CC BY 3.0 | easylist.to | ❌ 미포함 | 러시아어 사이트용 — 한국/동영상 사이트 중심이라 실익 적음 |
 | 4 | EasyList Germany | GNU GPLv3 / CC BY 3.0 | easylist.to | ❌ 미포함 | 독일어 사이트용 |
 | 5 | Fanboy's Japanese | CC BY 3.0 | fanboy.co.nz | ❌ 미포함 | 일본어 사이트용 |
 | 6 | EasyList Dutch | GNU GPLv3 / CC BY 3.0 | easylist.to | ❌ 미포함 | 네덜란드어 사이트용 |
@@ -112,7 +112,7 @@
 
 ### 기술적 이유 (공통)
 
-1. **대상 시스템**: 이 확장은 PC 크롬에서 유튜브/한국 사이트 중심으로 설계됨
+1. **대상 시스템**: 이 확장은 PC 크롬에서 동영상 사이트/한국 사이트 중심으로 설계됨
 2. **동적 규칙 한도**: Chrome DNR 동적 규칙은 30,000개 제한. 지역별 필터를 모두 넣으면 한도 초과
 3. **DNR 변환 한계**: 지역별 필터는 cosmetic(요소 숨김) 규칙이 대부분이라 네트워크 차단용 DNR로 변환 가능한 비율이 낮음
 4. **유지보수 비용**: 35개 미포함 소스의 URL/형식 변경을 추적해야 함

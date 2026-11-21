@@ -32,11 +32,11 @@
 | `background.js` | 557 | DNR 규칙 등록, 통계, 뱃지, 우클릭 메뉴, 토글, 필터 상태 | 역할 5개 혼재. 업데이트 로직 추가 시 과부하 |
 | `options.js` | 183 | 통계 표시 + 필터 목록 렌더링 + 토글 + 전체 ON/OFF | UI 3개 탭 모두 담당 예정 → 비대화 |
 | `tools/build-filters.js` | 394 | 원격 필터 다운로드 → DNR 변환 → 규칙셋 JSON 생성 | 변환 로직이 이 파일에만 있어 런타임 재사용 불가 |
-| `content.js` | 270 | 유튜브 DOM 정리·광고 스킵 | 주입 순서 민감 → **분리 금지** |
+| `content.js` | 270 | 동영상 사이트 DOM 정리·광고 스킵 | 주입 순서 민감 → **분리 금지** |
 | `element-blocker.js` | 311 | 우클릭 차단 선택자 저장·적용 | 단일 역할, 유지 |
 | `filehost-blocker.js` | 231 | 파일 공유 사이트 광고 차단 | 단일 역할, 유지 |
 | `anti-bypass.js` | 181 | 광고 차단 감지 무력화 | 단일 역할, 유지 |
-| `youtube-main.js` | 149 | 유튜브 응답 후킹 (MAIN world) | 단일 역할, 유지 |
+| `youtube-main.js` | 149 | 동영상 사이트 응답 후킹 (MAIN world) | 단일 역할, 유지 |
 | `general-blocker.js` | 125 | 일반 사이트 인라인 광고 숨김 | 단일 역할, 유지 |
 | `popup.js` | 126 | 팝업 UI·통계·로그 | 단일 역할, 유지 |
 | `popunder-blocker.js` | 42 | 팝언더 차단 (MAIN world) | 단일 역할, 유지 |
@@ -206,7 +206,7 @@ www_AD_Blocker/
 1. `node tools/build-filters.js --group=korean` — 변환 규칙 수가 이전(456 + List-KR)과 동일
 2. `node tools/validate-rules.js` — 14개 규칙셋 전부 통과
 3. 확장 재로드(`chrome://extensions/`) 후 오류 없음
-4. 유튜브 영상 광고 차단 정상
+4. 동영상 사이트 영상 광고 차단 정상
 5. 설정 페이지 탭 전환·통계·필터 토글 정상
 6. 우클릭 요소 차단 정상
 7. 필터 업데이트 버튼 동작 (구현 후)
