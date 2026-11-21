@@ -265,10 +265,26 @@
     }
   });
 
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true
-  });
+  // content.js가 document_start에 실행되므로 이 시점엔 document.body가 없을 수 있다.
+  // body가 준비된 뒤 observe 한다 (없으면 documentElement로 대체).
+  function startObserver() {
+    const target = document.body || document.documentElement;
+    if (!target) return false;
+    try {
+      observer.observe(target, { childList: true, subtree: true });
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+  if (!startObserver()) {
+    const retry = () => {
+      if (startObserver()) {
+        document.removeEventListener("readystatechange", retry);
+      }
+    };
+    document.addEventListener("readystatechange", retry);
+  }
 
   // 다른 스크립트(general-blocker.js)에 의해 안쪽만 지워진 그리드 셀도 정리한다.
   // 로딩 중인 셀을 지우지 않도록 일정 시간 이상 비어 있는 셀만 대상으로 한다.
@@ -312,7 +328,23 @@
       setTimeout(cleanupAds, 1500);
     }
   });
-  navObserver.observe(document.body, { subtree: true, childList: true });
+  // document_start 시점엔 document.body가 없을 수 있어 준비된 뒤 observe 한다.
+  function startNavObserver() {
+    const target = document.body || document.documentElement;
+    if (!target) return false;
+    try {
+      navObserver.observe(target, { subtree: true, childList: true });
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+  if (!startNavObserver()) {
+    const retryNav = () => {
+      if (startNavObserver()) document.removeEventListener("readystatechange", retryNav);
+    };
+    document.addEventListener("readystatechange", retryNav);
+  }
 
   // 제거된 광고 수를 주기적으로 background에 보고 (에러 핸들링 추가)
   setInterval(() => {
