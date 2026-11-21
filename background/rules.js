@@ -11,7 +11,8 @@ const adBlockRules = [
   { id: 4, priority: 1, action: { type: "block" }, condition: { urlFilter: "||google-analytics.com^" } },
   { id: 5, priority: 1, action: { type: "block" }, condition: { urlFilter: "||googletagmanager.com^" } },
   // YouTube 광고 스탯/추적 경로
-  { id: 6, priority: 1, action: { type: "block" }, condition: { urlFilter: "||youtube.com/api/stats/ads" } },
+  // 주의: youtube.com/api/stats/ads 차단은 유튜브의 "광고 차단 감지" 신호로 쓰여
+  //       영상 재생이 막힐 수 있어 차단하지 않는다 (광고 자체는 다른 경로에서 처리)
   { id: 7, priority: 1, action: { type: "block" }, condition: { urlFilter: "||youtube.com/pagead/" } },
   // 구글 검색/콘텐츠 광고 경로
   { id: 8, priority: 1, action: { type: "block" }, condition: { urlFilter: "||google.com/pagead/" } },
