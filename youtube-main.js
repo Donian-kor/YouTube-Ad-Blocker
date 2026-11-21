@@ -14,7 +14,19 @@
   const NESTED_KEYS = ["playerResponse", "playerMicroformatRenderer"];
   const AD_KEY_REGEX = /"(adSlots|playerAds|adPlacements|adBreakHeartbeatParams)"\s*:/g;
 
+  // content.js가 document_start에 심어둔 초기 토글 상태를 먼저 읽는다.
+  // OFF 상태면 MAIN world 후킹 자체를 설치하지 않아 유튜브가 "광고 차단 중"으로
+  // 감지하지 않도록 한다.
   let enabled = true;
+  try {
+    const initial = document.documentElement && document.documentElement.getAttribute("data-yab-enabled");
+    if (initial === "0") {
+      enabled = false;
+      // 토글 메시지 리스너만 남기고 즉시 종료 — 후킹 흔적을 남기지 않는다
+      installToggleListenerOnly();
+      return;
+    }
+  } catch (e) { /* 무시 */ }
 
   // content script(격리 세계)에서 토글 상태를 전달받는다.
   // 고정 문자열만으로 위조할 수 없도록 매 로드마다 생성된 토큰을 함께 확인한다.
@@ -36,6 +48,19 @@
     if (!token || data.token !== token) return; // 토큰 불일치 → 위조로 간주
     enabled = data.value !== false;
   });
+
+  // OFF 상태에서 설치하는 최소 리스너: 토글이 켜지면 value=true 메시지를 받아
+  // 페이지가 재로드되도록 popup이 처리하므로 여기서는 아무 후킹도 하지 않는다.
+  function installToggleListenerOnly() {
+    window.addEventListener("message", (event) => {
+      if (event.source !== window) return;
+      const data = event.data;
+      if (!data || data.source !== "yab-extension" || data.type !== "enabled") return;
+      const token = readStateToken();
+      if (!token || data.token !== token) return;
+      enabled = data.value !== false;
+    });
+  }
 
   function hasOwn(obj, key) {
     return Object.prototype.hasOwnProperty.call(obj, key);

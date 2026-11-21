@@ -22,9 +22,29 @@
     } catch (e) { /* 구형 브라우저에서는 아래 폴백 사용 */ }
     return "yab-" + Math.random().toString(36).slice(2) + "-" + Date.now().toString(36);
   })();
-  try {
-    document.documentElement.setAttribute("data-yab-state-token", STATE_TOKEN);
-  } catch (e) { /* DOM 준비 전이면 무시 */ }
+  function plantToken() {
+    try {
+      if (document.documentElement) {
+        document.documentElement.setAttribute("data-yab-state-token", STATE_TOKEN);
+        return true;
+      }
+    } catch (e) { /* 무시 */ }
+    return false;
+  }
+  // MAIN world가 document_start에서 바로 읽을 수 있도록 초기 토글 상태도 심는다
+  function plantInitialState() {
+    if (!plantToken()) return;
+    try {
+      chrome.storage.local.get(["adBlockerEnabled"], (res) => {
+        const on = res.adBlockerEnabled !== false;
+        document.documentElement.setAttribute("data-yab-enabled", on ? "1" : "0");
+      });
+    } catch (e) { /* 무시 */ }
+  }
+  plantInitialState();
+  if (typeof document !== "undefined") {
+    document.addEventListener("readystatechange", plantInitialState, { once: true });
+  }
 
   function applyEnabled(value) {
     enabled = value;
