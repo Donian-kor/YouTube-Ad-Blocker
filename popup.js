@@ -101,11 +101,12 @@
     chrome.runtime.openOptionsPage();
   });
 
-  // 요소 차단 모드: 현재 탭의 큰 페이지에서 선택 시작 (우클릭이 막힌 사이트용)
+  // 요소 차단 모드: 현재 탭의 모든 프레임에서 선택 시작 (iframe 안 광고도 선택 가능)
   document.getElementById("pickBtn").addEventListener("click", () => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (!tabs[0] || tabs[0].id === undefined) return;
-      chrome.tabs.sendMessage(tabs[0].id, { type: "startElementPick" }, { frameId: 0 }, () => {
+      // frameId 없이 보내면 해당 탭의 모든 content script 프레임에 전달된다
+      chrome.tabs.sendMessage(tabs[0].id, { type: "startElementPick" }, () => {
         void chrome.runtime.lastError; // content script가 없는 페이지면 무시
       });
       window.close();
