@@ -9,27 +9,21 @@
   if (window.__yabInstalled) return;
   window.__yabInstalled = true;
 
-  // 광고 데이터 키 (uBO filters.txt / uAssets 기준)
-  const AD_KEYS = ["adSlots", "playerAds", "adPlacements", "adBreakHeartbeatParams"];
-  const NESTED_KEYS = ["playerResponse", "playerMicroformatRenderer"];
-  const AD_KEY_REGEX = /"(adSlots|playerAds|adPlacements|adBreakHeartbeatParams)"\s*:/g;
+  // content.js(격리 world)가 document_start에 심어주는 초기 토글 상태를 기다린다.
+  // 저장소 읽기가 비동기라 값이 아직 없을 수 있으므로, 최대 몇 번 확인한 뒤 시작한다.
+  // OFF 상태면 후킹을 아예 설치하지 않아 유튜브의 "광고 차단 감지"를 피한다.
+  function readEnabledFlag() {
+    try {
+      const v = document.documentElement && document.documentElement.getAttribute("data-yab-enabled");
+      return v === "1" ? true : v === "0" ? false : null;
+    } catch (e) { return null; }
+  }
 
-  // content.js가 document_start에 심어둔 초기 토글 상태를 먼저 읽는다.
-  // OFF 상태면 MAIN world 후킹 자체를 설치하지 않아 유튜브가 "광고 차단 중"으로
-  // 감지하지 않도록 한다.
   let enabled = true;
-  try {
-    const initial = document.documentElement && document.documentElement.getAttribute("data-yab-enabled");
-    if (initial === "0") {
-      enabled = false;
-      // 토글 메시지 리스너만 남기고 즉시 종료 — 후킹 흔적을 남기지 않는다
-      installToggleListenerOnly();
-      return;
-    }
-  } catch (e) { /* 무시 */ }
 
-  // content script(격리 세계)에서 토글 상태를 전달받는다.
-  // 고정 문자열만으로 위조할 수 없도록 매 로드마다 생성된 토큰을 함께 확인한다.
+  // content script(격리 세계)에서 토글 상태를 전달받을 때 토큰을 확인한다.
+  // 고정 문자열만으로 위조할 수 없도록 매 로드마다 생성된 토큰을 사용한다.
+  // startHooking 안팎 어디서든 쓸 수 있도록 여기 정의한다.
   function readStateToken() {
     try {
       return document.documentElement
@@ -40,17 +34,7 @@
     }
   }
 
-  window.addEventListener("message", (event) => {
-    if (event.source !== window) return;
-    const data = event.data;
-    if (!data || data.source !== "yab-extension" || data.type !== "enabled") return;
-    const token = readStateToken();
-    if (!token || data.token !== token) return; // 토큰 불일치 → 위조로 간주
-    enabled = data.value !== false;
-  });
-
-  // OFF 상태에서 설치하는 최소 리스너: 토글이 켜지면 value=true 메시지를 받아
-  // 페이지가 재로드되도록 popup이 처리하므로 여기서는 아무 후킹도 하지 않는다.
+  // OFF 상태에서 설치하는 최소 리스너: 토글이 켜지면 value=true 메시지를 받는다.
   function installToggleListenerOnly() {
     window.addEventListener("message", (event) => {
       if (event.source !== window) return;
@@ -61,6 +45,37 @@
       enabled = data.value !== false;
     });
   }
+
+  function boot() {
+    const flag = readEnabledFlag();
+    if (flag === null) {
+      // 아직 상태가 안 심어졌으면 짧게 반복 (storage 콜백 대기)
+      if (!boot._n) boot._n = 0;
+      if (boot._n++ < 20) { setTimeout(boot, 5); return; }
+    }
+    if (flag === false) {
+      enabled = false;
+      installToggleListenerOnly();
+      return;
+    }
+    startHooking();
+  }
+
+  function startHooking() {
+  // 광고 데이터 키 (uBO filters.txt / uAssets 기준)
+  const AD_KEYS = ["adSlots", "playerAds", "adPlacements", "adBreakHeartbeatParams"];
+  const NESTED_KEYS = ["playerResponse", "playerMicroformatRenderer"];
+  const AD_KEY_REGEX = /"(adSlots|playerAds|adPlacements|adBreakHeartbeatParams)"\s*:/g;
+
+  // content script(격리 세계)에서 토글 상태를 전달받는다.
+  window.addEventListener("message", (event) => {
+    if (event.source !== window) return;
+    const data = event.data;
+    if (!data || data.source !== "yab-extension" || data.type !== "enabled") return;
+    const token = readStateToken();
+    if (!token || data.token !== token) return; // 토큰 불일치 → 위조로 간주
+    enabled = data.value !== false;
+  });
 
   function hasOwn(obj, key) {
     return Object.prototype.hasOwnProperty.call(obj, key);
@@ -198,4 +213,7 @@
   }
   hookInitial("ytInitialPlayerResponse");
   hookInitial("ytInitialData");
+  } // end startHooking
+
+  boot();
 })();
