@@ -135,15 +135,28 @@
   // 유튜브의 광고 차단 감지에 그대로 노출되어 경고를 유발한다.
   // (AdGuard AdBlock Ultimate 도 유튜브에서 DOM 제거·탐색 하지 않고 CSS 은닉만 한다.)
   // 실제 화면 은닉은 위 injectAdStyles()의 CSS가 담당한다.
+  //
+  // 이미 센 요소는 다시 세지 않는다. (WeakSet 으로 중복 방지)
+  // 요소를 DOM 에서 지우지 않기 때문에, 중복 검사를 하지 않으면
+  // 2초마다 같은 광고가 계속 다시 잡혀 숫자가 무한히 올라간다.
+  // WeakSet 은 요소가 문서에서 사라지면 자동으로 정리되어 메모리 누수도 없다.
+  const countedAds = new WeakSet();
+
   function countAds(selector) {
-    let count = 0;
+    let found;
     try {
-      count = document.querySelectorAll(selector).length;
+      found = document.querySelectorAll(selector);
     } catch (e) {
       return 0; // 잘못된 선택자는 무시
     }
-    if (count > 0) removedCount += count;
-    return count > 0;
+    let added = 0;
+    for (const el of found) {
+      if (countedAds.has(el)) continue; // 이미 센 요소
+      countedAds.add(el);
+      added++;
+    }
+    if (added > 0) removedCount += added;
+    return added > 0;
   }
 
   function cleanupAds() {

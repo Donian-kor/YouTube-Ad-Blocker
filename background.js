@@ -3,6 +3,7 @@
 importScripts("shared/filter-converter.js");
 importScripts("shared/filter-registry.js");
 importScripts("shared/build-meta.js");
+importScripts("shared/badge-format.js");
 importScripts("background/state.js");
 importScripts("background/stats.js");
 importScripts("background/rules.js");

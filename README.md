@@ -3,11 +3,11 @@
 크롬(Chrome)에서 웹사이트 광고와 추적기를 차단하는 Manifest V3 확장 프로그램입니다.
 개발자 모드에서 폴더 또는 ZIP을 불러와 사용합니다.
 
-**현재 버전: 0.35**
+**현재 버전: 0.36**
 
 ## 주요 기능
 
-- **유튜브 광고 차단** — 플레이어 응답의 `adSlots` / `playerAds` / `adPlacements` / `adBreakHeartbeatParams` 제거, Shorts `isAd` 플래그 무력화
+- **유튜브 광고 차단** — 광고 소재 도메인을 유튜브에서만 허용하고 요청 body를 광고 없는 클라이언트로 위조해 애초에 광고가 오지 않게 처리, 플레이어 응답의 `adSlots` / `playerAds` / `adPlacements` / `adBreakHeartbeatParams` 제거, Shorts `isAd` 플래그 무력화, 자동 음소거 해제
 - **네트워크 광고 차단** — 5개 카테고리·34개 소스(소스별 개별 토글), 정적 271,415개 + 동적 신규 규칙(최대 30,000개 한도)를 DNR로 차단
 - **인라인 광고 차단** — 네트워크 차단으로 잡히지 않는 배너·사이드바·스폰서·팝업·오버레이 광고를 CSS 숨김 + DOM 제거 (`general-blocker.js`)
 - **광고 감지 우회** — 감지 경고창·베이트 요소를 숨기고, dogdrip.net 서버 감지도 우회
@@ -30,7 +30,7 @@
 
 ### ZIP 배포판 (권장)
 
-1. [GitHub Release v0.35](https://github.com/Donian-kor/www_AD_Blocker/releases/tag/v0.35)에서 `www_AD_Blocker-v0.35.zip` 다운로드
+1. [GitHub Release v0.36](https://github.com/Donian-kor/www_AD_Blocker/releases/tag/v0.36)에서 `www_AD_Blocker-v0.36.zip` 다운로드
 2. 압축 해제 (`manifest.json`이 들어있는 폴더 확인)
 3. `chrome://extensions/` 접속 → **개발자 모드** ON
 4. **압축해제된 확장 프로그램을 로드합니다** → 2번 폴더 선택
@@ -49,7 +49,7 @@
 manifest.json          확장 설정(권한, 스크립트, 규칙 세트 37개)
 background.js          진입점 — 모듈 로드, 메시지 핸들러, 우클릭 메뉴
 background/            state.js(공유 상태) · stats.js(통계·뱃지) · rules.js(DNR 규칙) · filter-updater.js(필터 업데이트)
-shared/                filter-converter.js · filter-registry.js · build-meta.js (빌드/런타임 공용)
+shared/                filter-converter.js · filter-registry.js · build-meta.js · badge-format.js (빌드/런타임 공용)
 options/               main.js · config.js · stats.js · filters-tab.js · blocked-tab.js · licenses-tab.js
 youtube-main.js        유튜브 MAIN world 응답 후킹
 content.js             유튜브 DOM 정리/광고 스킵
@@ -125,6 +125,8 @@ node tools/test-filehost-blocker.js  # 해외 파일 공유 사이트 차단 테
 그래도 안 막히면 **어느 사이트에서 어떤 광고가** 안 막히는지 알려주시면 확인하겠습니다.
 
 ## 개선 내역 (버전별)
+
+- **v0.36**: 유튜브 광고 차단 감지 경고·재생 차단 해결 — 광고 소재 도메인을 유튜브 요청에 한해 허용하고 요청 body를 광고 없는 클라이언트로 위조, 텔레메트리 12개 경로 허용, 감지 콜백(`onAbnormalityDetected`)·`[native code]` 검사 타이머 무력화, 자동 음소거 해제. 유튜브에서는 광고 DOM 제거·영상 탐색을 하지 않고 CSS 은닉만 사용. 툴바 뱃지 9999 상한 해소(최대 999B), DOM 차단 수 중복 집계 수정, 뱃지 글자색 흰색 적용.
 
 - **v0.35**: 우클릭이 막힌 사이트용 **요소 차단 모드** 추가 — 팝업 버튼 → 마우스 위 요소가 파란 테두리로 실시간 하이라이트 → 클릭 시 차단, ESC 취소, iframe 포함 모든 프레임 지원. 필터 개수 뱃지에 동적 규칙 수 자동 합산.
 

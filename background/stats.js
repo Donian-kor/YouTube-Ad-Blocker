@@ -56,11 +56,20 @@ function siteTotal(site) {
   return c ? c.net + c.dom : 0;
 }
 
+// 뱃지 숫자 형식은 shared/badge-format.js 에 있다. (단위 축약 + 4자 제한)
+// tools/test-badge-format.js 에서 단위 검증한다.
 function formatBadge(total) {
-  if (total <= 0) return "";
-  if (total >= 10000) return "9999";
-  if (total >= 1000) return (total / 1000).toFixed(1) + "k"; // 뱃지 최대 4자
-  return String(total);
+  // 모듈이 로드되지 않은 상태에서 예외가 나면 뱃지 갱신 자체가 멈춰
+  // 이전 숫자가 그대로 남는다. 그런 경우를 대비해 최소한의 동작을 보장한다.
+  if (typeof BadgeFormat === "undefined" || !BadgeFormat || typeof BadgeFormat.format !== "function") {
+    console.error("[뱃지] shared/badge-format.js 로드 실패 — 임시 형식 사용");
+    if (total <= 0) return "";
+    if (total >= 1000000) return Math.floor(total / 1000000) + "M";
+    if (total >= 10000) return Math.floor(total / 1000) + "k";
+    if (total >= 1000) return (total / 1000).toFixed(1) + "k";
+    return String(total);
+  }
+  return BadgeFormat.format(total);
 }
 
 // 탭이 현재 보고 있는 사이트를 구한다. 매핑이 없으면 tabs.get으로 한 번만 조회한다.
@@ -88,6 +97,18 @@ function resolveTabSite(tabId, callback) {
   });
 }
 
+// 뱃지 색상 (배경 빨강 + 글자 흰색).
+// setBadgeTextColor 는 Chrome 110+ 에서 지원하므로 없어도 조용히 넘어간다.
+const BADGE_BACKGROUND_COLOR = "#e94560";
+const BADGE_TEXT_COLOR = "#ffffff";
+
+function applyBadgeStyle() {
+  chrome.action.setBadgeBackgroundColor({ color: BADGE_BACKGROUND_COLOR });
+  if (chrome.action.setBadgeTextColor) {
+    chrome.action.setBadgeTextColor({ color: BADGE_TEXT_COLOR });
+  }
+}
+
 // 현재 활성 탭의 뱃지만 갱신 (다른 탭 이벤트에는 반응하지 않음)
 function updateBadgeForTab(tabId) {
   if (!AppState.enabledState) {
@@ -97,7 +118,7 @@ function updateBadgeForTab(tabId) {
   if (tabId !== AppState.activeTabId) return;
   resolveTabSite(tabId, (site) => {
     if (tabId !== AppState.activeTabId) return;
-    chrome.action.setBadgeBackgroundColor({ color: "#e94560" });
+    applyBadgeStyle();
     chrome.action.setBadgeText({ text: formatBadge(siteTotal(site)) });
   });
 }
