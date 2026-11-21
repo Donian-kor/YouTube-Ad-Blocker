@@ -38,7 +38,9 @@ input:checked+.slider:before{transform:translateX(20px)}
 .total-row .total-number{font-size:14px;font-weight:700;color:#e94560}
 .total-row .total-hint{margin-left:auto;font-size:10px;color:#94a3b8}
 
-.actions{display:flex;gap:8px;margin-bottom:10px}
+.actions{display:flex;gap:8px;margin-bottom:8px}
+.pick-row{margin-bottom:10px}
+.pick-row button{width:100%}
 button{flex:1;padding:9px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:opacity .2s}
 button:hover{opacity:.85}
 button.secondary{background:#e8edf5;color:#1e293b}
@@ -76,6 +78,9 @@ button.primary{background:#2563eb;color:white}
 <div class="actions">
 <button class="secondary" id="resetBtn">통계 초기화</button>
 <button class="primary" id="optionsBtn">설정</button>
+</div>
+<div class="pick-row">
+<button class="secondary" id="pickBtn">🎯 요소 차단 모드</button>
 </div>
 
 <div class="footer">

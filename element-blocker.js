@@ -12,6 +12,8 @@
   const STYLE_ID = "yab-blocked-style";
   const TOAST_ID = "yab-block-toast";
   const AD_ATTRS = ["data-ad-t", "data-ad-slot", "data-ad-unit", "data-ad"];
+  const PICK_STYLE_ID = "yab-pick-highlight-style";
+  const PICK_ATTR = "data-yab-pick";
 
   // === 선택자 생성용 순수 함수 (Node 테스트에서도 사용) ===
   function escapeCss(value) {
@@ -129,6 +131,84 @@
   let lastTarget = null;
   let enabled = true;
   let selectors = [];
+
+  // === 요소 차단 모드 (우클릭이 막힌 사이트용 요소 선택기) ===
+  let picking = false;
+  let pickTarget = null;
+  let pickHandlers = null;
+
+  function setPickTarget(el) {
+    if (pickTarget && pickTarget.removeAttribute) pickTarget.removeAttribute(PICK_ATTR);
+    pickTarget = el && el.nodeType === 1 ? el : null;
+    if (pickTarget && pickTarget.setAttribute) pickTarget.setAttribute(PICK_ATTR, "");
+  }
+
+  function injectPickStyle() {
+    if (document.getElementById(PICK_STYLE_ID)) return;
+    const style = document.createElement("style");
+    style.id = PICK_STYLE_ID;
+    style.textContent = "[" + PICK_ATTR + "]{outline:3px solid #2563eb !important;outline-offset:-3px;cursor:crosshair !important}";
+    (document.head || document.documentElement).appendChild(style);
+  }
+
+  function stopPick(notify) {
+    if (!picking) return;
+    picking = false;
+    setPickTarget(null);
+    if (pickHandlers) {
+      window.removeEventListener("mousemove", pickHandlers.move, true);
+      window.removeEventListener("click", pickHandlers.click, true);
+      window.removeEventListener("keydown", pickHandlers.key, true);
+      pickHandlers = null;
+    }
+    const style = document.getElementById(PICK_STYLE_ID);
+    if (style) style.remove();
+    if (notify) showToast("요소 차단 모드를 종료했습니다.");
+  }
+
+  function startPick() {
+    if (picking) return;
+    if (!enabled) {
+      showToast("광고 차단이 꺼져 있습니다. 팝업에서 켜 주세요.");
+      return;
+    }
+    picking = true;
+    injectPickStyle();
+    showToast("차단할 요소 위에 마우스를 두고 클릭하세요. ESC 취소");
+
+    const move = (e) => {
+      if (!picking) return;
+      let el = null;
+      try { el = document.elementFromPoint(e.clientX, e.clientY); } catch (err) { /* 무시 */ }
+      setPickTarget(el);
+    };
+    const click = (e) => {
+      if (!picking) return;
+      e.preventDefault();          // 링크 이동 등 페이지 동작 방지
+      e.stopImmediatePropagation();
+      const raw = pickTarget || e.target;
+      const target = findBlockTarget(raw, document.body);
+      const selector = buildSelector(target, document.body);
+      stopPick(false);
+      if (!selector) {
+        showToast("이 요소는 차단할 수 없습니다. 다른 요소를 선택해 주세요.");
+        return;
+      }
+      saveSelector(selector, (ok) => {
+        showToast(ok ? "광고 요소를 차단했습니다." : "저장에 실패했습니다.");
+      });
+    };
+    const key = (e) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        stopPick(true);
+      }
+    };
+    pickHandlers = { move, click, key };
+    window.addEventListener("mousemove", move, true);
+    window.addEventListener("click", click, true);
+    window.addEventListener("keydown", key, true);
+  }
 
   // iframe 안에서도 상위 사이트 기준으로 규칙을 저장한다.
   function siteKey() {
@@ -287,6 +367,16 @@
   );
 
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.type === "startElementPick") {
+      startPick();
+      sendResponse({ ok: true });
+      return;
+    }
+    if (message.type === "stopElementPick") {
+      stopPick(true);
+      sendResponse({ ok: true });
+      return;
+    }
     if (message.type === "blockLastRightClicked") {
       if (!enabled) {
         showToast("광고 차단이 꺼져 있습니다. 팝업에서 켜 주세요.");

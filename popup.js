@@ -101,6 +101,17 @@
     chrome.runtime.openOptionsPage();
   });
 
+  // 요소 차단 모드: 현재 탭의 큰 페이지에서 선택 시작 (우클릭이 막힌 사이트용)
+  document.getElementById("pickBtn").addEventListener("click", () => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (!tabs[0] || tabs[0].id === undefined) return;
+      chrome.tabs.sendMessage(tabs[0].id, { type: "startElementPick" }, { frameId: 0 }, () => {
+        void chrome.runtime.lastError; // content script가 없는 페이지면 무시
+      });
+      window.close();
+    });
+  });
+
   // === 실행 및 주기적 갱신 ===
   updatePageCount();
   updateTotal();
