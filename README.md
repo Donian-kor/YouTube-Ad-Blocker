@@ -3,7 +3,7 @@
 크롬(Chrome)에서 웹사이트 광고와 추적기를 차단하는 Manifest V3 확장 프로그램입니다.
 개발자 모드에서 폴더 또는 ZIP을 불러와 사용합니다.
 
-**현재 버전: 0.34**
+**현재 버전: 0.35**
 
 ## 주요 기능
 
@@ -30,7 +30,7 @@
 
 ### ZIP 배포판 (권장)
 
-1. [GitHub Release v0.34](https://github.com/Donian-kor/www_AD_Blocker/releases/tag/v0.34)에서 `www_AD_Blocker-v0.34.zip` 다운로드
+1. [GitHub Release v0.35](https://github.com/Donian-kor/www_AD_Blocker/releases/tag/v0.35)에서 `www_AD_Blocker-v0.35.zip` 다운로드
 2. 압축 해제 (`manifest.json`이 들어있는 폴더 확인)
 3. `chrome://extensions/` 접속 → **개발자 모드** ON
 4. **압축해제된 확장 프로그램을 로드합니다** → 2번 폴더 선택
@@ -115,6 +115,8 @@ node tools/test-filehost-blocker.js  # 해외 파일 공유 사이트 차단 테
 > 참고: 토큰은 같은 페이지의 DOM에 저장되므로, 페이지 스크립트가 의도적으로 읽으면 흉내낼 수 있습니다. 다만 무작위 값이라 사전에 알고 있는 문자열로는 속일 수 없어 위조 난이도가 크게 올라갑니다.
 
 ## 개선 내역 (버전별)
+
+- **v0.35**: 우클릭이 막힌 사이트용 **요소 차단 모드** 추가 — 팝업 버튼 → 마우스 위 요소가 파란 테두리로 실시간 하이라이트 → 클릭 시 차단, ESC 취소, iframe 포함 모든 프레임 지원. 필터 개수 뱃지에 동적 규칙 수 자동 합산.
 
 - **초기**: `Promise.then` 후킹 무한 재귀 수정, 유튜브 광고 키/Shorts 처리 확대, DOM 전체 제거, Observer 등록 수정, DNR 로드 오류(`||*`·중복 ID) 수정
 - **v1.2**: 한국 도메인 + Turtlecute 규칙셋 추가
