@@ -113,6 +113,16 @@
     });
   });
 
+  // 설정 페이지에서 전체 ON/OFF를 바꾸면 팝업도 즉시 반영
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === "local" && changes.adBlockerEnabled) {
+      const enabled = changes.adBlockerEnabled.newValue !== false;
+      toggle.checked = enabled;
+      updateToggleUI(enabled);
+      updateActionIcon(enabled);
+    }
+  });
+
   // === 실행 및 주기적 갱신 ===
   updatePageCount();
   updateTotal();

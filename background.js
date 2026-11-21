@@ -63,6 +63,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
     return true;
   }
+  else if (message.type === "toggleMaster") {
+    // 설정 페이지에서 전체 ON/OFF가 바뀜 → 규칙·아이콘·뱃지 반영
+    const enabled = message.enabled !== false;
+    AppState.enabledState = enabled;
+    applyRules(enabled);
+    updateBadgeForTab(AppState.activeTabId);
+    sendResponse({ success: true });
+    return true;
+  }
   else if (message.type === "adRemoved") {
     const count = message.count || 1;
     AppState.stats.removedDomAds += count;

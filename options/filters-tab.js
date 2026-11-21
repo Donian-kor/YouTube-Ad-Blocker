@@ -208,9 +208,22 @@ function saveFilterStates() {
     const cb = document.getElementById("source-" + source.id);
     if (cb) states[source.id] = cb.checked;
   });
-  chrome.storage.local.set({ filterStates: states }, () => {
-    chrome.runtime.sendMessage({ type: "applyFilterStates", states }, () => {
-      void chrome.runtime.lastError;
+
+  // 활성 소스가 하나라도 있으면 전체 차단 ON, 모두 꺼졌으면 OFF로 팝업과 동기화
+  const anyOn = SOURCE_LIST.some((source) => states[source.id] !== false);
+
+  chrome.storage.local.get(["adBlockerEnabled"], (res) => {
+    const wasOn = res.adBlockerEnabled !== false;
+    chrome.storage.local.set({ filterStates: states, adBlockerEnabled: anyOn }, () => {
+      chrome.runtime.sendMessage({ type: "applyFilterStates", states }, () => {
+        void chrome.runtime.lastError;
+      });
+      // 전체 ON/OFF가 바뀌었으면 규칙·아이콘도 갱신하도록 background에 알린다
+      if (wasOn !== anyOn) {
+        chrome.runtime.sendMessage({ type: "toggleMaster", enabled: anyOn }, () => {
+          void chrome.runtime.lastError;
+        });
+      }
     });
   });
   loadFilterStates();
