@@ -1,5 +1,5 @@
 // options/filters-tab.js - 2단 필터 토글(카테고리 + 개별 소스), 업데이트, 이력
-import { FILTER_LIST, SOURCE_LIST, LOCKED_SOURCES, STATIC_FILTER_COUNT } from "./config.js";
+import { FILTER_LIST, SOURCE_LIST, STATIC_FILTER_COUNT } from "./config.js";
 
 function sourcesOf(categoryId) {
   return SOURCE_LIST.filter((s) => s.category === categoryId);
@@ -175,9 +175,12 @@ function loadFilterStates() {
     SOURCE_LIST.forEach((source) => {
       const cb = document.getElementById("source-" + source.id);
       if (!cb) return;
-      const effective = source.locked ? true : (states[source.id] !== undefined ? states[source.id] : true);
-      cb.checked = masterOn && effective;
-      cb.disabled = source.locked || !masterOn;
+      // 소스 자체 상태는 마스터와 무관하게 저장값 유지 (마스터 ON/OFF는 표시에만 반영)
+      const sourceOn = states[source.id] !== undefined ? states[source.id] : true;
+      // 마스터 OFF면 화면상 전부 꺼져 보이게 하고, ON이면 실제 소스 상태 표시
+      cb.checked = masterOn && sourceOn;
+      // 마스터 OFF여도 개별 소스 토글은 조작 가능 (토글하면 마스터가 켜진다)
+      cb.disabled = source.locked;
     });
 
     FILTER_LIST.forEach((category) => {
@@ -189,7 +192,7 @@ function loadFilterStates() {
       const onCount = boxes.filter((cb) => cb.checked).length;
       input.checked = boxes.length > 0 && onCount === boxes.length;
       input.indeterminate = onCount > 0 && onCount < boxes.length;
-      input.disabled = category.locked || !masterOn;
+      input.disabled = category.locked;
       const toggleEl = input.closest(".toggle");
       if (toggleEl) toggleEl.classList.toggle("partial", input.indeterminate);
       const card = document.getElementById("filter-card-" + category.id);
@@ -201,16 +204,13 @@ function loadFilterStates() {
 function saveFilterStates() {
   const states = {};
   SOURCE_LIST.forEach((source) => {
-    if (LOCKED_SOURCES.has(source.id)) {
-      states[source.id] = true;
-      return;
-    }
     const cb = document.getElementById("source-" + source.id);
     if (cb) states[source.id] = cb.checked;
   });
 
-  // 활성 소스가 하나라도 있으면 전체 차단 ON, 모두 꺼졌으면 OFF로 팝업과 동기화
-  const anyOn = SOURCE_LIST.some((source) => states[source.id] !== false);
+  // 저장된 소스 상태 중 켜진 것이 하나라도 있으면 마스터 ON, 모두 꺼졌으면 마스터 OFF.
+  // (마스터 OFF 상태에서 개별 소스를 켜면 자동으로 마스터도 켜져 차단이 시작된다)
+  const anyOn = SOURCE_LIST.some((source) => states[source.id] === true);
 
   chrome.storage.local.get(["adBlockerEnabled"], (res) => {
     const wasOn = res.adBlockerEnabled !== false;
@@ -258,23 +258,22 @@ export function initFiltersTab() {
   loadFilterStates();
   loadDynamicCount();
 
+  // 전체 활성화: 모든 소스 ON + 마스터 ON → 팝업 토글도 켜지고 광고 차단 시작
   document.getElementById("filterAllOnBtn").addEventListener("click", () => {
     SOURCE_LIST.forEach((source) => {
       const cb = document.getElementById("source-" + source.id);
-      if (cb && !cb.disabled) cb.checked = true;
+      if (cb) cb.checked = true;
     });
     saveFilterStates();
   });
 
+  // 전체 비활성화: 모든 소스 OFF + 마스터 OFF → 팝업 토글도 꺼지고 광고 차단 중지
   document.getElementById("filterAllOffBtn").addEventListener("click", () => {
-    if (confirm("잠금 필터(국제 광고·보안)를 제외한 소스를 모두 비활성화하시겠습니까?")) {
-      SOURCE_LIST.forEach((source) => {
-        if (LOCKED_SOURCES.has(source.id)) return;
-        const cb = document.getElementById("source-" + source.id);
-        if (cb) cb.checked = false;
-      });
-      saveFilterStates();
-    }
+    SOURCE_LIST.forEach((source) => {
+      const cb = document.getElementById("source-" + source.id);
+      if (cb) cb.checked = false;
+    });
+    saveFilterStates();
   });
 
   const updateBtn = document.getElementById("filterUpdateBtn");
