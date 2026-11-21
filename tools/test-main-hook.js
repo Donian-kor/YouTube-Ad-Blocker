@@ -19,17 +19,40 @@ function check(name, actual, expected) {
 
 // 브라우저 환경 흉내
 const messageListeners = [];
+const timeoutCalls = [];
 function MockResponse() {}
 MockResponse.prototype.json = function () {
   // 실제 Response.json()처럼 객체를 반환 (JSON.parse 후킹 영향을 피하려고 직접 생성)
   return Promise.resolve({ adSlots: [1], videoDetails: { title: "t" } });
 };
 
+// Node / HTMLIFrameElement 흉내 (appendChild 후킹 검사용)
+class FakeNode {
+  constructor() { this.children = []; }
+  appendChild(child) { this.children.push(child); return child; }
+}
+class FakeIframe extends FakeNode {
+  constructor(src) { super(); this.src = src; this.contentWindow = {}; }
+}
+
+// Request / TextEncoder / XMLHttpRequest 흉내 (요청 스푸핑 검사용)
+class FakeRequest {
+  constructor(url, init) { this.url = url; this.init = init || {}; }
+}
+class FakeTextEncoder {
+  encode(str) { return str; }
+}
+class FakeXHR {
+  send(body) { this.body = body; }
+}
+
 const TEST_TOKEN = "test-token-12345";
 const documentObj = {
   documentElement: {
     getAttribute(name) {
-      return name === "data-yab-state-token" ? TEST_TOKEN : null;
+      if (name === "data-yab-state-token") return TEST_TOKEN;
+      if (name === "data-yab-enabled") return "1"; // ON 상태로 테스트
+      return null;
     }
   }
 };
@@ -37,7 +60,11 @@ const windowObj = {
   addEventListener(type, fn) {
     if (type === "message") messageListeners.push(fn);
   },
-  Response: MockResponse
+  Response: MockResponse,
+  // setTimeout 후킹 검사용: 실제 예약 대신 호출 인자만 기록한다
+  setTimeout(fn, delay) { timeoutCalls.push(delay); return 0; },
+  fetch() {},
+  Request: function Request() {}
 };
 windowObj.window = windowObj;
 
@@ -50,6 +77,13 @@ const sandbox = {
   Object,
   Function,
   Array,
+  Node: FakeNode,
+  HTMLIFrameElement: FakeIframe,
+  Request: FakeRequest,
+  TextEncoder: FakeTextEncoder,
+  XMLHttpRequest: FakeXHR,
+  location: { href: "https://www.youtube.com/watch?v=abc", hostname: "www.youtube.com" },
+  setTimeout,
   console
 };
 vm.createContext(sandbox);
@@ -147,6 +181,86 @@ function hookableCallback(collect) {
     setTimeout(resolve, 10);
   });
   check("후킹 콜백 단일 실행 (무한 재귀 방지)", callCount, 1);
+
+  // 10) 감지 보고 콜백(onAbnormalityDetected)이 호출되지 않게 무력화되는지
+  let detectCalled = 0;
+  await new Promise((resolve) => {
+    Promise.resolve("{}").then(function onAbnormalityDetected() { detectCalled++; });
+    setTimeout(resolve, 10);
+  });
+  check("onAbnormalityDetected 콜백 무력화", detectCalled, 0);
+
+  // 11) "[native code]" 검사 타이머만 단축되고 나머지는 그대로인지
+  timeoutCalls.length = 0;
+  windowObj.setTimeout(function () { void "[native code]"; }, 17000);
+  check("native code 검사 타이머 17ms로 단축", timeoutCalls[0], 17);
+
+  timeoutCalls.length = 0;
+  windowObj.setTimeout(function () {}, 17000);
+  check("일반 17초 타이머는 유지", timeoutCalls[0], 17000);
+
+  timeoutCalls.length = 0;
+  windowObj.setTimeout(function () { void "[native code]"; }, 5000);
+  check("다른 지연의 native code 타이머는 유지", timeoutCalls[0], 5000);
+
+  // 12) about:blank iframe 에만 fetch/Request 가 복사되는지
+  const parent = new FakeNode();
+  const blankFrame = new FakeIframe("about:blank");
+  parent.appendChild(blankFrame);
+  check("about:blank iframe 에 fetch 복사", typeof blankFrame.contentWindow.fetch, "function");
+  check("about:blank iframe 에 Request 복사", typeof blankFrame.contentWindow.Request, "function");
+
+  const srcFrame = new FakeIframe("https://example.com/");
+  parent.appendChild(srcFrame);
+  check("src 있는 iframe 은 건드리지 않음", Object.keys(srcFrame.contentWindow).length, 0);
+
+  const plain = new FakeNode();
+  parent.appendChild(plain);
+  check("일반 노드는 그대로 반환", parent.children[2], plain);
+
+  // 13) /youtubei/v1/player 요청 body 를 "광고 없는 클라이언트"로 위조하는지
+  const playerBody = '{"context":{"client":{"clientName":"WEB"}},' +
+    '"playbackContext":{"contentPlaybackContext":{"r":1}}}';
+  const req = new windowObj.Request("/youtubei/v1/player", { body: playerBody });
+  check("player 요청 params 위조", /"params":"eAFgAQ"/.test(req.init.body), true);
+  check("playbackContext.params 위조", /"params":"eAFgAQ"/.test(req.init.body), true);
+  check("lactMilliseconds 주입", /"lactMilliseconds":"\d+"/.test(req.init.body), true);
+
+  // 14) youtubei 가 아닌 요청은 건드리지 않는지
+  const otherBody = '{"context":{"client":{}},"playbackContext":{}}';
+  const other = new windowObj.Request("/api/other", { body: otherBody });
+  check("youtubei 아닌 요청은 그대로", other.init.body, otherBody);
+
+  // 15) TextEncoder 경로도 같은 패치를 하는지
+  const encoded = new FakeTextEncoder().encode(playerBody);
+  check("TextEncoder 경로 params 위조", /"params":"eAFgAQ"/.test(encoded), true);
+
+  // 16) XMLHttpRequest.send 경로도 같은 패치를 하는지
+  const xhr = new FakeXHR();
+  xhr.send(playerBody);
+  check("XHR 경로 params 위조", /"params":"eAFgAQ"/.test(xhr.body), true);
+
+  // 17) 숏츠는 params 위조 대상이 아닌지
+  sandbox.location.href = "https://www.youtube.com/shorts/abc";
+  const shortsReq = new windowObj.Request("/youtubei/v1/player", { body: otherBody });
+  check("숏츠는 params 위조 안 함", shortsReq.init.body, otherBody);
+  sandbox.location.href = "https://www.youtube.com/watch?v=abc";
+
+  // 18) 자동 음소거(muteOnStart) 해제 — 일반 시청 페이지
+  sandbox.location.href = "https://www.youtube.com/watch?v=abc";
+  const unmuted = JSON.parse('{"playerConfig":{"audioConfig":{"muteOnStart":true}},' +
+    '"videoDetails":{"title":"t"}}');
+  check("watch 페이지 muteOnStart 해제", "muteOnStart" in unmuted.playerConfig.audioConfig, false);
+
+  // 19) 미니플레이어 자동 재생 음소거는 유지
+  const miniplayer = JSON.parse('{"playabilityStatus":{"miniplayer":true},' +
+    '"playerConfig":{"audioConfig":{"muteOnStart":true}},"videoDetails":{"title":"t"}}');
+  check("미니플레이어 muteOnStart 유지", miniplayer.playerConfig.audioConfig.muteOnStart, true);
+
+  // 20) muteOnStart 가 false 면 그대로 유지
+  const notMuted = JSON.parse('{"playerConfig":{"audioConfig":{"muteOnStart":false}},' +
+    '"videoDetails":{"title":"t"}}');
+  check("muteOnStart false 유지", notMuted.playerConfig.audioConfig.muteOnStart, false);
 
   if (failures > 0) {
     console.error("실패: " + failures + "건");

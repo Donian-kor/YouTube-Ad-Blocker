@@ -6,8 +6,9 @@
   // 광고 제거는 모든 프레임에서 하지만, 통계 보고는 큰 페이지에서만 한다 (중복 방지)
   const IS_TOP_FRAME = typeof window === "undefined" || window === window.top;
   if (typeof location === "undefined") return;
-  // 유튜브는 content.js/content-main hook이 전담하므로 중복 처리하지 않는다.
-  if (location.hostname === "studio.youtube.com") return;
+  // 유튜브는 content.js/youtube-main.js가 전담하므로 중복 처리하지 않는다.
+  // (광고 요소를 general-blocker가 먼저 지우면 유튜브의 감지 로직이 오작동한다)
+  if (/(^|\.)youtube\.com$/.test(location.hostname)) return;
   if (window.__yabGeneralInstalled) return;
   window.__yabGeneralInstalled = true;
 

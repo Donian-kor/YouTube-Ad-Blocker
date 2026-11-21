@@ -11,9 +11,10 @@ const adBlockRules = [
   { id: 4, priority: 1, action: { type: "block" }, condition: { urlFilter: "||google-analytics.com^" } },
   { id: 5, priority: 1, action: { type: "block" }, condition: { urlFilter: "||googletagmanager.com^" } },
   // YouTube 광고 스탯/추적 경로
-  // 주의: youtube.com/api/stats/ads 차단은 유튜브의 "광고 차단 감지" 신호로 쓰여
-  //       영상 재생이 막힐 수 있어 차단하지 않는다 (광고 자체는 다른 경로에서 처리)
-  { id: 7, priority: 1, action: { type: "block" }, condition: { urlFilter: "||youtube.com/pagead/" } },
+  // 주의: youtube.com/api/stats/ads 는 유튜브의 "광고 차단 감지" 신호로 쓰이므로
+  //       차단하지 않는다. 필터 목록(list-kr·filterslists-ko)에도 block 규칙이 있어
+  //       아래 youtubeAllowRules(priority 100)로 덮어쓴다.
+  //       (광고 자체는 youtube-main.js / content.js가 처리)
   // 구글 검색/콘텐츠 광고 경로
   { id: 8, priority: 1, action: { type: "block" }, condition: { urlFilter: "||google.com/pagead/" } },
   // 참고 필터(AdAway / NoriDev / List-KR) 기준 광고 전용 도메인 추가
@@ -103,8 +104,62 @@ const dogdripAllowRules = DOGDRIP_DETECTION_DOMAINS.map((domain, i) => ({
   condition: { urlFilter: "||" + domain + "^", initiatorDomains: ["dogdrip.net"] }
 }));
 
+// 유튜브의 광고 차단 감지 신호로 쓰이는 경로를 허용한다.
+// AdGuard AdBlock Ultimate 은 유튜브에 네트워크 차단 규칙을 하나도 두지 않는다.
+// list-kr·filterslists-ko·easyprivacy 필터 목록에 아래 경로의 block 규칙이 들어 있어
+// 정적 규칙(priority 1~10)을 덮어쓰도록 priority 100을 쓴다.
+// gen_204·csi_204·player_204·api/stats/qoe 는 광고와 무관한 정상 재생에도 매 시청
+// 마다 나가는 텔레메트리라, 막히면 유튜브가 비정상 클라이언트로 판단할 수 있다.
+// 광고 차단 자체는 youtube-main.js / content.js가 담당하므로 이 허용 규칙과 무관하다.
+const YOUTUBE_ALLOW_PATHS = [
+  "||youtube.com/api/stats/",
+  "||youtube.com/pagead/",
+  "||youtube.com/youtubei/v1/player/ad_break",
+  "||youtube.com/youtubei/v1/log_event",
+  "||youtube.com/ptracking?",
+  "||youtube.com/pcs/activeview?",
+  "||youtube.com/gen_204",
+  "||youtube.com/csi_204?",
+  "||youtube.com/player_204?",
+  "||youtube.com/set_awesome?",
+  "||youtube.com/get_video?",
+  "||fcmatch.youtube.com^"
+];
+const YOUTUBE_ALLOW_RULE_BASE_ID = 110;
+const youtubeAllowRules = YOUTUBE_ALLOW_PATHS.map((urlFilter, i) => ({
+  id: YOUTUBE_ALLOW_RULE_BASE_ID + i,
+  priority: 100,
+  action: { type: "allow" },
+  condition: { urlFilter }
+}));
+
+// 유튜브 광고 도메인 허용 (dogdrip.net 와 같은 원리).
+// 유튜브는 광고 소재를 못 불러오면 그 자체를 "광고 차단 감지"로 보고 경고를 띄운다.
+// 따라서 youtube.com에서 시작되는 요청에 한해서만 광고 도메인을 열어주고,
+// 다른 사이트의 광고는 계속 차단한다. 화면의 광고는 content.js가 숨기고 스킵한다.
+const YOUTUBE_AD_DOMAINS = [
+  "doubleclick.net",
+  "googlesyndication.com",
+  "googleadservices.com",
+  "2mdn.net",
+  "googletagservices.com",
+  "adservice.google.com",
+  "ads.google.com",
+  "google-analytics.com",
+  "googletagmanager.com"
+];
+const YOUTUBE_AD_ALLOW_RULE_BASE_ID = 130;
+const youtubeAdAllowRules = YOUTUBE_AD_DOMAINS.map((domain, i) => ({
+  id: YOUTUBE_AD_ALLOW_RULE_BASE_ID + i,
+  priority: 100,
+  action: { type: "allow" },
+  condition: { urlFilter: "||" + domain + "^", initiatorDomains: ["youtube.com"] }
+}));
+
 // 1~68: 이전 버전에서 등록된 잔여 규칙까지 모두 제거하기 위해 넓게 지정
 // 100: YouTube Studio 허용 규칙 / 101~109: dogdrip 감지 우회 허용 규칙
+// 110+: 유튜브 감지 신호 경로 허용 / 130+: 유튜브 광고 도메인 허용
+//      (둘 다 YOUTUBE_ALLOW_PATHS / YOUTUBE_AD_DOMAINS 개수를 따름)
 // 재적용 시 중복 ID 오류를 막기 위해 모두 함께 제거한다.
 const ALL_RULE_IDS = [
   1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
@@ -112,7 +167,9 @@ const ALL_RULE_IDS = [
   36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
   50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
   60, 61, 62, 63, 64, 65, 66, 67, 68,
-  100, 101, 102, 103, 104, 105, 106, 107, 108, 109
+  100, 101, 102, 103, 104, 105, 106, 107, 108, 109,
+  ...Array.from({ length: YOUTUBE_ALLOW_PATHS.length }, (_, i) => YOUTUBE_ALLOW_RULE_BASE_ID + i),
+  ...Array.from({ length: YOUTUBE_AD_DOMAINS.length }, (_, i) => YOUTUBE_AD_ALLOW_RULE_BASE_ID + i)
 ];
 
 // === 필터 활성화 상태 관리 ===
@@ -329,8 +386,13 @@ function applyRules(enabled) {
   updateActionIcon(enabled);
   // YouTube Studio 허용 규칙은 항상 적용 (광고 차단 대상이 아님)
   const studioAllowRule = { id: 100, priority: 100, action: { type: "allow" }, condition: { domainType: "firstParty", domains: ["studio.youtube.com"] } };
-  // 항상 적용되는 허용 규칙: Studio + dogdrip 감지 우회
-  const alwaysAllowRules = [studioAllowRule, ...dogdripAllowRules];
+  // 항상 적용되는 허용 규칙: Studio + 유튜브 감지 신호/광고 도메인 + dogdrip 감지 우회
+  const alwaysAllowRules = [
+    studioAllowRule,
+    ...youtubeAllowRules,
+    ...youtubeAdAllowRules,
+    ...dogdripAllowRules
+  ];
   chrome.declarativeNetRequest.updateDynamicRules(
     {
       addRules: enabled ? [...alwaysAllowRules, ...adBlockRules] : alwaysAllowRules,

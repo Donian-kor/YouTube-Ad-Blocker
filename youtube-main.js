@@ -87,6 +87,19 @@
     for (const key of AD_KEYS) {
       if (hasOwn(obj, key)) delete obj[key];
     }
+    // 자동 음소거 해제.
+    // 광고 응답에는 playerConfig.audioConfig.muteOnStart = true 가 들어와 유튜브가
+    // 음소거 상태로 시작한다. 정상 시청 페이지에서는 이 값을 지운다.
+    // (미니플레이어의 자동 재생 음소거는 정상 동작이므로 건드리지 않는다.)
+    try {
+      const audio = obj.playerConfig && obj.playerConfig.audioConfig;
+      if (audio && audio.muteOnStart === true) {
+        const isWatch = location.href.indexOf("/watch") !== -1;
+        const hasCards = !!obj.cards;
+        const isMiniplayer = !!(obj.playabilityStatus && obj.playabilityStatus.miniplayer);
+        if (!isMiniplayer && (isWatch || hasCards)) delete audio.muteOnStart;
+      }
+    } catch (e) { /* 무시 */ }
     // Shorts / 광고 클라이언트 파라미터의 isAd 플래그를 false로 되돌린다
     if (obj.adClientParams && typeof obj.adClientParams === "object") {
       obj.adClientParams.isAd = false;
@@ -137,34 +150,99 @@
     return typeof value === "string" ? cleanText(value) : cleanObject(value);
   }
 
-  // === 1) Promise.then 콜백 후킹 ===
-  // 플레이어 응답을 처리하는 콜백(.next( 또는 jspbResponseCtor)만 골라 값을 정리한다.
-  // 모든 then 콜백을 건드리면 유튜브 전체가 느려지므로 대상만 선별한다.
-  const nativeThen = Promise.prototype.then;
-  Promise.prototype.then = function (onFulfilled, onRejected) {
-    if (typeof onFulfilled === "function" && enabled) {
-      const src = Function.prototype.toString.call(onFulfilled);
-      const isAdCallback = src.indexOf(".next(") !== -1 || src.indexOf("jsonpResponseCtor") !== -1;
-      if (isAdCallback) {
-        // 원본을 지역 변수에 반드시 캡처한다.
-        // (그냥 onFulfilled를 재할당하면 클로저가 새 함수를 가리켜 무한 재귀가 발생한다)
-        const original = onFulfilled;
-        onFulfilled = function (value) {
-          return original.call(this, clean(value));
-        };
-      }
-    }
-    return nativeThen.call(this, onFulfilled, onRejected);
-  };
+  // === 1) 광고 차단 "감지" 자체를 무력화 ===
+  // AdGuard 필터 목록(filter_1)에 이번에 추가된 유튜브 대응을 이식한 부분이다.
+  // 지금까지의 후킹은 "광고 데이터를 지우는" 쪽만 있었고, 유튜브가 감지 결과를
+  // 서버/플레이어로 보고하는 경로는 그대로 두어 경고가 계속 떴다.
 
-  // === 2) JSON.parse 후킹 ===
+  // 1-1) 감지 결과 보고 콜백(onAbnormalityDetected)을 빈 함수로 교체한다.
+  //      유튜브는 광고 데이터가 사라진 것을 감지하면 이 콜백으로 이상 징후를 보고한다.
+  const DETECT_CALLBACK = "onAbnormalityDetected";
+  // 1-2) 네이티브 함수 여부 검사 타이머(17초)를 즉시 실행되게 단축한다.
+  //      콜백 소스에 "[native code]" 가 있고 지연이 17000ms 인 것만 대상.
+  //      페이지 초기화가 덜 끝난 시점에 검사가 돌아가도록 해 "정상"으로 판정되게 한다.
+  const AD_CHECK_DELAY = 17000;
+  const AD_CHECK_FACTOR = 0.001;
+  // 1-3) 유튜브가 붙이는 about:blank iframe 이 후킹 여부를 별도로 검사하지 못하게
+  //      페이지의 fetch·Request 를 그 iframe 에 물려준다.
+  function neutralizeDetection() {
+    const nativeSetTimeout = window.setTimeout;
+    if (typeof nativeSetTimeout === "function") {
+      try {
+        window.setTimeout = new Proxy(nativeSetTimeout, {
+          apply(target, thisArg, args) {
+            try {
+              const cb = args[0];
+              if (args[1] === AD_CHECK_DELAY && typeof cb === "function" &&
+                  Function.prototype.toString.call(cb).indexOf("[native code]") !== -1) {
+                args[1] = Math.max(1, Math.round(AD_CHECK_DELAY * AD_CHECK_FACTOR));
+              }
+            } catch (e) { /* 검사 실패는 원래 동작 유지 */ }
+            return Reflect.apply(target, thisArg, args);
+          }
+        });
+      } catch (e) { /* 재정의 불가 환경은 건너뜀 */ }
+    }
+
+    if (typeof Node !== "undefined" && Node.prototype && Node.prototype.appendChild) {
+      try {
+        Node.prototype.appendChild = new Proxy(Node.prototype.appendChild, {
+          apply(target, thisArg, args) {
+            const node = Reflect.apply(target, thisArg, args);
+            try {
+              if (!node || typeof HTMLIFrameElement === "undefined" || !(node instanceof HTMLIFrameElement)) return node;
+              if (node.src !== "" && node.src !== "about:blank") return node;
+              const win = node.contentWindow;
+              if (!win) return node;
+              win.fetch = window.fetch;
+              win.Request = window.Request;
+            } catch (e) { /* iframe 접근 불가 */ }
+            return node;
+          }
+        });
+      } catch (e) { /* 재정의 불가 환경은 건너뜀 */ }
+    }
+  }
+
+  // === 2) Promise.then 콜백 후킹 ===
+  // ① 감지 보고 콜백은 빈 함수로 바꾸고, ② 플레이어 응답을 다루는 콜백
+  //    (.next( 또는 jsonpResponseCtor)의 값을 정리한다.
+  // Proxy로 감싸 Function.prototype.toString 이 "[native code]" 로 보이게 한다.
+  neutralizeDetection();
+  const nativeThen = Promise.prototype.then;
+  Promise.prototype.then = new Proxy(nativeThen, {
+    apply(target, thisArg, args) {
+      if (enabled && typeof args[0] === "function") {
+        const src = Function.prototype.toString.call(args[0]);
+        if (src.indexOf(DETECT_CALLBACK) !== -1) {
+          args[0] = function () {};
+        } else if (src.indexOf(".next(") !== -1 || src.indexOf("jsonpResponseCtor") !== -1) {
+          // 원본을 지역 변수로 반드시 캡처한다.
+          // (그냥 args[0]를 재할당하면 클로저가 새 함수를 가리켜 무한 재귀가 발생한다)
+          const original = args[0];
+          args[0] = function (value) {
+            return original.call(this, clean(value));
+          };
+        }
+      }
+      return Reflect.apply(target, thisArg, args);
+    }
+  });
+
+  // === 3) JSON.parse 후킹 ===
   const nativeParse = JSON.parse;
   JSON.parse = function (text, reviver) {
     const result = nativeParse.call(this, text, reviver);
-    return enabled ? cleanObject(result) : result;
+    if (!enabled) return result;
+    // 재생 불가 응답이면 다음 params 값으로 스푸핑 단계를 전진시킨다.
+    try {
+      const status = result && result.playabilityStatus && result.playabilityStatus.status;
+      if (status === "LOGIN_REQUIRED" || status === "CONTENT_CHECK_REQUIRED") advanceSpoof();
+    } catch (e) { /* 무시 */ }
+    return cleanObject(result);
   };
 
-  // === 3) Response.json 후킹 ===
+  // === 4) Response.json 후킹 ===
   if (window.Response && window.Response.prototype && window.Response.prototype.json) {
     const nativeJson = window.Response.prototype.json;
     window.Response.prototype.json = function () {
@@ -172,7 +250,7 @@
     };
   }
 
-  // === 4) XMLHttpRequest 응답 후킹 (uBO trusted-replace-xhr-response 대응) ===
+  // === 5) XMLHttpRequest 응답 후킹 (uBO trusted-replace-xhr-response 대응) ===
   // 유튜브는 /youtubei/v1/player, /get_watch 응답을 XHR로 읽기도 한다.
   if (typeof XMLHttpRequest !== "undefined" && XMLHttpRequest.prototype) {
     ["responseText", "response"].forEach((prop) => {
@@ -191,7 +269,7 @@
     });
   }
 
-  // === 5) 초기 플레이어/데이터 응답 후킹 ===
+  // === 6) 초기 플레이어/데이터 응답 후킹 ===
   // 인라인 스크립트로 넣는 ytInitialPlayerResponse / ytInitialData 는 JSON.parse를 거치지 않는다.
   // document_start 시점에 setter를 미리 정의해 나중에 대입되는 값을 잡는다.
   function hookInitial(name) {
@@ -213,6 +291,121 @@
   }
   hookInitial("ytInitialPlayerResponse");
   hookInitial("ytInitialData");
+
+  // === 7) 요청 스푸핑 (AdGuard filter_1 "pyv" 스크립틀릿 이식) ===
+  // 지금까지의 후킹은 "응답에서 광고 데이터를 지우는" 쪽만 했다.
+  // 그러나 서버는 계속 광고 config를 내려주고, 플레이어는 광고를 재생하려다
+  // 실패하거나 화면에서 숨겨지므로 "광고 차단을 쓰는 클라이언트"로 보고된다.
+  // AdGuard 는 요청 body 자체를 "광고를 받지 않는 클라이언트"로 위조해
+  // 서버가 애초에 광고를 실어 보내지 않게 만든다.
+  // 광고 소재 도메인을 허용해도 광고 자체가 만들어지지 않으므로 감지도 없다.
+  const SPOOF_PARAMS = ["eAFgAQ", "8AUB"];
+  let spoofIndex = 0;
+
+  // 숏츠·TV·임베드는 params 위조 대상이 아니므로 제외한다.
+  function isSpoofSkipped() {
+    const href = location.href;
+    return href.indexOf("/shorts/") !== -1 ||
+      href.indexOf("youtube.com/tv") !== -1 ||
+      href.indexOf("youtube.com/embed/") !== -1;
+  }
+
+  // 재생 불가 응답(LOGIN_REQUIRED / CONTENT_CHECK_REQUIRED)을 받으면
+  // 다음 params 값으로 한 단계 전진한다.
+  function advanceSpoof() {
+    if (spoofIndex < SPOOF_PARAMS.length - 1) spoofIndex++;
+  }
+
+  function patchPlayerRequest(obj) {
+    try {
+      if (!obj || typeof obj !== "object" || !obj.context || !obj.context.client) return obj;
+      if (isSpoofSkipped()) return obj;
+      if (obj.context.client.clientScreen === "CHANNEL") return obj;
+
+      const params = SPOOF_PARAMS[spoofIndex];
+      obj.params = params;
+      if (obj.playerRequest && typeof obj.playerRequest === "object") obj.playerRequest.params = params;
+
+      const pc = obj.playbackContext;
+      if (pc && typeof pc === "object") {
+        pc.params = params;
+        delete pc.adPlaybackContext;
+        if (pc.contentPlaybackContext) {
+          // 정상 시청 중인 것처럼 보이게 하는 필수 값
+          pc.contentPlaybackContext.lactMilliseconds = String(Date.now());
+        }
+      }
+      // 앱 설치 정보는 광고 차단 탐지에 쓰이므로 제거한다.
+      if (obj.context.client.configInfo) delete obj.context.client.configInfo.appInstallData;
+    } catch (e) { /* 실패 시 원래 요청을 그대로 보낸다 */ }
+    return obj;
+  }
+
+  function patchBodyText(text) {
+    if (typeof text !== "string") return text;
+    if (text.indexOf('"contentPlaybackContext"') === -1 && text.indexOf('"adSignalsInfo"') === -1) return text;
+    try {
+      const obj = JSON.parse(text);
+      if (!obj || !obj.context || !obj.context.client) return text;
+      return JSON.stringify(patchPlayerRequest(obj));
+    } catch (e) { return text; }
+  }
+
+  // 7-1) JSON.stringify — fetch body 직렬화 경로
+  JSON.stringify = new Proxy(JSON.stringify, {
+    apply(target, thisArg, args) {
+      try {
+        const v = args[0];
+        if (enabled && v && typeof v === "object" && v.context && v.context.client &&
+            (v.playbackContext || v.playerRequest || v.adSignalsInfo)) {
+          args[0] = patchPlayerRequest(v);
+        }
+      } catch (e) { /* 무시 */ }
+      return Reflect.apply(target, thisArg, args);
+    }
+  });
+
+  // 7-2) Request 생성자 — fetch(new Request(...)) 경로
+  if (typeof Request !== "undefined" && Request.prototype) {
+    window.Request = new Proxy(Request, {
+      construct(target, args, newTarget) {
+        try {
+          const url = args[0];
+          const init = args[1];
+          const u = typeof url === "string" ? url : (url && url.url) || "";
+          if (enabled && u.indexOf("youtubei") !== -1 && init && typeof init.body === "string") {
+            init.body = patchBodyText(init.body);
+          }
+        } catch (e) { /* 무시 */ }
+        return Reflect.construct(target, args, newTarget);
+      }
+    });
+  }
+
+  // 7-3) XMLHttpRequest.send — 유튜브는 XHR 로도 player 요청을 보낸다
+  if (typeof XMLHttpRequest !== "undefined" && XMLHttpRequest.prototype &&
+      XMLHttpRequest.prototype.send) {
+    XMLHttpRequest.prototype.send = new Proxy(XMLHttpRequest.prototype.send, {
+      apply(target, thisArg, args) {
+        try {
+          if (enabled && typeof args[0] === "string") args[0] = patchBodyText(args[0]);
+        } catch (e) { /* 무시 */ }
+        return Reflect.apply(target, thisArg, args);
+      }
+    });
+  }
+
+  // 7-4) TextEncoder.encode — 위 세 경로를 우회하는 직렬화
+  if (typeof TextEncoder !== "undefined" && TextEncoder.prototype && TextEncoder.prototype.encode) {
+    TextEncoder.prototype.encode = new Proxy(TextEncoder.prototype.encode, {
+      apply(target, thisArg, args) {
+        try {
+          if (enabled && typeof args[0] === "string") args[0] = patchBodyText(args[0]);
+        } catch (e) { /* 무시 */ }
+        return Reflect.apply(target, thisArg, args);
+      }
+    });
+  }
   } // end startHooking
 
   boot();

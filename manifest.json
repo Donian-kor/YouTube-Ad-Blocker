@@ -262,19 +262,19 @@
         "*://*.youtube.com/*"
       ],
       "js": [
-        "youtube-main.js"
+        "content.js"
       ],
-      "run_at": "document_start",
-      "world": "MAIN"
+      "run_at": "document_start"
     },
     {
       "matches": [
         "*://*.youtube.com/*"
       ],
       "js": [
-        "content.js"
+        "youtube-main.js"
       ],
-      "run_at": "document_start"
+      "run_at": "document_start",
+      "world": "MAIN"
     },
     {
       "matches": [

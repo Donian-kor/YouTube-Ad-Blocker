@@ -1,5 +1,7 @@
 // www_AD_Blocker - Content Script
-// YouTube 페이지에 주입되어 광고 DOM을 제거하고 통계를 보고
+// YouTube 페이지에 주입되어 광고를 CSS로 숨기고 통계를 보고한다.
+// 광고를 DOM에서 제거하거나 video 재생 위치를 조작하면 유튜브 광고 차단 감지에
+// 노출되므로, 화면 은닉은 CSS에만 맡긴다. (AdGuard AdBlock Ultimate 과 같은 방식)
 
 (function () {
   "use strict";
@@ -9,54 +11,17 @@
   if (typeof location !== "undefined" && location.hostname === "studio.youtube.com") return;
 
   // === 활성화 상태 관리 ===
+  // 주의: 여기에 "이 확장"을 식별할 수 있는 흔적을 남기면 유튜브 광고 차단 감지에
+  // 그대로 노출된다. 과거에는 <html> 에 data-yab-* 속성을 심고
+  // window.postMessage({source:"yab-extension"}) 을 방송했는데, 페이지의 어떤
+  // 스크립트든 이 두 가지를 1줄로 읽어 확장을 특정할 수 있었다.
+  // MAIN world 스크립트와의 통신이 필요 없어져(스크립틀릿 미사용) 전부 제거했다.
   let enabled = true;
-
-  // MAIN world(youtube-main.js)와 주고받을 임시 토큰.
-  // 페이지 로드마다 새로 만들고 DOM에 심어두어, 웹사이트가 고정 문자열만으로
-  // 토글 상태 메시지를 위조하지 못하게 한다.
-  const STATE_TOKEN = (function () {
-    try {
-      if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
-        return crypto.randomUUID();
-      }
-    } catch (e) { /* 구형 브라우저에서는 아래 폴백 사용 */ }
-    return "yab-" + Math.random().toString(36).slice(2) + "-" + Date.now().toString(36);
-  })();
-  function plantToken() {
-    try {
-      if (document.documentElement) {
-        document.documentElement.setAttribute("data-yab-state-token", STATE_TOKEN);
-        return true;
-      }
-    } catch (e) { /* 무시 */ }
-    return false;
-  }
-  // MAIN world가 document_start에서 바로 읽을 수 있도록 초기 토글 상태도 심는다
-  function plantInitialState() {
-    if (!plantToken()) return;
-    try {
-      chrome.storage.local.get(["adBlockerEnabled"], (res) => {
-        const on = res.adBlockerEnabled !== false;
-        document.documentElement.setAttribute("data-yab-enabled", on ? "1" : "0");
-      });
-    } catch (e) { /* 무시 */ }
-  }
-  plantInitialState();
-  if (typeof document !== "undefined") {
-    document.addEventListener("readystatechange", plantInitialState, { once: true });
-  }
+  let hideStyle = null;
 
   function applyEnabled(value) {
     enabled = value;
-    const style = document.getElementById("yab-ad-hide-style");
-    if (style) style.disabled = !enabled;
-
-    // MAIN world(youtube-main.js)에 토글 상태 전달
-    try {
-      window.postMessage({ source: "yab-extension", token: STATE_TOKEN, type: "enabled", value: enabled }, "*");
-    } catch (e) {
-      // 전달 실패 시 무시
-    }
+    if (hideStyle) hideStyle.disabled = !enabled;
   }
 
   function loadEnabled() {
@@ -79,10 +44,12 @@
   });
 
   // === CSS로 광고 요소 즉시 숨김 (그려지기 전에 차단해 깜빡임 방지) ===
+  // style 요소에 id 를 붙이지 않는다. id 는 페이지에서 getElementById 로
+  // 바로 조회되므로 확장 식별 표식이 된다. 참조는 클로저 변수로만 유지한다.
   function injectAdStyles() {
-    if (document.getElementById("yab-ad-hide-style")) return;
+    if (hideStyle) return;
     const style = document.createElement("style");
-    style.id = "yab-ad-hide-style";
+    hideStyle = style;
     const adSelectors = [
       "#masthead-ad",
       "#player-ads",
@@ -163,22 +130,17 @@
 
   let removedCount = 0;
 
-  // 선택자에 해당하는 요소를 "전부" 제거한다.
-  // (querySelector 한 건만 지우면 같은 광고가 여러 개 있을 때 남는다)
-  function removeAd(selector) {
-    const elements = document.querySelectorAll(selector);
+  // 유튜브 광고는 DOM에서 지우지 않고 "감지"만 한다.
+  // 광고 요소를 remove() 하거나 video.currentTime 을 조작하는 동작은
+  // 유튜브의 광고 차단 감지에 그대로 노출되어 경고를 유발한다.
+  // (AdGuard AdBlock Ultimate 도 유튜브에서 DOM 제거·탐색 하지 않고 CSS 은닉만 한다.)
+  // 실제 화면 은닉은 위 injectAdStyles()의 CSS가 담당한다.
+  function countAds(selector) {
     let count = 0;
-    for (const el of elements) {
-      if (el && el.parentNode) {
-        // 홈 그리드에서는 광고 렌더러를 감싼 셀도 함께 지워야 빈 칸이 남지 않는다.
-        const cell = el.closest("ytd-rich-item-renderer");
-        el.remove();
-        if (cell && cell.parentNode) {
-          const content = cell.querySelector("#content");
-          if (content && content.children.length === 0) cell.remove();
-        }
-        count++;
-      }
+    try {
+      count = document.querySelectorAll(selector).length;
+    } catch (e) {
+      return 0; // 잘못된 선택자는 무시
     }
     if (count > 0) removedCount += count;
     return count > 0;
@@ -186,68 +148,13 @@
 
   function cleanupAds() {
     if (!enabled) return;
-    AD_SELECTORS.forEach(removeAd);
-
-    const overlays = document.querySelectorAll(
-      "[class*='ad-overlay'], [class*='adOverlay'], [class*='ad-cover']"
-    );
-    overlays.forEach((el) => el.remove());
-
-    skipVideoAds();
-    restorePlayerControls();
+    AD_SELECTORS.forEach(countAds);
   }
 
-  // === 영상 광고 자동 스킵 ===
-  // 유튜브 영상 광고는 본 영상과 같은 video 태그/CDN을 쓰기 때문에
-  // 네트워크 차단 대신 "건너뛰기 버튼 클릭" 또는 "광고 끝으로 이동"으로 처리
-  let adInProgress = false;
-
-  function skipVideoAds() {
-    if (!enabled) return;
-
-    const player = document.querySelector(".html5-video-player.ad-showing");
-    if (!player) {
-      adInProgress = false;
-      return;
-    }
-
-    const video = player.querySelector("video") || document.querySelector("video");
-    const skipBtn = player.querySelector(
-      ".ytp-ad-skip-button, .ytp-skip-ad-button, .ytp-ad-skip-button-modern, .ytp-ad-skip-button-container button"
-    );
-
-    if (skipBtn && !skipBtn.disabled) {
-      skipBtn.click();
-    } else if (video && video.duration && isFinite(video.duration) && video.duration > 0) {
-      // 광고 영상을 끝 지점으로 이동시켜 즉시 종료
-      if (video.currentTime < video.duration - 0.5) {
-        try {
-          video.currentTime = video.duration - 0.1;
-        } catch (e) {
-          // 이동 실패 시 무시 (다음 틱에 재시도)
-        }
-      }
-    }
-
-    // 광고 1건당 한 번만 카운트
-    if (!adInProgress) {
-      adInProgress = true;
-      removedCount++;
-    }
-  }
-
-  function restorePlayerControls() {
-    if (!enabled) return;
-    const player = document.querySelector("#player");
-    if (player) {
-      player.style.visibility = "visible";
-      player.style.opacity = "1";
-    }
-    const video = document.querySelector("video");
-    if (video) {
-      video.style.visibility = "visible";
-    }
-  }
+  // === 영상 광고 자동 스킵은 하지 않는다 ===
+  // "건너뛰기 버튼 클릭"과 "광고 끝으로 이동(video.currentTime 조작)"은 둘 다
+  // 광고가 정상 재생되지 않았다는 명백한 신호라 유튜브 광고 차단 감지에 노출된다.
+  // 프리롤 광고는 youtube-main.js가 플레이어 응답에서 광고 데이터를 걷어내 처리한다.
 
   // === MutationObserver ===
   const observer = new MutationObserver((mutations) => {
@@ -286,34 +193,13 @@
     document.addEventListener("readystatechange", retry);
   }
 
-  // 다른 스크립트(general-blocker.js)에 의해 안쪽만 지워진 그리드 셀도 정리한다.
-  // 로딩 중인 셀을 지우지 않도록 일정 시간 이상 비어 있는 셀만 대상으로 한다.
-  const emptyCellSince = new WeakMap();
-  function cleanupEmptyGridCells() {
-    if (!enabled) return;
-    const now = Date.now();
-    document.querySelectorAll("ytd-rich-item-renderer").forEach((cell) => {
-      const content = cell.querySelector("#content");
-      if (content && content.children.length === 0) {
-        const since = emptyCellSince.get(cell);
-        if (since === undefined) emptyCellSince.set(cell, now);
-        else if (now - since >= 5000) cell.remove();
-      } else {
-        emptyCellSince.delete(cell);
-      }
-    });
-  }
+  // 그리드 셀 정리도 하지 않는다. (general-blocker.js 가 유튜브에서 꺼져 있어
+  // 셀이 비는 상황 자체가 발생하지 않고, DOM 조작은 감지 신호가 된다.)
 
-  // 주기적 재확인
+  // 주기적 재확인 (DOM 을 건드리지 않고 개수만 센다)
   setInterval(() => {
     cleanupAds();
-    cleanupEmptyGridCells();
   }, 2000);
-
-  // 광고 스킵은 0.5초 간격으로 빠르게 감지
-  setInterval(() => {
-    skipVideoAds();
-  }, 500);
 
   // 초기 실행
   setTimeout(() => {
